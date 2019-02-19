@@ -1,0 +1,318 @@
+/* clearfix */
+
+.clearfix {
+  @include clearfix;
+}
+
+/* vertical-align */
+
+.align-baseline {
+  vertical-align: baseline !important;
+}
+
+.align-top {
+  vertical-align: top !important;
+}
+
+.align-middle {
+  vertical-align: middle !important;
+}
+
+.align-bottom {
+  vertical-align: bottom !important;
+}
+
+.align-text-bottom {
+  vertical-align: text-bottom !important;
+}
+
+.align-text-top {
+  vertical-align: text-top !important;
+}
+
+/* text-hide */
+
+.text-hide {
+  @include text-hide;
+}
+
+/* text-transformation */
+
+.text-lowercase {
+  text-transform: lowercase !important;
+}
+
+.text-uppercase {
+  text-transform: uppercase !important;
+}
+
+.text-capitalize {
+  text-transform: capitalize !important;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Weight and italics */
+
+.font-weight-light {
+  font-weight: 300 !important;
+}
+
+.font-weight-normal {
+  font-weight: 400 !important;
+}
+
+.font-weight-medium {
+  font-weight: 500 !important;
+}
+
+.font-weight-semibold {
+  font-weight: 600 !important;
+}
+
+.font-weight-bold {
+  font-weight: 700 !important;
+}
+
+.font-italic {
+  font-style: italic !important;
+}
+
+/* Responsive alignment */
+
+.text-justify {
+  text-align: justify !important;
+}
+
+.text-nowrap {
+  white-space: nowrap !important;
+}
+
+/* text-align */
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .text#{$infix}-left {
+      text-align: left !important;
+    }
+
+    .text#{$infix}-right {
+      text-align: right !important;
+    }
+
+    .text#{$infix}-center {
+      text-align: center !important;
+    }
+  }
+}
+
+/* border-radius */
+
+.rounded-circle {
+  border-radius: 50% !important;
+}
+
+/* float */
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .float#{$infix}-left {
+      @include float-left;
+    }
+
+    .float#{$infix}-right {
+      @include float-right;
+    }
+
+    .float#{$infix}-none {
+      @include float-none;
+    }
+  }
+}
+
+/* 1.width and height
+   2.spacing(marign)
+*/
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    @each $prop,
+      $abbrev in (width: w, height: h) {
+      @each $size, $length in $sizes {
+        .#{$abbrev}#{$infix}-#{$size} {
+          #{$prop}: $length !important;
+        }
+      }
+    }
+
+    .m#{$infix}-0 {
+      margin: 0 !important;
+    }
+
+    .mt#{$infix}-0 {
+      margin-top: 0 !important;
+    }
+
+    .mr#{$infix}-0 {
+      margin-right: 0 !important;
+    }
+
+    .mb#{$infix}-0 {
+      margin-bottom: 0 !important;
+    }
+
+    .ml#{$infix}-0 {
+      margin-left: 0 !important;
+    }
+  }
+}
+
+/* list-rest */
+
+.list-unstyle {
+  @include list-unstyle;
+}
+
+/* postion */
+
+.fixed-top {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: $zindex-fixed;
+}
+
+.fixed-bottom {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: $zindex-fixed;
+}
+
+.position-static {
+  position: static !important;
+}
+
+/* Visibility */
+
+.visible {
+  visibility: visible;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+/* Show & Hide */
+
+.show-mobile {
+  @include media(tablet) {
+    display: none !important;
+  }
+}
+
+.hide-mobile {
+  @include media(mobile) {
+    display: none !important;
+  }
+}
+
+.show-tablet {
+  @include media(mobile) {
+    display: none !important;
+  }
+
+  @include media(desktop) {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  @include media(onlyTablet) {
+    display: none !important;
+  }
+}
+
+.show-desktop {
+  @include media(noDesktop) {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @include media(desktop) {
+    display: none !important;
+  }
+}
+
+//no-scroll
+.no-scroll {
+  overflow: hidden;
+}
+
+//mobile background
+.bg-white-mobile {
+  @include media(mobile) {
+    background: #ffffff;
+  }
+}
+
+//mobile text center
+.text-xs-center {
+  @include media(mobile) {
+    text-align: center;
+  }
+}
+
+// space
+.no-padding {
+  padding: 0 !important;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+// input-hide
+.input-hide {
+  position: absolute;
+  width: .01rem;
+  height: .01rem;
+  border: 0;
+  opacity: 0;
+}
+
+// App-header
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1029;
+  width: 100%;
+}
+
+//border
+.no-border {
+  border: none !important;
+}
+
+//empty data style
+.empty-data {
+  color: #252525;
+  font-size: .17rem;
+  font-weight: 500;
+  line-height: .25rem;
+  padding: .18rem .15rem;
+}
