@@ -56,7 +56,7 @@ import PriceDetail from './pages/mall/Inquiry/Price/PriceDetail';
 
 
 // report working hour
-import ReportWorkingHour from './pages/ReportWorkingHour'
+import DailyReport from './pages/DailyReport'
 
 
 // ice 会自动在这个变量下添加路由数据
@@ -74,10 +74,10 @@ import ReportWorkingHour from './pages/ReportWorkingHour'
 // 下面两个页面就是对比 你可以分别观察两个页面上显示的路由数据差异
 const routerConfig = [
   {
-     path: '/reportWorkingHour',
-     name: 'ReportWorkingHour',
+     path: '/dailyReport',
+     name: 'DailyReport',
      layout: Blank,
-     component: ReportWorkingHour
+     component: DailyReport
   },
   {
     path: '/',

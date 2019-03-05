@@ -24,6 +24,7 @@
       <el-table
         ref="multipleTable"
         class="fillTable"
+        :data="tableData"
       >
         <el-table-column
           type="selection"
@@ -34,18 +35,32 @@
           prop="name"
           label="项目/产品名称 "
           >
+          <el-select placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-table-column>
 
         <el-table-column
           prop="name"
           label="报工时长"
           >
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.hour" placeholder="请输入内容"></el-input>
+          </template>
         </el-table-column>
 
         <el-table-column
           prop="name"
           label="备注信息"
           >
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.message" placeholder="请输入内容"></el-input>
+          </template>
         </el-table-column>
 
       </el-table>
@@ -58,7 +73,14 @@
     
     data () {
       return {
-        date: ''
+        date: '',
+        tableData: [
+          {
+            projectName: '',
+            workingHour: '',
+            message: ''
+          }
+        ]
       }
     }
   }
