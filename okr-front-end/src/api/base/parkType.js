@@ -32,6 +32,5 @@ export default {
    */
   saveParkType (detail) {
     return axios.post('/park/type/saveParkType.json', detail)
-  },
-
+  }
 }
