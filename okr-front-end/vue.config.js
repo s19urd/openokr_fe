@@ -7,6 +7,7 @@ function resolve (dir) {
 }
 
 // 基础路径 注意发布之前要先修改这里
+
 const baseUrl = env === 'development' ? '/' : '/tenement-app-web/'
 
 module.exports = {
@@ -15,7 +16,7 @@ module.exports = {
   // lintOnSave: true,
   devServer: {
     // 和 baseUrl 保持一致
-    publicPath: baseUrl,
+    publicPath: process.env.BASE_URL,
     // 代理设置
     proxy: {
       '/.*\.(json|htm)': {
@@ -23,7 +24,8 @@ module.exports = {
         //小郑
         //target:'http://172.16.135.36:8077/tenement-app-web',
         //阿二
-        target:'http://172.16.135.169:8077/tenement-app-web',
+        // target:'http://172.16.135.169:8077/tenement-app-web',
+        target: 'http://172.16.135.169:8892',
         //广荣
         // target:'http://localhost:8077/tenement-app-web',
         // target:'http://192.168.0.5:8077/tenement-app-web',

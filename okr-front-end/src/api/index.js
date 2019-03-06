@@ -39,6 +39,9 @@ import pimPermission from './pim/permission'
 //线上报价
 import inquiry from './mall/inquiry'
 
+//okr reprot hour
+import dailyWork from './okr/dailyWork'
+
 export default {
   common,
   corp,
@@ -84,5 +87,8 @@ export default {
     follow: pimFollow,
     project: pimProject,
     permission: pimPermission
+  },
+  okr: {
+    dailyWork: dailyWork
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <d2-container>    
     <el-form class="">
-      <div class="tip"><img src="public/image/okr/icon-happy.png"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～</div>
+      <div class="tip"><img src="../../../public/image/okr/icon-happy.png"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～</div>
       <div class="baseOperationWrap">
         <el-date-picker
           v-model="date"
@@ -34,7 +34,7 @@
           label="项目/产品名称"
           >
           <template slot-scope="scope">
-            <el-select v-model="scope.row.projectName" placeholder="请选择">
+            <el-select v-model="scope.row.taskName" placeholder="请选择">
               <el-option
                 v-for="item in projectList"
                 :key="item.value"
@@ -50,7 +50,7 @@
           label="报工时长"
           >
           <template slot-scope="scope">
-            <el-input v-model="scope.row.workingHour" type="number" placeholder="请输入" @change="changeTime"></el-input>
+            <el-input v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
           </template>
         </el-table-column>
 
@@ -59,7 +59,7 @@
           label="备注信息"
           >
           <template slot-scope="scope">
-            <el-input v-model="scope.row.message" placeholder="请输入内容"></el-input>
+            <el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
           </template>
         </el-table-column>
 
@@ -86,10 +86,11 @@
         date: '',
         tableData: [],
         initItemData: {
-           index: '',
-           projectName: '',
-           workingHour: '',
-           message: ''
+          id: '',
+          taskName: '',
+          duration: '',
+          remark: '',
+          reportDay: ''
         },
         projectList: [
           { value: '项目/产品名称1', label: '项目/产品名称1' },
@@ -110,7 +111,7 @@
     methods:{
       add () {
         let taskItem = Object.assign({}, this.initItemData)
-        taskItem.index = ++(this.maxLength)
+        taskItem.id = ++(this.maxLength)
         this.tableData.push(taskItem)
       },
 
@@ -125,21 +126,41 @@
       changeTime () {
         let sumTemp = 0
         this.tableData.forEach(item => {
-          sumTemp = sumTemp + Number(item.workingHour)
+          sumTemp = sumTemp + Number(item.duration)
         })
         this.sumWorkingHour = sumTemp
       },
 
       submit () {
-        console.log(this.tableData)
+        this.tableData.forEach(item => {
+          item.reportDay = this.date
+        })
+        this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
+          console.log(this.tableData)
+          console.log(res.data)
+        })
       }
     }
   }
 </script>
 <style lang="scss">
   .tip {
+    display: flex;
+    align-items: center;
     padding: 22px 0px;
     border-bottom: 1px solid rgb(243, 243, 243);
+    font-size: 14px;
+    font-weight: bold;
+    color: #4c84ff;
+
+    img {
+      margin-right: 10px;
+    }
+  }
+
+  .sumWorkingHour {
+    color: #545454;
+    font-size: 14px;
   }
 
   .baseOperationWrap {

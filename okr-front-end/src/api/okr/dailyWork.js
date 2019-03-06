@@ -6,7 +6,9 @@ export default {
    * @return {*}
    */
 
-   submitDailyWork (dailyWork) {
-     return axios.post('')
-   }
+  submitDailyWork (dailyWork) {
+    return axios.post('/api/daily/saveDailyList.json', 
+      { dailyList: dailyWork }
+    )
+  }
 }
