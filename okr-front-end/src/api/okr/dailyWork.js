@@ -6,9 +6,21 @@ export default {
    * @return {*}
    */
 
-  submitDailyWork (dailyWork) {
-    return axios.post('/api/daily/saveDailyList.json', 
-      { dailyList: dailyWork }
+  submitDailyWork (dailyList) {
+    console.log(dailyList)
+    return axios.post('/api/daily/saveDailyList.json', dailyList
     )
-  }
+  },
+
+  /**
+   * POST /task/getTaskListByPage.json
+   * 寻找项目列表
+   * @return {*}
+   */
+
+   queryTaskListByPage () {
+     return axios.post('/task/getTaskListByPage.json', {
+        pageSize: 100
+     })
+   }
 }

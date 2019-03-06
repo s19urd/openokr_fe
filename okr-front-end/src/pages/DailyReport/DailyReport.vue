@@ -34,7 +34,7 @@
           label="项目/产品名称"
           >
           <template slot-scope="scope">
-            <el-select v-model="scope.row.taskName" placeholder="请选择">
+            <el-select filterable v-model="scope.row.taskId" placeholder="请选择">
               <el-option
                 v-for="item in projectList"
                 :key="item.value"
@@ -62,7 +62,6 @@
             <el-input v-model="scope.row.remark" placeholder="请输入内容"></el-input>
           </template>
         </el-table-column>
-
       </el-table>
 
       <div class="formFooter">
@@ -71,7 +70,20 @@
           <span class="time">{{ sumWorkingHour }}</span>
           <label>h</label>
         </div>
-        <el-button type="primary" @click="submit">完成今日报工</el-button>
+        <el-button type="primary" @click="dialogVisible = true">完成今日报工</el-button>
+        <el-dialog
+          title="提示"
+          :visible.sync="dialogVisible"
+          width="40%">
+          <span><i class="el-icon-warning"></i>每日仅能提交一次报工且提交后不可修改</span>
+          <span slot="footer" class="dialog-footer">
+            <el-checkbox class="checked" v-model="checked">不再提示</el-checkbox>
+            <div class="buttonWrap">
+              <el-button @click="dialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="submit">确 定</el-button>
+            </div>
+          </span>
+        </el-dialog>
       </div>
     </el-form>
   </d2-container>
@@ -87,24 +99,17 @@
         tableData: [],
         initItemData: {
           id: '',
-          taskName: '',
+          taskId: '',
           duration: '',
           remark: '',
           reportDay: ''
         },
-        projectList: [
-          { value: '项目/产品名称1', label: '项目/产品名称1' },
-          { value: '项目/产品名称2', label: '项目/产品名称2' },
-          { value: '项目/产品名称3', label: '项目/产品名称3' },
-          { value: '项目/产品名称4', label: '项目/产品名称4' },
-          { value: '项目/产品名称5', label: '项目/产品名称5' },
-          { value: '项目/产品名称6', label: '项目/产品名称6' },
-          { value: '项目/产品名称7', label: '项目/产品名称7' },
-          { value: '项目/产品名称8', label: '项目/产品名称8' }
-        ],
+        projectList: [],
         multipleSelection: [],
         sumWorkingHour: 0,
-        maxLength: 0
+        maxLength: 0,
+        dialogVisible: false,
+        checked: ''
       }
     },
 
@@ -136,10 +141,23 @@
           item.reportDay = this.date
         })
         this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
-          console.log(this.tableData)
-          console.log(res.data)
+          this.dialogVisible = false
+          if (res.code == 6000) {
+            this.$message.success('保存成功！')
+          }
         })
       }
+    },
+
+    mounted () {
+      // this.$api.okr.login.login()
+      this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
+        let resData = res.data.data
+        console.log(resData)
+        resData.forEach(item => {
+          this.projectList.push({ value: item.taskCode, label: item.taskName })
+        })
+      })
     }
   }
 </script>
@@ -181,9 +199,24 @@
     margin: 10px 0 0;
   }
 
+  .el-dialog__footer {
+    margin-top: 3rem;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .time {
     margin-left: .2rem;
     margin-right: .2rem;
+    color:#4c84ff;
+    font-size: 18px;
+  }
+
+  .el-icon-warning {
+    margin-right: 12px;
   }
 </style>
 

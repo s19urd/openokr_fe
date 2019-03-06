@@ -41,6 +41,8 @@ import inquiry from './mall/inquiry'
 
 //okr reprot hour
 import dailyWork from './okr/dailyWork'
+import login from './okr/login'
+
 
 export default {
   common,
@@ -89,6 +91,7 @@ export default {
     permission: pimPermission
   },
   okr: {
-    dailyWork: dailyWork
+    dailyWork: dailyWork,
+    login: login
   }
 }
