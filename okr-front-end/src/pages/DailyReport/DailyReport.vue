@@ -14,9 +14,9 @@
           <!-- delete -->
           <el-button type="default" icon="el-icon-remove" @click="remove">删除</el-button>
           <!-- moveUp -->
-          <!-- <el-button type="default" @click="moveUp">上移</el-button> -->
+          <el-button type="default" @click="moveUp">上移</el-button>
           <!-- moveDown -->
-          <!-- <el-button type="default" >下移</el-button> -->
+          <el-button type="default" @click="moveDown">下移</el-button>
         </div>
       </div>
       <el-table
@@ -30,7 +30,6 @@
         </el-table-column>
 
         <el-table-column
-          prop="taskId"
           label="项目/产品名称"
           width="250"
           >
@@ -94,7 +93,7 @@
   </d2-container>
 </template>
 <script>
-  import { difference } from 'lodash'
+  import { difference, findIndex, max, min } from 'lodash'
   export default {
     name: 'report-working-hour',
     
@@ -112,12 +111,14 @@
         projectList: [],
         multipleSelection: [],
         sumWorkingHour: 0,
-        maxLength: 0,
+        maxLength: -1,
         dialogVisible: false,
         checked: '',
         flag: '',
         publicPath: process.env.BASE_URL,
-        imageUrl: require('@/assets/okr/icon-happy.png')
+        imageUrl: require('@/assets/okr/icon-happy.png'),
+        tempMaxIndex: '',
+        tempMinIndex: ''
       }
     },
 
@@ -130,6 +131,18 @@
 
       handleSelectionChange (selection) {
         this.multipleSelection = selection
+
+        let tempMaxIndex = 0,
+            tempMinIndex = this.multipleSelection.length,
+            tempIndexArray = []
+
+        this.multipleSelection.forEach(item => {
+          let tem = findIndex(this.tableData, item)
+          tempIndexArray.push(findIndex(this.tableData, item))
+        })
+        this.tempMaxIndex = max([...tempIndexArray, tempMaxIndex])
+        this.tempMinIndex = min([...tempIndexArray, tempMinIndex])
+        console.log(this.tempMinIndex, this.tempMaxIndex)
       },
 
       remove () {
@@ -144,32 +157,55 @@
         this.sumWorkingHour = sumTemp
       },
 
-      // moveUp () {
-      //   if (this.tableData.length === 0) {
-      //     this.$message.warning('请先添加数据')
-      //     return
-      //   }
-      //   if (this.multipleSelection.length === 0) {
-      //     this.$message.warning('请先勾选数据')
-      //     return
-      //   }
+      moveUp () {
+        this.isEmptyData ()
 
-      //   let tempMaxIndex = 0,
-      //       tempMinIndex = 0
-      //   console.log(this.multipleSelection)
-      //   this.multipleSelection.forEach(item => {
-      //     console.log(item)
-      //     if (item.id === 1) {
-      //       this.$message.warning('已经是第一行了')
-      //       return
-      //     }
-      //     tempMaxIndex = (item.id - 1) > tempMaxIndex ? (item.id - 1): tempMaxIndex
-      //     tempMinIndex = (item.id - 1) < tempMinIndex ? (item.id - 1): tempMinIndex
-      //   })
-      //   let temData = this.tableData[tempMinIndex]
-      //   this.tableData.splice(tempMinIndex, 1)
-      //   this.tableData.splice(tempMaxIndex, 0, temData)
-      // },
+        let flag = true
+
+        this.multipleSelection.forEach(item => {
+
+          if (findIndex(this.tableData, item) === 0) {
+            this.$message.warning('已经是第一行了')
+            flag = false
+            return
+          }
+        })
+
+        if (!flag) return
+        let temData = this.tableData[this.tempMinIndex-1]
+        this.tableData.splice(this.tempMinIndex-1, 1)
+        this.tableData.splice(this.tempMaxIndex, 0, temData)
+      },
+
+      moveDown () {
+        this.isEmptyData ()
+
+        let flag = true
+
+        this.multipleSelection.forEach(item => {
+          if (findIndex(this.tableData, item) === this.tableData.length-1) {
+            this.$message.warning('已经是最后一行了')
+            flag = false
+            return
+          }
+        })
+
+        if (!flag) return
+        let temData = this.tableData[this.tempMaxIndex+1]
+        this.tableData.splice(this.tempMaxIndex+1, 1)
+        this.tableData.splice(this.tempMaxIndex-1, 0, temData)
+      },
+
+      isEmptyData () {
+        if (this.tableData.length === 0) {
+          this.$message.warning('请先添加数据')
+          return
+        }
+        if (this.multipleSelection.length === 0) {
+          this.$message.warning('请先勾选数据')
+          return
+        }
+      },
 
       //验证formData
       validate () {
