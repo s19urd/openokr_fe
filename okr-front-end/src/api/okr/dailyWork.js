@@ -7,7 +7,6 @@ export default {
    */
 
   submitDailyWork (dailyList) {
-    console.log(dailyList)
     return axios.post('/api/daily/saveDailyList.json', dailyList
     )
   },

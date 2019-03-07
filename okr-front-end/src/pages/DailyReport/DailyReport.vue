@@ -14,9 +14,9 @@
           <!-- delete -->
           <el-button type="default" icon="el-icon-remove" @click="remove">删除</el-button>
           <!-- moveUp -->
-          <el-button type="default" >上移</el-button>
+          <!-- <el-button type="default" >上移</el-button> -->
           <!-- moveDown -->
-          <el-button type="default" >下移</el-button>
+          <!-- <el-button type="default" >下移</el-button> -->
         </div>
       </div>
       <el-table
@@ -30,7 +30,7 @@
         </el-table-column>
 
         <el-table-column
-          prop="name"
+          prop="taskId"
           label="项目/产品名称"
           >
           <template slot-scope="scope">
@@ -50,7 +50,7 @@
           label="报工时长"
           >
           <template slot-scope="scope">
-            <el-input v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
+              <el-input v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
           </template>
         </el-table-column>
 
@@ -109,7 +109,8 @@
         sumWorkingHour: 0,
         maxLength: 0,
         dialogVisible: false,
-        checked: ''
+        checked: '',
+        flag: ''
       }
     },
 
@@ -136,24 +137,59 @@
         this.sumWorkingHour = sumTemp
       },
 
-      submit () {
-        this.tableData.forEach(item => {
-          item.reportDay = this.date
-        })
-        this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
+      //验证formData
+      validate () {
+        this.flag = true
+        if (!this.date) {
+          this.$message.warning('日期不能为空！')
           this.dialogVisible = false
-          if (res.code == 6000) {
-            this.$message.success('保存成功！')
-          }
-        })
+          this.flag = false
+          return
+        }
+        if (this.tableData.length === 0) {
+          this.$message.warning('请添加条数！')
+          this.dialogVisible = false
+          this.flag = false
+          return
+        } else {
+          this.tableData.forEach(item => {
+            if(item.taskId === "") {
+              this.$message.warning('项目类型不能为空！')
+              this.dialogVisible = false
+              this.flag = false
+              return
+            }
+            if(item.duration === '') {
+              this.$message.warning('报工时长不能为空！')
+              this.dialogVisible = false
+              this.flag = false
+              return
+            }
+          })
+        }
+      },
+
+      submit () {
+        this.validate ()
+        if (this.flag) {
+          //每条task添加日期
+          this.tableData.forEach(item => {
+            item.reportDay = this.date
+          })
+          //提交数据，关闭弹窗
+          this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
+            this.dialogVisible = false
+            if (res.code == 6000) {
+              this.$message.success('保存成功！')
+            }
+          })
+        }
       }
     },
 
     mounted () {
-      // this.$api.okr.login.login()
       this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
         let resData = res.data.data
-        console.log(resData)
         resData.forEach(item => {
           this.projectList.push({ value: item.taskCode, label: item.taskName })
         })
