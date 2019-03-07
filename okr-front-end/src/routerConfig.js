@@ -74,7 +74,7 @@ import DailyReport from './pages/DailyReport'
 // 下面两个页面就是对比 你可以分别观察两个页面上显示的路由数据差异
 const routerConfig = [
   {
-     path: '/dailyReport',
+     path: '/dailyReport.vhtml',
      name: 'DailyReport',
      layout: Blank,
      component: DailyReport

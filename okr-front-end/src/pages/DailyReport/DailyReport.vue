@@ -14,9 +14,9 @@
           <!-- delete -->
           <el-button type="default" icon="el-icon-remove" @click="remove">删除</el-button>
           <!-- moveUp -->
-          <!-- <el-button type="default" >上移</el-button> -->
+          <el-button type="default" @click="moveUp">上移</el-button>
           <!-- moveDown -->
-          <!-- <el-button type="default" >下移</el-button> -->
+          <el-button type="default" >下移</el-button>
         </div>
       </div>
       <el-table
@@ -32,9 +32,13 @@
         <el-table-column
           prop="taskId"
           label="项目/产品名称"
+          width="250"
           >
           <template slot-scope="scope">
-            <el-select filterable v-model="scope.row.taskId" placeholder="请选择">
+            <el-select
+              filterable
+              v-model="scope.row.taskId"
+              placeholder="请选择">
               <el-option
                 v-for="item in projectList"
                 :key="item.value"
@@ -48,6 +52,7 @@
         <el-table-column
           prop="name"
           label="报工时长"
+          width="300"
           >
           <template slot-scope="scope">
               <el-input v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
@@ -135,6 +140,10 @@
           sumTemp = sumTemp + Number(item.duration)
         })
         this.sumWorkingHour = sumTemp
+      },
+
+      moveUp () {
+        
       },
 
       //验证formData
