@@ -1,7 +1,7 @@
 <template>
   <d2-container>    
     <el-form class="">
-      <div class="tip"><img src="../../../public/image/okr/icon-happy.png"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～</div>
+      <div class="tip"><img :src="`${publicPath}image/okr/icon-happy.png`"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～</div>
       <div class="baseOperationWrap">
         <el-date-picker
           v-model="date"
@@ -115,7 +115,8 @@
         maxLength: 0,
         dialogVisible: false,
         checked: '',
-        flag: ''
+        flag: '',
+        publicPath: process.env.BASE_URL
       }
     },
 
@@ -143,7 +144,29 @@
       },
 
       moveUp () {
-        
+        if (this.tableData.length === 0) {
+          this.$message.warning('请先添加数据')
+          return
+        }
+        if (this.multipleSelection.length === 0) {
+          this.$message.warning('请先勾选数据')
+          return
+        }
+
+        let tempMaxIndex = 0,
+            tempMinIndex = 0
+        this.multipleSelection.forEach(item => {
+          console.log(item)
+          if (item.id === 1) {
+            this.$message.warning('已经是第一行了')
+            return
+          }
+          tempMaxIndex = item.id > tempMaxIndex ? item.id : tempMaxIndex
+          tempMinIndex = item.id < tempMinIndex ? item.id : tempMinIndex
+        })
+        let temData = this.tableData[tempMinIndex-1]
+        this.tableData.splice(tempMinIndex-1, 1)
+        this.tableData.splice(tempMaxIndex, 0, temData)
       },
 
       //验证formData
