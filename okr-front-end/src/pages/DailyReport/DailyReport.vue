@@ -1,7 +1,7 @@
 <template>
   <d2-container>    
     <el-form class="">
-      <div class="tip"><img :src="`${publicPath}image/okr/icon-happy.png`"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～</div>
+      <div class="tip"><img :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～</div>
       <div class="baseOperationWrap">
         <el-date-picker
           v-model="date"
@@ -116,7 +116,8 @@
         dialogVisible: false,
         checked: '',
         flag: '',
-        publicPath: process.env.BASE_URL
+        publicPath: process.env.BASE_URL,
+        imageUrl: require('@/assets/okr/icon-happy.png')
       }
     },
 
