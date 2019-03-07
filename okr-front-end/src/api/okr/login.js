@@ -3,11 +3,10 @@ import axios from 'axios'
 export default {
 
  /**
-  *       http://localhost:8892/devLogin.json?username=admin
-  * 登陆接口
+  * 确认用户是否登陆
   * @return {*}
   */
-  login () {
-    return axios.post('http://localhost:8892/devLogin.json?username=admin')
+ isLogin () {
+    return axios.post('/sys/user/checkUserLogin.json')
   }
 }
