@@ -16,4 +16,4 @@ COPY ./nginx/nginx.conf /etc/nginx/
 COPY ./nginx/custom.conf /etc/nginx/conf.d/
 
 RUN mkdir -p ${DEPLOY_DIR}
-COPY ./dist/ ${DEPLOY_DIR}/
+COPY ./build/ ${DEPLOY_DIR}/
