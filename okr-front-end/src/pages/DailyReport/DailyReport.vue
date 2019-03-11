@@ -6,11 +6,11 @@
         <el-date-picker
           v-model="date"
           type="date"
-          placeholder="请选择时间">
+        >
         </el-date-picker>
         <div class="buttonWrap">
           <!-- add -->
-          <el-button type="default" icon="el-icon-circle-plus" @click="add">新增KR</el-button>
+          <el-button type="default" icon="el-icon-circle-plus" @click="add">新增</el-button>
           <!-- delete -->
           <el-button type="default" icon="el-icon-remove" @click="remove">删除</el-button>
           <!-- moveUp -->
@@ -30,7 +30,7 @@
         </el-table-column>
 
         <el-table-column
-          label="项目/产品名称"
+          label="任务名称"
           width="250"
           >
           <template slot-scope="scope">
@@ -74,7 +74,7 @@
           <span class="time">{{ sumWorkingHour }}</span>
           <label>h</label>
         </div>
-        <el-button type="primary" @click="dialogVisible = true">完成今日报工</el-button>
+        <el-button type="primary" @click="validate" :disabled="isDisabled">完成今日报工</el-button>
         <el-dialog
           title="提示"
           :visible.sync="dialogVisible"
@@ -99,7 +99,7 @@
     
     data () {
       return {
-        date: '',
+        date: new Date(),
         tableData: [],
         initItemData: {
           id: '',
@@ -118,7 +118,8 @@
         publicPath: process.env.BASE_URL,
         imageUrl: require('@/assets/okr/icon-happy.png'),
         tempMaxIndex: '',
-        tempMinIndex: ''
+        tempMinIndex: '',
+        isDisabled: false
       }
     },
 
@@ -237,23 +238,24 @@
             }
           })
         }
+        if (this.flag) {
+          this.dialogVisible = true
+        }
       },
 
       submit () {
-        this.validate ()
-        if (this.flag) {
-          //每条task添加日期
-          this.tableData.forEach(item => {
-            item.reportDay = this.date
-          })
-          //提交数据，关闭弹窗
-          this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
-            this.dialogVisible = false
-            if (res.code == 6000) {
-              this.$message.success('保存成功！')
-            }
-          })
-        }
+        //每条task添加日期
+        this.tableData.forEach(item => {
+          item.reportDay = this.date
+        })
+        //提交数据，关闭弹窗
+        this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
+          this.dialogVisible = false
+          if (res.code == 6000) {
+            this.$message.success('保存成功！')
+            this.isDisabled = true
+          }
+        })
       }
     },
 
