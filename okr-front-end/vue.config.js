@@ -8,7 +8,7 @@ function resolve (dir) {
 
 // 基础路径 注意发布之前要先修改这里
 
-const baseUrl = '/vue/'
+const baseUrl = env === 'development' ? '/' : '/vue/'
 
 module.exports = {
   baseUrl, // 根据你的实际情况更改这里
@@ -25,7 +25,7 @@ module.exports = {
         //target:'http://172.16.135.36:8077/tenement-app-web',
         //阿二
         // target:'http://172.16.135.169:8077/tenement-app-web',
-        target: 'http://172.16.135.169:8892',
+        target: 'http://172.16.135.169:8892', 
         //广荣
         // target:'http://localhost:8077/tenement-app-web',
         // target:'http://192.168.0.5:8077/tenement-app-web',
