@@ -147,7 +147,11 @@
       },
 
       remove () {
+        if (this.multipleSelection.length === 0) {
+          this.$message.warning('请选择要删除的项目')
+        }
         this.tableData = difference(this.tableData, this.multipleSelection)
+        this.changeTime()
       },
 
       changeTime () {
