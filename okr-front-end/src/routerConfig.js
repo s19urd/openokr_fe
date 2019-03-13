@@ -58,6 +58,7 @@ import PriceDetail from './pages/mall/Inquiry/Price/PriceDetail';
 // report working hour
 import DailyReport from './pages/DailyReport'
 import CreateTask from './pages/CreateTask'
+import TaskDetailPage from './pages/CreateTask/TaskDetailPage/TaskDetailPage'
 
 
 // ice 会自动在这个变量下添加路由数据
@@ -79,6 +80,12 @@ const routerConfig = [
     name: 'CreateTask',
     layout: Blank,
     component: CreateTask
+  },
+  {
+    path: '/TaskDetailPage.vhtml',
+    name: 'TaskDetailPage',
+    layout: Blank,
+    component: TaskDetailPage
   },
   {
      path: '/dailyReport.vhtml',
