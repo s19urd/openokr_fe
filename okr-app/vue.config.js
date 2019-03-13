@@ -24,6 +24,9 @@ module.exports = {
       }
     }
   },
+  devServer: {
+    port: 8081,
+  },
   // webpack.config
   configureWebpack: config => {
     config.resolve.alias['assets'] = resolve('src/assets')
