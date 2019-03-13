@@ -58,6 +58,13 @@ export default {
 </script>
 
 <style lang="scss">
+.d2-layout-blank-group {
+  overflow-y: auto !important;
+}
+.d2-theme-container-main {
+  overflow-y: auto !important;
+}
 // 注册主题
 @import '~@/assets/style/theme/register.scss';
+
 </style>

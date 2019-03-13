@@ -57,6 +57,7 @@ import PriceDetail from './pages/mall/Inquiry/Price/PriceDetail';
 
 // report working hour
 import DailyReport from './pages/DailyReport'
+import CreateTask from './pages/CreateTask'
 
 
 // ice 会自动在这个变量下添加路由数据
@@ -73,6 +74,12 @@ import DailyReport from './pages/DailyReport'
 // 如果不指定 meta.name 的话，name 字段会使用和上面路由 name 一样的取值逻辑
 // 下面两个页面就是对比 你可以分别观察两个页面上显示的路由数据差异
 const routerConfig = [
+  {
+    path: '/CreateTask.vhtml',
+    name: 'CreateTask',
+    layout: Blank,
+    component: CreateTask
+  },
   {
      path: '/dailyReport.vhtml',
      name: 'DailyReport',

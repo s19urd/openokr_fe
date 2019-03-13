@@ -42,3 +42,23 @@ $prefix: d2;
   font-size: 14px;
   position: relative;
 }
+
+.clearfix {
+  &::before,
+  &::after {
+    content: "";
+    display: table;
+  }
+
+  &::after {
+    clear: both;
+  }
+}
+
+.resetP {
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+}
