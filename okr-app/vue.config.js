@@ -16,7 +16,7 @@ module.exports = {
     // publicPath: process.env.BASE_URL,
     proxy: {
       '/.*\.(json|htm)': {
-        target: 'http://172.16.135.169:8893',
+        target: 'http://localhost:8893',
         changeOrigin: true,
         pathRewrite: {
           '^/': '/'
