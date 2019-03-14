@@ -6,26 +6,23 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-// const baseUrl =  '/'
+const baseUrl =  '/m/'
 
 module.exports = {
-  // baseUrl,
+  baseUrl,
   outputDir: 'build',
 
   devServer: {
     // publicPath: process.env.BASE_URL,
     proxy: {
       '/.*\.(json|htm)': {
-        target: 'http://localhost:8893',
+        target: 'http://localhost:8892',
         changeOrigin: true,
         pathRewrite: {
           '^/': '/'
         }
       }
     }
-  },
-  devServer: {
-    port: 8081,
   },
   // webpack.config
   configureWebpack: config => {
