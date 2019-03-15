@@ -9,51 +9,51 @@
         <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskName"></el-input>
       </el-form-item>
    
-        <el-row
-          :gutter="12"
-          class="sharProjectItem"
-          v-for="(item, index) in taskForm.apportionVOS"
-          :key="index"
-          >
+      <el-row
+        :gutter="12"
+        class="sharProjectItem"
+        v-for="(item, index) in taskForm.apportionVOS"
+        :key="index"
+        >
 
-            <el-col :span="7">
-              <el-form-item label="分摊名称：" prop="apportionNameId">
-                <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
-                  <el-option
-                    v-for="item in projectList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
+          <el-col :span="7">
+            <el-form-item label="分摊名称：" prop="apportionNameId">
+              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
+                <el-option
+                  v-for="item in projectList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
 
-            <el-col :span="7">
-              <el-form-item label="分摊类别:" prop="categoryId">
-                <el-select v-model="item.categoryId" placeholder="请选择">
-                  <el-option
-                    v-for="item in projetTypeList"
-                    :key="item.id"
-                    :label="item.categoryName"
-                    :value="item.id">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
+          <el-col :span="7">
+            <el-form-item label="分摊类别:" prop="categoryId">
+              <el-select v-model="item.categoryId" placeholder="请选择">
+                <el-option
+                  v-for="item in projetTypeList"
+                  :key="item.id"
+                  :label="item.categoryName"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
 
-            <el-col :span="6">
-              <el-form-item label="分摊比例：" prop="apportionRate">
-                <el-input class="apportionRate" placeholder="例如:4.0" v-model="item.apportionRate"></el-input>
-              </el-form-item>
-            </el-col>
+          <el-col :span="6">
+            <el-form-item label="分摊比例：" prop="apportionRate">
+              <el-input class="apportionRate" placeholder="例如:4.0" v-model="item.apportionRate"></el-input>
+            </el-form-item>
+          </el-col>
 
-            <el-col :span="2" class="alignCenter">
-              <button class="button remove" @click="deleteShareTaskItem(item, index)"  v-if="taskForm.apportionVOS.length !== 1">
-                <i class="el-icon-remove"></i>
-              </button>
-            </el-col>
-        </el-row>
+          <el-col :span="2" class="alignCenter">
+            <button class="button remove" @click="deleteShareTaskItem(item, index)"  v-if="taskForm.apportionVOS.length !== 1">
+              <i class="el-icon-remove"></i>
+            </button>
+          </el-col>
+      </el-row>
       
       <el-col :span="1" class="plusIcon">
         <button class="button add" @click="addShareTaskItem">
@@ -77,19 +77,19 @@
         <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.jiraLabel"></el-input>
       </el-form-item >
 
-      <!-- <el-form-item label="参与人员: ">
+      <el-form-item label="参与人员: ">
         <el-tree
-          :data="releatedPerson"
+          :data="userIds"
           show-checkbox
           @check-change="handleCheckChange"></el-tree>
-      </el-form-item > -->
+      </el-form-item >
 
-      <!-- <el-form-item label="关联KR: ">
+      <el-form-item label="关联KR: ">
         <el-tree
           :data="releatedKR"
           show-checkbox
           @check-change="handleCheckChange"></el-tree>
-      </el-form-item > -->
+      </el-form-item >
 
     </el-form>
 
@@ -119,10 +119,11 @@
         taskForm: {
           taskName: '',
           date: '',
+          taskStartTime: '',
+          taskEndTime: '',
           // jiraLabel: '',
           apportionVOS: [
             {
-              shareTask: '',
               apportionNameId: '',
               categoryId: '',
               apportionRate: ''
@@ -138,7 +139,7 @@
           apportionRate: ''
         },
 
-        releatedPerson: [{
+        userIds: [{
           label: '一级 1',
           children: [{
             label: '二级 1-1',
@@ -256,6 +257,21 @@
       }
     },
 
+    computed: {
+      dateRange () {
+        return this.taskForm.date
+      }
+    },
+
+    watch: {
+      dateRange () {
+        if (this.dateRange.length && this.dateRange.length > 0) {
+          this.taskForm['taskStartTime'] = this.dateRange[0],
+          this.taskForm['taskEndTime'] = this.dateRange[1]
+        }
+      }    
+    },
+
     mounted () {
       this.$api.okr.task.getApportionSelectList().then(res=> {
         this.projectList = res.data
@@ -325,6 +341,11 @@
     .dialog-footer {
       display: flex;
       justify-content: space-between;
+    }
+
+    .el-tree {
+      float: left;
+      padding-top: 10px;
     }
   }
 
