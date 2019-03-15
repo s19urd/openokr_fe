@@ -42,7 +42,7 @@ import inquiry from './mall/inquiry'
 //okr reprot hour
 import dailyWork from './okr/dailyWork'
 import login from './okr/login'
-
+import task from './okr/task'
 
 export default {
   common,
@@ -92,6 +92,7 @@ export default {
   },
   okr: {
     dailyWork: dailyWork,
-    login: login
+    login: login,
+    task: task
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="createTaskWapper">
+  <div class="createTaskWapper positionAbsolute">
     <div class="header clearfix">
       <p>
         <a class="link">OKR管理系统</a>
@@ -42,12 +42,24 @@
           </div>
         </div>
         <div class="collapseHeader_right">
-          <el-button class="el-icon-delete">删除</el-button>
-          <el-button class="el-icon-more">查看详情</el-button>
+          <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
+          <el-button class="el-icon-more" @click="openDetailPage(item.taskId)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
         </div>
+
+        <el-dialog
+          title="提示"
+          :visible.sync="tipDialogVisible"
+          class="warning"
+          width="30%">
+          <span><i class="el-icon-warning"></i>删除后将无法恢复，确认删除吗？</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="tipDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="confirm(item, index)">确 定</el-button>
+          </span>
+        </el-dialog>
       </li>
     </ul>
 
@@ -65,6 +77,8 @@ export default {
 
   data() {
     return {
+      tipDialogVisible: false,
+
       searchForm: {
         keyWord: "",
         time: ""
@@ -164,6 +178,19 @@ export default {
   methods: {
     createTask() {
       this.isShow = true;
+    },
+
+    deleteItem () {
+      this.tipDialogVisible = true
+    },
+
+    openDetailPage (taskId) {
+      this.$router.push({ name : 'TaskDetailPage'})
+    },
+    
+    confirm (item, index) {
+      this.tipDialogVisible = false
+      this.taskList.splice(index, 1)
     }
   }
 };
@@ -181,6 +208,12 @@ export default {
     font-size: 12px;
     color: #b7b8bd;
     vertical-align: top;
+  }
+
+  .link {
+    &:hover {
+      color: rgb(76, 132, 255)
+    }
   }
   .gray {
     font-size: 14px;
@@ -257,6 +290,16 @@ export default {
 .taskList {
   margin-left: -40px;
   margin-right: 40px;
+}
+
+.warning {
+  span {
+    font-size: 16px;
+  }
+
+  .el-icon-warning {
+    color: rgb(253, 180, 77);
+  }
 }
 </style>
 
