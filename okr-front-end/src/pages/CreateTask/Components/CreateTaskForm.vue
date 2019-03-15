@@ -119,7 +119,7 @@
         taskForm: {
           taskName: '',
           date: '',
-          jiraLabel: '',
+          // jiraLabel: '',
           apportionVOS: [
             {
               shareTask: '',
