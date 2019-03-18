@@ -13,6 +13,7 @@
     "register-service-worker": "^1.5.2",
     "vant": "^1.6.7",
     "vue": "^2.6.6",
+    "vue-mobile-calendar": "^3.0.5",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },

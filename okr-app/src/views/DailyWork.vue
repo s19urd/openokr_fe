@@ -15,7 +15,7 @@
       </div>
 
       <div class="报工日期">
-        <Cell title="报工日期" is-link :value="selectedTime.toLocaleDateString()" @click="showPopup('datePicker')"></Cell>
+        <Cell title="报工日期" is-link :value="selectedTime.toLocaleDateString()" @click="showPopup('calendar')"></Cell>
       </div>
 
       <div class="projectWorkingHour"
@@ -39,18 +39,18 @@
           <field v-model="item.remark" label="备注信息" rows="1" type="textarea" autosize></field>
         </cell-group>
 
+        
+
         <popup
           v-model="show"
           position="bottom"
           :overlay="true">
-          <datetime-picker
-            v-if="showType === 'datePicker'"
-            type="date"
-            v-model="selectedTime"
-            @confirm="confirm"
-            @cancel="cancel"
-          >
-          </datetime-picker>
+
+          <template v-if="showType === 'calendar'">
+            <calendar>
+            </calendar>
+            <inlineCalendar :dayClick="dayClick"/>
+          </template>
 
           <picker
             v-if="showType === 'projectList'"
@@ -112,9 +112,24 @@ export default {
     }
   },
 
+  computed: {
+    sumWorkingHour () {
+      let sumTemp = 0
+      this.totalProjectReport.forEach(item => {
+        sumTemp = sumTemp + Number(item.duration)
+      })
+      return sumTemp
+    }
+  },
+
   methods: {
     back () {
       this.$router.replace({ name: 'Login' })
+    },
+
+    dayClick (date) {
+      this.hidePopup()
+      this.selectedTime = date.$d
     },
 
     showPopup (type, index) {
@@ -179,16 +194,10 @@ export default {
           Toast(`${res.message}`)
         }
       })
-    }
-  },
+    },
 
-  computed: {
-    sumWorkingHour () {
-      let sumTemp = 0
-      this.totalProjectReport.forEach(item => {
-        sumTemp = sumTemp + Number(item.duration)
-      })
-      return sumTemp
+    handelChange () {
+      console.log('3333')
     }
   },
 
@@ -202,14 +211,14 @@ export default {
           this.initProjectReport = Object.assign({}, {
             taskName: item.taskName,
             taskId: item.id,
-            duration: 4.0,
+            duration: 8.0,
             remark: '',
             reportDay: ''
           })
           this.totalProjectReport.push({
             taskName: item.taskName,
             taskId: item.id,
-            duration: 4.0,
+            duration: 8.0,
             remark: '',
             reportDay: ''
           })

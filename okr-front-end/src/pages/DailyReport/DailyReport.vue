@@ -143,7 +143,6 @@
         })
         this.tempMaxIndex = max([...tempIndexArray, tempMaxIndex])
         this.tempMinIndex = min([...tempIndexArray, tempMinIndex])
-        console.log(this.tempMinIndex, this.tempMaxIndex)
       },
 
       remove () {

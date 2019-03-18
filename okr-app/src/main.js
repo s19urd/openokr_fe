@@ -5,10 +5,13 @@ import router from './router'
 import store from './store'
 import './registerServiceWorker'
 import Api from './api'
+import Calendar from 'vue-mobile-calendar'
 
 Vue.config.productionTip = false
 
 Vue.use(Api)
+Vue.use(Calendar)
+
 new Vue({
   router,
   store,

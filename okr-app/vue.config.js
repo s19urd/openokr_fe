@@ -16,7 +16,7 @@ module.exports = {
     // publicPath: process.env.BASE_URL,
     proxy: {
       '/.*\.(json|htm)': {
-        target: 'http://localhost:8892',
+        target: 'http://172.16.135.169:8892',
         changeOrigin: true,
         pathRewrite: {
           '^/': '/'
@@ -30,5 +30,6 @@ module.exports = {
     config.resolve.alias['components'] = resolve('src/components')
     config.resolve.alias['sass'] = resolve('src/sass')
     config.resolve.alias['views'] = resolve('src/views')
+    config.resolve.alias['utilities'] = resolve('src/utilities')
   }
 }
