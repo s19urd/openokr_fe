@@ -32,5 +32,13 @@ export default {
 
   getApportionSelectList () {
     return axios.get('/task/getApportionSelectList.json')
+  },
+
+    /*
+  * 项目相关用户信息
+  * @return {*}
+  */
+  queryUserSelectInfo () {
+    return axios.get('/sys/user/getUserSelectInfo.json')
   }
 }

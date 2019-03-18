@@ -38,9 +38,6 @@ export default {
         id
       }
     })
-  },
-
-
-
+  }
 }
 

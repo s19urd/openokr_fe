@@ -4,7 +4,7 @@
     :visible="dialogVisible"
     width="60%"
     @close="close">
-    <el-form :model="taskForm" :rules="rules"  ref="taskForm">
+    <el-form :model="taskForm" ref="taskForm">
       <el-form-item label="任务名称：" prop="taskName">
         <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskName"></el-input>
       </el-form-item>
@@ -186,22 +186,7 @@
              { label: '部门3的Kr' }
            ]
          }
-        ],
-
-        rules: {
-          taskName: [
-            { required: true, message: '请选择任务名称', trigger: 'change' }
-          ],
-          apportionNameId: [
-            { required: true, message: '请选择分摊项目' }
-          ],
-          categoryId: [
-            { required: true, message: '请选择分摊类别', trigger: 'change' }
-          ],
-          apportionRate: [
-            { required: true, message: '请填写分摊比例', trigger: 'blur' }
-          ]
-        }
+        ]
       } 
     },
 
@@ -278,6 +263,10 @@
       })
 
       this.getApportionCategoryList()
+
+      this.$api.okr.task.queryUserSelectInfo().then(res=>{
+        console.log(res.data)
+      })
     }
   }
 </script>
