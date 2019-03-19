@@ -68,6 +68,15 @@
       </li>
     </ul>
 
+    <el-pagination
+      ref="pagination"
+      :page-size="searchForm.pageSize"
+      layout="prev, pager, next"
+      :total="totalPage"
+      @current-change="fetchData"
+      class="alginCenter">  
+    </el-pagination>
+
     <create-task-form :dialog-visible.sync="isShow"></create-task-form>
   </div>
 </template>
@@ -89,59 +98,12 @@ export default {
         searchKey: "",
         queryStartDate: '',
         queryEndDate: '',
-        pageSize: 100,
+        pageSize: 3,
         currentPage: 1
       },
 
-      taskList: [
-        {
-          taskName: '',
-          timeRange: "2019.01.12～2019.02.19",
-          taskStartTime: '',
-          taskEndTime: '',
-          jiraLabel: "XXXXXXXXXXX",
-          taskCode: '',
-          person: "张明烽",
-          count: "4",
-          createUserName: '',
-          personKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            }
-          ],
-          teamKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            }
-          ],
-          companyKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            }
-          ]
-        }
-      ],
+      totalPage: 0,
+      taskList: [],
 
       isShow: false
     };
@@ -166,10 +128,16 @@ export default {
     },
 
     serach (searchForm) {
-      console.log(searchForm)
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data.data
+        this.totalPage = res.data.totalPage
       })
+    },
+    
+    fetchData (pageIndex) {
+      console.log(pageIndex)
+      this.searchForm.currentPage = pageIndex || this.searchForm.currentPage || 1
+      this.serach(this.searchForm)
     }
   },
 

@@ -205,6 +205,7 @@ export default {
   mounted () {
     let taskId = this.$route.params.id
     this.$api.okr.task.getTaskDetailInfo(taskId).then(res=> {
+      console.log(res.data)
       this.detailInfo = res.data
       this.taskVo = res.data.data.taskVO
     })
