@@ -6,7 +6,7 @@
     @close="close">
     <el-form :model="taskForm" ref="taskForm">
       <el-form-item label="任务名称：" prop="taskName">
-        <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskName"></el-input>
+        <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskVO['taskName']"></el-input>
       </el-form-item>
    
       <el-row
@@ -64,7 +64,7 @@
   
       <el-form-item label="起止时间：" class="dateItem">
         <el-date-picker
-          v-model="taskForm.date"
+          v-model="dateRange"
           type="daterange"
           range-separator="到"
           start-placeholder="开始时间"
@@ -74,22 +74,24 @@
   
 
       <el-form-item label="jira标签: ">
-        <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.jiraLabel"></el-input>
+        <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO['jiraLabel']"></el-input>
       </el-form-item >
 
       <el-form-item label="参与人员: ">
         <el-tree
-          :data="userIds"
+          :data="userTree"
           show-checkbox
-          @check-change="handleCheckChange"></el-tree>
+          node-key="id"
+          ref="userTree"></el-tree>
       </el-form-item >
 
       <el-form-item label="关联KR: ">
         <el-tree
-          :data="releatedKR"
+          :data="KRTrees"
           show-checkbox
-          @check-change="handleCheckChange"></el-tree>
-      </el-form-item >
+          node-key="id"
+          ref="KRTrees"></el-tree>
+      </el-form-item >  
 
     </el-form>
 
@@ -116,77 +118,35 @@
 
     data () {
       return {
+        dateRange: '',
         taskForm: {
-          taskName: '',
-          date: '',
-          taskStartTime: '',
-          taskEndTime: '',
-          // jiraLabel: '',
           apportionVOS: [
             {
               apportionNameId: '',
               categoryId: '',
               apportionRate: ''
             }
-          ]
+          ],
+          taskVO: {
+            taskName: '',
+            taskStartTime: '',
+            taskEndTime: '',
+            jiraLabel: ''
+          },
+          userIds: [],
+          krIds: []
         },
+
         projectList: [],
         projetTypeList: [],
         initItem: {
-          shareTask: '',
           apportionNameId: '',
           categoryId: '',
           apportionRate: ''
         },
-
-        userIds: [{
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1',
-            children: [{
-              label: '三级 1-1-1'
-            }]
-          }]
-        }, {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1',
-            children: [{
-              label: '三级 2-1-1'
-            }]
-          }, {
-            label: '二级 2-2',
-            children: [{
-              label: '三级 2-2-1'
-            }]
-          }]
-        }, {
-          label: '一级 3',
-          children: [{
-            label: '二级 3-1',
-            children: [{
-              label: '三级 3-1-1'
-            }]
-          }, {
-            label: '二级 3-2',
-            children: [{
-              label: '三级 3-2-1'
-            }]
-          }]
-        }],
-
-        releatedKR: [ {
-           label: '公司的kr',
-           children: [
-             { label: '部门1的Kr',
-               children: [{
-                 label: '部门1-1的Kr'
-               }] },
-             { label: '部门2的Kr' },
-             { label: '部门3的Kr' }
-           ]
-         }
-        ]
+        userTree: [],
+        KRTrees: [],
+        flag: true
       } 
     },
 
@@ -194,7 +154,6 @@
       addShareTaskItem () {
         let temp = Object.assign({}, this.initItem)
         this.taskForm['apportionVOS'].push(temp)
-        console.log(this.taskForm.apportionVOS)
       },
 
       deleteShareTaskItem (item, index) {
@@ -209,50 +168,64 @@
         this.$emit('update:dialogVisible', false)
       },
 
+      validate () {
+        this.flag = true
+        if (this.taskForm) {
+          if (!this.taskForm.taskVO['taskName']) {
+            this.$message.warning('任务名称不能为空')
+            this.flag = false
+            return
+          } 
+          if (this.taskForm.apportionVOS.length > 0) {
+
+            let apportionVOS = this.taskForm.apportionVOS
+            apportionVOS.forEach(item => {
+              if(!item.apportionNameId) {
+                  this.$message.warning('分摊名称不能为空')
+                  this.flag = false
+                  return
+              }
+              else if(!item.categoryId) {
+                  this.$message.warning('分摊类别不能为空')
+                  this.flag = false
+                  return
+              }
+              else if(!item.apportionRate) {
+                  this.$message.warning('分摊比列不能为空')
+                  this.flag = false
+                  return
+              }
+            })
+          }
+          if (!this.taskForm.taskVO.taskStartTime || !this.taskForm.taskVO.taskEndTime) {
+            this.$message.warning('时间不能为空')
+            this.flag = false
+            return
+          }
+        }
+      },
+
       confirm () {
-        // this.$refs['taskForm'].validate((valid) => {
-        //   if (valid) {
-        //     this.$api.okr.task.saveTask(this.taskForm).then(res=> {
-        //       this.$emit('update:dialogVisible', false)
-        //       console.log(res.data)
-        //     })
-        //   } else {
-        //     return false
-        //   }
-        // })
-        this.$api.okr.task.saveTask(this.taskForm).then(res=> {
-          this.$emit('update:dialogVisible', false)
-          console.log(res.data)
-        })
+        this.validate()
+        if (this.flag) {
+          this.$api.okr.task.saveTask(this.taskForm).then(res=> {
+            this.$emit('update:dialogVisible', false)
+          })
+        }
+        this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
+        this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
       },
 
       close () {
         this.$emit('update:dialogVisible', false)
-      },
-
-      handleCheckChange(data, checked, indeterminate) {
-        console.log(data, checked, indeterminate);
-      },
-
-      getApportionCategoryList () {
-        this.$api.okr.task.getApportionCategoryList().then(res=> {
-          this.projetTypeList = res.data
-          console.log(res.data)
-        })
-      }
-    },
-
-    computed: {
-      dateRange () {
-        return this.taskForm.date
       }
     },
 
     watch: {
       dateRange () {
         if (this.dateRange.length && this.dateRange.length > 0) {
-          this.taskForm['taskStartTime'] = this.dateRange[0],
-          this.taskForm['taskEndTime'] = this.dateRange[1]
+          this.taskForm.taskVO['taskStartTime'] = this.dateRange[0],
+          this.taskForm.taskVO['taskEndTime'] = this.dateRange[1]
         }
       }    
     },
@@ -262,10 +235,16 @@
         this.projectList = res.data
       })
 
-      this.getApportionCategoryList()
+      this.$api.okr.task.getApportionCategoryList().then(res=> {
+        this.projetTypeList = res.data
+      })
 
-      this.$api.okr.task.queryUserSelectInfo().then(res=>{
-        console.log(res.data)
+      this.$api.okr.task.queryUsers().then(res => {
+        this.userTree = res
+      })
+
+      this.$api.okr.task.queryOKRTreeData().then(res => {
+        this.KRTrees = res
       })
     }
   }

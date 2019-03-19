@@ -12,14 +12,12 @@ export default {
     })
   },
 
-  getTaskListByPage () {
-    return axios.post('/task/getTaskListByPage.json', {
-      pageSize: 100
-    })
+  getTaskListByPage (vo) {
+    return axios.post('/task/getTaskListByPage.json', vo)
   },
 
-  getTaskDetailInfo (taskId) {
-    return axios.get('/task/getTaskDetailInfo.json', taskId)
+  getTaskDetailInfo (id) {
+    return axios.get(`/task/getTaskDetailInfo.json?id=${id}`)
   },
 
   deleteTask (taskId) {
@@ -34,11 +32,27 @@ export default {
     return axios.get('/task/getApportionSelectList.json')
   },
 
-    /*
+   /*
   * 项目相关用户信息
   * @return {*}
   */
-  queryUserSelectInfo () {
-    return axios.get('/sys/user/getUserSelectInfo.json')
+  queryUsers () {
+    return axios.post('/sys/organization/findOrganizationTreeData.json')
+  },
+
+  /*
+  * OKR目标管理
+  * @return {*}
+  */
+  queryOKRTreeData () {
+    return axios.post('/manage/okrObject/findAllOkrTreeData.json')
   }
+
+  // /**
+  //  * 任务列表
+  //  * @return {*}
+  //  */
+  // queryTaskList (vo) {
+  //   return axios.post('/task/getTaskListByPage.json')
+  // }
 }

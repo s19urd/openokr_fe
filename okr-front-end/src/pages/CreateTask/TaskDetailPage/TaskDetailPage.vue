@@ -6,11 +6,12 @@
       </div>
       <div class="collapseHeader_intro alginRight">
         <div>
-          <span class="taskName">任务名称或描述</span>
+          <span class="taskName">{{ taskVO.taskName }}</span>
           <div class="text">
-            <el-tag>{{ taskItem.timeRange }}</el-tag>
-            <el-tag>jira编码:{{ taskItem.jiraNubmer }}</el-tag>由
-            <span class="person">{{ taskItem.person }}</span>创建
+            <el-tag>{{ taskVO.taskStartTime }}</el-tag> ~
+            <el-tag>{{ taskVO.taskEndTime }}</el-tag>
+            <el-tag>jira编码:{{ taskVO.jiraNubmer }}</el-tag>由
+            <span class="person">{{ taskVO.createUserId }}</span>创建
           </div>
         </div>
       </div>
@@ -50,7 +51,7 @@
 
     <div class="apportionTable">
       <el-table :data="taskItem.apportionTable" style="width: 100%">
-        <el-table-column label="序号" type="expand" prop="number" width="180">
+        <!-- <el-table-column label="序号" type="expand" prop="number" width="180">
           <template slot-scope="props">
             <ul>
               <li
@@ -63,7 +64,7 @@
               </li>
             </ul>
           </template>
-        </el-table-column>
+        </el-table-column> -->
 
         <el-table-column label="分摊名称" prop="name" width="180"></el-table-column>
 
@@ -103,8 +104,10 @@ export default {
             }
           ]
         }
-      ]
-    };
+      ],
+      taskDetailInfo: {},
+      taskVO: {}
+    }
   },
 
   props: {
@@ -154,11 +157,11 @@ export default {
           ],
           apportionTable: [
             {
-              number: "1",
-              name: "yy",
-              type: "person",
-              apportion: "3.0",
-              count: "44",
+              number: "1", //序号
+              name: "yy", //分摊名称
+              type: "person", //分摊类型
+              apportion: "3.0", //分摊比例
+              count: "44", //当前累计工时
               apportionList: [
                 {
                   name: "yy",
@@ -168,10 +171,10 @@ export default {
                   name: "yZ",
                   workingHours: "22"
                 }
-              ]
+              ] //这个是下拉选项，先忽略
             },
              {
-              number: "1",
+              number: "2",
               name: "yy",
               type: "person",
               apportion: "3.0",
@@ -197,6 +200,14 @@ export default {
     back () {
       this.$router.push({ name: 'CreateTask' })
     }
+  },
+
+  mounted () {
+    let taskId = this.$route.params.id
+    this.$api.okr.task.getTaskDetailInfo(taskId).then(res=> {
+      this.detailInfo = res.data
+      this.taskVo = res.data.data.taskVO
+    })
   }
 }
 </script>

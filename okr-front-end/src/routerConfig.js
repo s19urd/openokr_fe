@@ -82,7 +82,7 @@ const routerConfig = [
     component: CreateTask
   },
   {
-    path: '/TaskDetailPage.vhtml',
+    path: '/TaskDetailPage/:id',
     name: 'TaskDetailPage',
     layout: Blank,
     component: TaskDetailPage

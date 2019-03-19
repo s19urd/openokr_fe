@@ -7,43 +7,48 @@
         <a class="link">创建任务</a>
       </p>
       <el-form class="searchForm">
-        <el-col :span="6">
-          <el-form-item label="关键字:">
-            <el-input placeholder="请输入" v-model="searchForm.keyWord"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="7">
-          <el-form-item label="创建日期:">
-            <el-date-picker
-              v-model="searchForm.time"
-              type="date"
-              palceholder="请选择时间"
-              prefix-icon="el-icon-date"
-            ></el-date-picker>
-          </el-form-item>
-        </el-col>
-        <el-col :span="7">
-          <el-button type="primary" icon="el-icon-search">搜索</el-button>
-        </el-col>
-        <el-col :span="4">
-          <el-button type="primary" @click="createTask">+ 创建任务</el-button>
-        </el-col>
+        <el-row>
+          <el-col :span="5">
+            <el-form-item label="关键字:">
+              <el-input placeholder="请输入" v-model="searchForm.searchKey"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item label="创建日期:">
+              <el-date-picker
+                v-model="dateRange"
+                type="daterange"
+                range-separator="到"
+                palceholder="请选择时间"
+                prefix-icon="el-icon-date"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+              ></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="4" class="alginRight">
+            <el-button type="primary" icon="el-icon-search" @click="serach(searchForm)">搜索</el-button>
+          </el-col>
+          <el-col :span="4" class="alginRight">
+            <el-button type="primary" @click="createTask">+ 创建任务</el-button>
+          </el-col>
+        </el-row>
       </el-form>
     </div>
 
     <ul class="taskList">
       <li class="taskItem" v-for="(item, index) in taskList" :key="index">
         <div class="collapseHeader_left">
-          <span class="taskName">任务名称或描述</span>
+          <span class="taskName" v-text="item.taskName"></span>
           <div class="text">
-            <el-tag>{{ item.timeRange }}</el-tag>
-            <el-tag>jira编码:{{ item.jiraNubmer }}</el-tag>由
-            <span class="person">{{ item.person }}</span>创建
+            <el-tag>{{ item.taskStartTime }}</el-tag> ~ <el-tag>{{ item.taskEndTime }}</el-tag>
+            <el-tag>jira编码:{{ item.jiraLabel }}</el-tag>由
+            <span class="person">{{ item.createUserName }}</span>创建
           </div>
         </div>
         <div class="collapseHeader_right">
           <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
-          <el-button class="el-icon-more" @click="openDetailPage(item.taskId)"> 查看详情</el-button>
+          <el-button class="el-icon-more" @click="openDetailPage(item.taskCode)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
@@ -78,60 +83,27 @@ export default {
   data() {
     return {
       tipDialogVisible: false,
+      dateRange: "",
 
       searchForm: {
-        keyWord: "",
-        time: ""
+        searchKey: "",
+        queryStartDate: '',
+        queryEndDate: '',
+        pageSize: 100,
+        currentPage: 1
       },
 
       taskList: [
         {
+          taskName: '',
           timeRange: "2019.01.12～2019.02.19",
-          jiraNubmer: "XXXXXXXXXXX",
+          taskStartTime: '',
+          taskEndTime: '',
+          jiraLabel: "XXXXXXXXXXX",
+          taskCode: '',
           person: "张明烽",
           count: "4",
-          personKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            }
-          ],
-          teamKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            }
-          ],
-          companyKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            }
-          ]
-        },
-        {
-          timeRange: "2019.01.12～2019.02.19",
-          jiraNubmer: "XXXXXXXXXXX",
-          person: "张明烽",
-          count: "4",
+          createUserName: '',
           personKeys: [
             {
               index: "k1",
@@ -184,14 +156,34 @@ export default {
       this.tipDialogVisible = true
     },
 
-    openDetailPage (taskId) {
-      this.$router.push({ name : 'TaskDetailPage'})
+    openDetailPage (taskCode) {
+      this.$router.push({ name : 'TaskDetailPage', params: { id: taskCode } })
     },
     
     confirm (item, index) {
       this.tipDialogVisible = false
       this.taskList.splice(index, 1)
+    },
+
+    serach (searchForm) {
+      console.log(searchForm)
+      this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
+        this.taskList = res.data.data
+      })
     }
+  },
+
+  watch: {
+    dateRange () {
+      if (this.dateRange.length && this.dateRange.length > 0) {
+        this.searchForm['queryStartDate'] = this.dateRange[0],
+        this.searchForm['queryEndDate'] = this.dateRange[1]
+      }
+    }
+  },
+
+  mounted () {
+    this.serach(this.searchForm)
   }
 };
 </script>
@@ -199,6 +191,10 @@ export default {
 <style lang="scss">
 .createTaskWapper {
   padding: 8px 30px 30px;
+  
+   .el-dialog {
+     box-shadow: none;
+   }
 }
 
 .header {
