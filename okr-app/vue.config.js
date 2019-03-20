@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const baseUrl =  '/m/'
+const baseUrl =  '/okrApp/'
 
 module.exports = {
   baseUrl,

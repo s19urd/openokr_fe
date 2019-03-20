@@ -44,7 +44,9 @@
 
           <el-col :span="6">
             <el-form-item label="分摊比例：" prop="apportionRate">
-              <el-input class="apportionRate" placeholder="例如:4.0" v-model="item.apportionRate"></el-input>
+              <el-input class="apportionRate" placeholder="例如:4.0" v-model="item.apportionRate">
+                <template slot="append">%</template>
+              </el-input>
             </el-form-item>
           </el-col>
 
@@ -169,6 +171,7 @@
       },
 
       validate () {
+        let totalRate = 0
         this.flag = true
         if (this.taskForm) {
           if (!this.taskForm.taskVO['taskName']) {
@@ -203,17 +206,27 @@
             return
           }
         }
+
+        (this.taskForm.apportionVOS).forEach(item => {
+          totalRate += Number(item.apportionRate)
+        })
+
+        if (totalRate > 100) {
+          this.$message.warning('百分比总合不能大于100%')
+          this.flag = false
+          return
+        }
       },
 
       confirm () {
+        this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
+        this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
         this.validate()
         if (this.flag) {
           this.$api.okr.task.saveTask(this.taskForm).then(res=> {
             this.$emit('update:dialogVisible', false)
           })
         }
-        this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
-        this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
       },
 
       close () {
@@ -224,7 +237,8 @@
     watch: {
       dateRange () {
         if (this.dateRange.length && this.dateRange.length > 0) {
-          this.taskForm.taskVO['taskStartTime'] = this.dateRange[0],
+          
+          this.taskForm.taskVO['taskStartTime'] = this.dateRange[0]
           this.taskForm.taskVO['taskEndTime'] = this.dateRange[1]
         }
       }    

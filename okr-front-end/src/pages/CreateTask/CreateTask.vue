@@ -7,32 +7,29 @@
         <a class="link">创建任务</a>
       </p>
       <el-form class="searchForm">
-        <el-row>
-          <el-col :span="5">
-            <el-form-item label="关键字:">
-              <el-input placeholder="请输入" v-model="searchForm.searchKey"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="7">
-            <el-form-item label="创建日期:">
-              <el-date-picker
-                v-model="dateRange"
-                type="daterange"
-                range-separator="到"
-                palceholder="请选择时间"
-                prefix-icon="el-icon-date"
-                start-placeholder="开始时间"
-                end-placeholder="结束时间"
-              ></el-date-picker>
-            </el-form-item>
-          </el-col>
-          <el-col :span="4" class="alginRight">
+          <el-form-item label="关键字:">
+            <el-input placeholder="请输入" v-model="searchForm.searchKey"></el-input>
+          </el-form-item>
+
+          <el-form-item label="创建日期:">
+            <el-date-picker
+              v-model="dateRange"
+              type="daterange"
+              range-separator="到"
+              palceholder="请选择时间"
+              prefix-icon="el-icon-date"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+            ></el-date-picker>
+          </el-form-item>
+
+          <el-form-item>
             <el-button type="primary" icon="el-icon-search" @click="serach(searchForm)">搜索</el-button>
-          </el-col>
-          <el-col :span="4" class="alginRight">
+          </el-form-item>
+    
+          <el-form-item>
             <el-button type="primary" @click="createTask">+ 创建任务</el-button>
-          </el-col>
-        </el-row>
+          </el-form-item>
       </el-form>
     </div>
 
@@ -41,14 +38,16 @@
         <div class="collapseHeader_left">
           <span class="taskName" v-text="item.taskName"></span>
           <div class="text">
-            <el-tag>{{ item.taskStartTime }}</el-tag> ~ <el-tag>{{ item.taskEndTime }}</el-tag>
+            <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
+              <el-tag>{{ item.taskStartTime }}</el-tag> ~ <el-tag>{{ item.taskEndTime }}</el-tag>
+            </div>
             <el-tag>jira编码:{{ item.jiraLabel }}</el-tag>由
-            <span class="person">{{ item.createUserName }}</span>创建
+            <span class="person">{{ item.createUserName || 'XX' }} </span>创建
           </div>
         </div>
         <div class="collapseHeader_right">
           <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
-          <el-button class="el-icon-more" @click="openDetailPage(item.taskCode)"> 查看详情</el-button>
+          <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
@@ -68,11 +67,21 @@
       </li>
     </ul>
 
+    <el-pagination
+      ref="pagination"
+      :page-size="searchForm.pageSize"
+      layout="prev, pager, next"
+      :total="totalPage"
+      @current-change="fetchData"
+      class="alginCenter">  
+    </el-pagination>
+
     <create-task-form :dialog-visible.sync="isShow"></create-task-form>
   </div>
 </template>
 <script>
-import createTaskForm from "./Components/CreateTaskForm";
+import createTaskForm from "./Components/CreateTaskForm"
+import { timestampsToDate } from  '../../libs/helper'
 export default {
   name: "create-task",
 
@@ -89,59 +98,12 @@ export default {
         searchKey: "",
         queryStartDate: '',
         queryEndDate: '',
-        pageSize: 100,
+        pageSize: 3,
         currentPage: 1
       },
 
-      taskList: [
-        {
-          taskName: '',
-          timeRange: "2019.01.12～2019.02.19",
-          taskStartTime: '',
-          taskEndTime: '',
-          jiraLabel: "XXXXXXXXXXX",
-          taskCode: '',
-          person: "张明烽",
-          count: "4",
-          createUserName: '',
-          personKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            }
-          ],
-          teamKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            }
-          ],
-          companyKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            }
-          ]
-        }
-      ],
+      totalPage: 0,
+      taskList: [],
 
       isShow: false
     };
@@ -156,8 +118,8 @@ export default {
       this.tipDialogVisible = true
     },
 
-    openDetailPage (taskCode) {
-      this.$router.push({ name : 'TaskDetailPage', params: { id: taskCode } })
+    openDetailPage (id) {
+      this.$router.push({ name : 'TaskDetailPage', params: { id: id } })
     },
     
     confirm (item, index) {
@@ -166,10 +128,20 @@ export default {
     },
 
     serach (searchForm) {
-      console.log(searchForm)
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data.data
+        this.totalPage = res.data.totalPage
+        this.taskList.forEach((item, index) => {
+          item.taskStartTime = timestampsToDate(item.taskStartTime) 
+          item.taskEndTime = timestampsToDate(item.taskEndTime) 
+        })
+
       })
+    },
+    
+    fetchData (pageIndex) {
+      this.searchForm.currentPage = pageIndex || this.searchForm.currentPage || 1
+      this.serach(this.searchForm)
     }
   },
 
@@ -195,6 +167,10 @@ export default {
    .el-dialog {
      box-shadow: none;
    }
+
+  .header {
+    padding-right: 42px;
+  }
 }
 
 .header {
@@ -218,6 +194,9 @@ export default {
 }
 
 .searchForm {
+  display: flex;
+  justify-content: space-between;
+
   .el-form-item {
     &__content {
       display: inline-block;
@@ -243,6 +222,10 @@ export default {
   .text {
     margin-bottom: 0;
     margin-top: 12px;
+
+    .timeRange {
+      display: inline;
+    }
   }
 
   ul {
@@ -295,6 +278,23 @@ export default {
 
   .el-icon-warning {
     color: rgb(253, 180, 77);
+  }
+}
+
+.el-pagination {
+  span:not([class*=suffix]),
+  button,
+  li {
+    height: 42px;
+    line-height: 42px;
+  }
+
+  .el-pager {
+    li.btn-quicknext,
+    li.btn-quickprev {
+      height: 42px;
+      line-height: 42px;
+    }
   }
 }
 </style>
