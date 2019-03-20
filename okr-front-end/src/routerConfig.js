@@ -13,7 +13,7 @@ import Error404 from './pages/Error404';
 import DailyReport from './pages/DailyReport'
 import CreateTask from './pages/CreateTask'
 import TaskDetailPage from './pages/CreateTask/TaskDetailPage/TaskDetailPage'
-// import dailyDashboard from './pages/daily/Dashboard'
+import dailyDashboard from './pages/daily/Dashboard'
 import TeamOKR from './pages/TeamOKR'
 
 
@@ -64,15 +64,15 @@ const routerConfig = [
       title: '今日报工',
     }
   },
-  // {
-  //   path: '/daily/dashboard.vhtml',
-  //   name: 'dailyDashboard',
-  //   layout: Blank,
-  //   component: dailyDashboard,
-  //   meta: {
-  //     title: '周报统计',
-  //   }
-  // },
+  {
+    path: '/daily/dashboard.vhtml',
+    name: 'dailyDashboard',
+    layout: Blank,
+    component: dailyDashboard,
+    meta: {
+      title: '周报统计',
+    }
+  },
   {
     path: '/',
     name: 'index',
