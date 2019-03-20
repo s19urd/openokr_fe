@@ -12,43 +12,39 @@
               <el-tag>{{ taskVO.taskStartTime }}</el-tag> ~ <el-tag>{{ taskVO.taskEndTime }}</el-tag>
             </div>
             <el-tag>jira编码:{{ taskVO.jiraLabel }}</el-tag>由
-            <span class="person">{{ taskVO.createUserId || 'XX' }} </span>创建
+            <span class="person">{{ taskVO.createUserName || 'XX' }} </span>创建
           </div>
         </div>
       </div>
     </div>
     <div class="okrKeys">
-      <ul class="personal">
+      <ul class="personal" v-if ="taskDetailInfo.personKeys && taskDetailInfo.personKeys.length > 0">
         <div class="icon icon-personal">
           <img :src="imageUrl_person">
           <span>我的</span>
         </div>
-        <template v-if ="!taskDetailInfo.personKeys">
-          <li v-for="(keyItem, index) in taskDetailInfo.personKeys" :key="index">
-            <div class="keyText">{{ keyItem.index }}: {{ keyItem.text}}</div>
-            <div class="personCount">共{{ keyItem.count }}人协同</div>
-          </li>
-        </template>
+        <li v-for="(keyItem, index) in taskDetailInfo.personKeys" :key="index">
+          <div class="keyText">k{{ index+1 }}: {{ keyItem.text}}</div>
+          <div class="personCount">共{{ keyItem.count }}人协同</div>
+        </li>
       </ul>
-      <ul class="team">
+      <ul class="team" v-if ="taskDetailInfo.teamKeys && taskDetailInfo.teamKeys.length > 0">
         <div class="icon icon-team">
           <img :src="imageUrl_team">
           <span>团队</span>
         </div>
-        <template v-if ="!taskDetailInfo.teamKeys">
-          <li v-for="(keyItem, index) in taskDetailInfo.teamKeys" :key="index">
-            <div class="keyText">{{ keyItem.index }}: {{ keyItem.text}}</div>
-            <div class="personCount">共{{ keyItem.count }}人协同</div>
-          </li>
-        </template>
+        <li v-for="(keyItem, index) in taskDetailInfo.teamKeys" :key="index">
+          <div class="keyText">K{{ index+1 }}: {{ keyItem.text}}</div>
+          <div class="personCount">共{{ keyItem.count }}人协同</div>
+        </li>
       </ul>
-      <ul class="company">
+      <ul class="company" v-if ="taskDetailInfo.companyKeys && taskDetailInfo.companyKeys.length > 0">
         <div class="icon icon-company">
           <img :src="imageUrl_company">
           <span>公司</span>
         </div>
         <li v-for="(keyItem, index) in taskDetailInfo.companyKeys" :key="index">
-          <div class="keyText">{{ keyItem.index }}: {{ keyItem.text}}</div>
+          <div class="keyText">k{{ index+1 }}: {{ keyItem.text}}</div>
           <div class="personCount">共{{ keyItem.count }}人协同</div>
         </li>
       </ul>
@@ -73,11 +69,11 @@
 
         <el-table-column label="分摊名称" prop="apportionName" width="180"></el-table-column>
 
-        <el-table-column label="分摊类型" prop="categoryId"></el-table-column>
+        <el-table-column label="分摊类型" prop="categoryName"></el-table-column>
 
-        <el-table-column label="分摊比例" prop="apportionRate"></el-table-column>
+        <el-table-column label="分摊比例(%)" prop="apportionRate"></el-table-column>
 
-        <!-- <el-table-column label="当前累计耗费工时(h)" prop="count"></el-table-column> -->
+        <el-table-column label="当前累计耗费工时(h)" prop="totalWorkingHours"></el-table-column>
       </el-table>
     </div>
   </div>
@@ -94,7 +90,8 @@ export default {
       imageUrl_company: require("@/assets/okr/icon-ask_company.gif"),
       apportionTable: [],
       taskDetailInfo: {},
-      taskVO: {}
+      taskVO: {},
+      personKeys: []
     }
   },
 
@@ -108,6 +105,7 @@ export default {
     let taskId = this.$route.params.id
     this.$api.okr.task.getTaskDetailInfo(taskId).then(res=> {
       this.taskDetailInfo = res.data
+      this.personKeys = res.data.personKeys
       this.taskVO = res.data.taskVO
       this.taskVO.taskStartTime = timestampsToDate(this.taskVO.taskStartTime)
       this.taskVO.taskEndTime = timestampsToDate(this.taskVO.taskEndTime)

@@ -208,7 +208,7 @@
         }
 
         (this.taskForm.apportionVOS).forEach(item => {
-          totalRate += item.apportionRate
+          totalRate += Number(item.apportionRate)
         })
 
         if (totalRate > 100) {
@@ -220,8 +220,6 @@
 
       confirm () {
         this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
-        console.log(this.$refs.KRTrees.getCheckedKeys())
-        console.log(this.taskForm['krIds'])
         this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
         this.validate()
         if (this.flag) {
@@ -242,8 +240,6 @@
           
           this.taskForm.taskVO['taskStartTime'] = this.dateRange[0]
           this.taskForm.taskVO['taskEndTime'] = this.dateRange[1]
-          // console.log(this.GMTToStr(this.dateRange[0]))
-          console.log(this.taskForm.taskVO['taskStartTime'] )
         }
       }    
     },

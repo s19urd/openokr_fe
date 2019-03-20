@@ -6,15 +6,17 @@
         <i class="el-icon-arrow-right gray"></i>
         <a class="link">我的团队</a>
       </p>
-      <el-form class="searchForm">
-        <el-row>
-          <el-col :span="8">
+      <el-form class="">
+        <el-row :gutter="20">
+          <el-col :span="8" class="flex">
             <el-form-item label="团队名称:">
               <el-input placeholder="请输入关键字以查询" v-model="searchKey"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8" class="alginRight">
-            <el-button type="primary" icon="el-icon-search" @click="serach()">搜索</el-button>
+          <el-col :span="6">
+            <el-form-item>
+              <el-button type="primary" icon="el-icon-search" @click="serach()">搜索</el-button>
+            </el-form-item>
           </el-col>
         </el-row>
       </el-form>
@@ -22,7 +24,6 @@
 
     <div class="card">
       <h4 class="name">团队名称： 园区宝贝事业部</h4>
-
       
       <div class="cardFooter">
         <div class="detail">
@@ -35,6 +36,25 @@
           <i class="el-icon-d-arrow-right"></i>
         </div>
       </div>
+<!-- 
+      <el-dialog
+        title="团队名称"
+        :visible.sync="dialogVisible"
+        width="30%"
+       >
+       <p>已用工时：<span>{{ workingHours }}h</span></p>
+       <p>团队成员<span>{{ persons }}位:</span></p>
+       <div>关联任务<span>{{ count }}:</span>
+         <ul v-if="taskList">
+           <li
+             v-for="(item, index) in taskList"
+             :key="index"
+           >
+           {{ index }}. {{ item.text}}
+           </li>
+         </ul>
+       </div>
+      </el-dialog> -->
     </div>
   </div>
 </template>
@@ -44,7 +64,12 @@
 
       data () {
         return {
-          searchKey: ''
+          searchKey: '',
+          dialogVisible: '',
+          taskList: [],
+          workingHours: '122',
+          persons: '4',
+          count: ''
         }
       },
 
@@ -99,5 +124,9 @@
         }
       }
     }
+  }
+
+  .flex {
+    display: flex;
   }
 </style>
