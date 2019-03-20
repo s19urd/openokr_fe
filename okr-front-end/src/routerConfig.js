@@ -13,7 +13,8 @@ import Error404 from './pages/Error404';
 import DailyReport from './pages/DailyReport'
 import CreateTask from './pages/CreateTask'
 import TaskDetailPage from './pages/CreateTask/TaskDetailPage/TaskDetailPage'
-import dailyDashboard from './pages/daily/Dashboard'
+// import dailyDashboard from './pages/daily/Dashboard'
+import TeamOKR from './pages/TeamOKR'
 
 
 // ice 会自动在这个变量下添加路由数据
@@ -30,6 +31,12 @@ import dailyDashboard from './pages/daily/Dashboard'
 // 如果不指定 meta.name 的话，name 字段会使用和上面路由 name 一样的取值逻辑
 // 下面两个页面就是对比 你可以分别观察两个页面上显示的路由数据差异
 const routerConfig = [
+  {
+    path: '/TeamOKR',
+    name: 'TeamOKR',
+    layout: Blank,
+    component: TeamOKR
+  },
   {
     path: '/CreateTask.vhtml',
     name: 'CreateTask',
@@ -57,15 +64,15 @@ const routerConfig = [
       title: '今日报工',
     }
   },
-  {
-    path: '/daily/dashboard.vhtml',
-    name: 'dailyDashboard',
-    layout: Blank,
-    component: dailyDashboard,
-    meta: {
-      title: '周报统计',
-    }
-  },
+  // {
+  //   path: '/daily/dashboard.vhtml',
+  //   name: 'dailyDashboard',
+  //   layout: Blank,
+  //   component: dailyDashboard,
+  //   meta: {
+  //     title: '周报统计',
+  //   }
+  // },
   {
     path: '/',
     name: 'index',

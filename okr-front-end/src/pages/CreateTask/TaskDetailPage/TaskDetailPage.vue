@@ -8,49 +8,50 @@
         <div>
           <span class="taskName">{{ taskVO.taskName }}</span>
           <div class="text">
-            <el-tag>{{ taskVO.taskStartTime }}</el-tag> ~
-            <el-tag>{{ taskVO.taskEndTime }}</el-tag>
-            <el-tag>jira编码:{{ taskVO.jiraNubmer }}</el-tag>由
-            <span class="person">{{ taskVO.createUserId }}</span>创建
+            <div class="timeRange" v-if="taskVO.taskStartTime && taskVO.taskEndTime">
+              <el-tag>{{ taskVO.taskStartTime }}</el-tag> ~ <el-tag>{{ taskVO.taskEndTime }}</el-tag>
+            </div>
+            <el-tag>jira编码:{{ taskVO.jiraLabel }}</el-tag>由
+            <span class="person">{{ taskVO.createUserName || 'XX' }} </span>创建
           </div>
         </div>
       </div>
     </div>
     <div class="okrKeys">
-      <ul class="personal">
+      <ul class="personal" v-if ="taskDetailInfo.personKeys && taskDetailInfo.personKeys.length > 0">
         <div class="icon icon-personal">
           <img :src="imageUrl_person">
           <span>我的</span>
         </div>
-        <li v-for="(keyItem, index) in taskItem.personKeys" :key="index">
-          <div class="keyText">{{ keyItem.index }}: {{ keyItem.text}}</div>
+        <li v-for="(keyItem, index) in taskDetailInfo.personKeys" :key="index">
+          <div class="keyText">k{{ index+1 }}: {{ keyItem.text}}</div>
           <div class="personCount">共{{ keyItem.count }}人协同</div>
         </li>
       </ul>
-      <ul class="team">
+      <ul class="team" v-if ="taskDetailInfo.teamKeys && taskDetailInfo.teamKeys.length > 0">
         <div class="icon icon-team">
           <img :src="imageUrl_team">
           <span>团队</span>
         </div>
-        <li v-for="(keyItem, index) in taskItem.teamKeys" :key="index">
-          <div class="keyText">{{ keyItem.index }}: {{ keyItem.text}}</div>
+        <li v-for="(keyItem, index) in taskDetailInfo.teamKeys" :key="index">
+          <div class="keyText">K{{ index+1 }}: {{ keyItem.text}}</div>
           <div class="personCount">共{{ keyItem.count }}人协同</div>
         </li>
       </ul>
-      <ul class="company">
+      <ul class="company" v-if ="taskDetailInfo.companyKeys && taskDetailInfo.companyKeys.length > 0">
         <div class="icon icon-company">
           <img :src="imageUrl_company">
           <span>公司</span>
         </div>
-        <li v-for="(keyItem, index) in taskItem.companyKeys" :key="index">
-          <div class="keyText">{{ keyItem.index }}: {{ keyItem.text}}</div>
+        <li v-for="(keyItem, index) in taskDetailInfo.companyKeys" :key="index">
+          <div class="keyText">k{{ index+1 }}: {{ keyItem.text}}</div>
           <div class="personCount">共{{ keyItem.count }}人协同</div>
         </li>
       </ul>
     </div>
 
     <div class="apportionTable">
-      <el-table :data="taskItem.apportionTable" style="width: 100%">
+      <el-table :data="taskDetailInfo.apportionVOS" style="width: 100%">
         <!-- <el-table-column label="序号" type="expand" prop="number" width="180">
           <template slot-scope="props">
             <ul>
@@ -66,18 +67,19 @@
           </template>
         </el-table-column> -->
 
-        <el-table-column label="分摊名称" prop="name" width="180"></el-table-column>
+        <el-table-column label="分摊名称" prop="apportionName" width="180"></el-table-column>
 
-        <el-table-column label="分摊类型" prop="type"></el-table-column>
+        <el-table-column label="分摊类型" prop="categoryName"></el-table-column>
 
-        <el-table-column label="分摊比例" prop="apportion"></el-table-column>
+        <el-table-column label="分摊比例(%)" prop="apportionRate"></el-table-column>
 
-        <el-table-column label="当前累计耗费工时(h)" prop="count"></el-table-column>
+        <el-table-column label="当前累计耗费工时(h)" prop="totalWorkingHours"></el-table-column>
       </el-table>
     </div>
   </div>
 </template>
 <script>
+import { timestampsToDate } from  '../../../libs/helper'
 export default {
   name: "task-detail-page",
 
@@ -86,113 +88,10 @@ export default {
       imageUrl_person: require("@/assets/okr/icon-ask_person.gif"),
       imageUrl_team: require("@/assets/okr/icon-ask_team.gif"),
       imageUrl_company: require("@/assets/okr/icon-ask_company.gif"),
-      apportionTable: [
-        {
-          number: "1",
-          name: "yy",
-          type: "person",
-          apportion: "3.0",
-          count: "44",
-          apportionList: [
-            {
-              name: "yy",
-              workingHours: "12"
-            },
-            {
-              name: "yZ",
-              workingHours: "22"
-            }
-          ]
-        }
-      ],
+      apportionTable: [],
       taskDetailInfo: {},
-      taskVO: {}
-    }
-  },
-
-  props: {
-    taskItem: {
-      type: Object,
-      default() {
-        return {
-          timeRange: "2019.01.12～2019.02.19",
-          jiraNubmer: "XXXXXXXXXXX",
-          person: "张明烽",
-          count: "4",
-          personKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到1个以上",
-              count: 3
-            }
-          ],
-          teamKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到2个以上",
-              count: 3
-            }
-          ],
-          companyKeys: [
-            {
-              index: "k1",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            },
-            {
-              index: "k2",
-              text: "加快产品反馈收集和迭代速度，每月核心体验优化点达到5个以上",
-              count: 3
-            }
-          ],
-          apportionTable: [
-            {
-              number: "1", //序号
-              name: "yy", //分摊名称
-              type: "person", //分摊类型
-              apportion: "3.0", //分摊比例
-              count: "44", //当前累计工时
-              apportionList: [
-                {
-                  name: "yy",
-                  workingHours: "12"
-                },
-                {
-                  name: "yZ",
-                  workingHours: "22"
-                }
-              ] //这个是下拉选项，先忽略
-            },
-             {
-              number: "2",
-              name: "yy",
-              type: "person",
-              apportion: "3.0",
-              count: "44",
-              apportionList: [
-                {
-                  name: "yy",
-                  workingHours: "12"
-                },
-                {
-                  name: "yZ",
-                  workingHours: "22"
-                }
-              ]
-            }
-          ]
-        }
-      }
+      taskVO: {},
+      personKeys: []
     }
   },
 
@@ -205,9 +104,11 @@ export default {
   mounted () {
     let taskId = this.$route.params.id
     this.$api.okr.task.getTaskDetailInfo(taskId).then(res=> {
-      console.log(res.data)
-      this.detailInfo = res.data
-      this.taskVo = res.data.data.taskVO
+      this.taskDetailInfo = res.data
+      this.personKeys = res.data.personKeys
+      this.taskVO = res.data.taskVO
+      this.taskVO.taskStartTime = timestampsToDate(this.taskVO.taskStartTime)
+      this.taskVO.taskEndTime = timestampsToDate(this.taskVO.taskEndTime)
     })
   }
 }
@@ -228,13 +129,9 @@ export default {
 
   .header {
     display: flex;
-    padding: 0 20px;
     margin-bottom: 35px;
 
     .collapseHeader {
-      &_button {
-        flex: 1;
-      }
 
       &_intro {
         flex: 1;
@@ -254,6 +151,10 @@ export default {
 
     .text {
       margin-top: 20px;
+
+      .timeRange {
+        margin-bottom: 20px;
+      }
     }
   }
 
@@ -291,9 +192,10 @@ export default {
 .team,
 .company {
   position: relative;
-  margin: 8px 0 0 70px;
+  margin: 8px 0 0 38px;
   padding-bottom: 5px;
   border-bottom: 1px solid #483f3f2b;
+  min-height: 40px;
 
   .icon {
     position: absolute;
@@ -325,6 +227,9 @@ export default {
     display: flex;
     justify-content: space-between;
   }
+}
+.el-tag {
+  margin-right: .2rem;
 }
 </style>
 

@@ -31,6 +31,7 @@ module.exports = {
   // webpack 设置
   // 默认设置: https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-service/lib/config/base.js
   chainWebpack: (config) => {
+
     // svg
     const svgRule = config.module.rule('svg')
     svgRule.uses.clear()
