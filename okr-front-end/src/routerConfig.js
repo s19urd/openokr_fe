@@ -13,6 +13,7 @@ import Error404 from './pages/Error404';
 import DailyReport from './pages/DailyReport'
 import CreateTask from './pages/CreateTask'
 import TaskDetailPage from './pages/CreateTask/TaskDetailPage/TaskDetailPage'
+import dailyDashboard from './pages/daily/Dashboard'
 
 
 // ice 会自动在这个变量下添加路由数据
@@ -33,19 +34,37 @@ const routerConfig = [
     path: '/CreateTask.vhtml',
     name: 'CreateTask',
     layout: Blank,
-    component: CreateTask
+    component: CreateTask,
+    meta: {
+      title: '创建任务',
+    }
   },
   {
     path: '/TaskDetailPage/:id',
     name: 'TaskDetailPage',
     layout: Blank,
-    component: TaskDetailPage
+    component: TaskDetailPage,
+    meta: {
+      title: '我的任务',
+    }
   },
   {
      path: '/dailyReport.vhtml',
      name: 'DailyReport',
      layout: Blank,
-     component: DailyReport
+     component: DailyReport,
+    meta: {
+      title: '今日报工',
+    }
+  },
+  {
+    path: '/daily/dashboard.vhtml',
+    name: 'dailyDashboard',
+    layout: Blank,
+    component: dailyDashboard,
+    meta: {
+      title: '周报统计',
+    }
   },
   {
     path: '/',
