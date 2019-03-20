@@ -17,6 +17,7 @@
     "babel-polyfill": "^6.26.0",
     "better-scroll": "^1.12.1",
     "countup.js": "^1.9.3",
+    "echarts": "^4.1.0",
     "element-ui": "^2.4.4",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.10",

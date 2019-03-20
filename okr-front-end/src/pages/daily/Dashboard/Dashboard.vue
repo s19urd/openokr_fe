@@ -29,9 +29,9 @@
     <div class="tab-content-wrap" v-loading="tabLoading"  element-loading-text="加载中">
       <div class="tab-content" v-if="pageType==='1'">
         <el-row>
-          <el-col :span="12">
+          <el-col :span="12"  style="padding: 20px">
             <el-table
-              :data="tableData"
+              :data="tableData1"
               style="width: 100%">
               <el-table-column
                 prop="date"
@@ -49,7 +49,9 @@
               </el-table-column>
             </el-table>
           </el-col>
-          <el-col :span="12"></el-col>
+          <el-col :span="12" style="padding: 40px">
+            <div class="echart-sty1" id="echart-pie" style="width:100%; min-height: 400px"></div>
+          </el-col>
         </el-row>
       </div>
       <div class="tab-content" v-if="pageType==='2'">
@@ -59,8 +61,10 @@
   </div>
 </template>
 <script>
+  import Vue from 'vue'
   import util from '@/libs/util.js'
-
+  import echarts from 'echarts'
+  Vue.prototype.$echarts = echarts;
   export default {
     name: "Dashboard",
 
@@ -86,6 +90,10 @@
         searchDate:'',
         weekSearchType:'1',
         tabLoading:true,
+        //表格1的数据
+        tableData1:[],
+        //表格1的数据
+        tableData2:[]
 
       };
     },
@@ -216,9 +224,40 @@
         setTimeout(()=>{
           this.tabLoading = false;
         },2000)
+      },
+      //渲染表1
+      drawLine(){
+        let myChart = this.$echarts.init(document.getElementById('echart-pie'))
+        // 绘制图表
+        myChart.setOption({
+          title: { text: '按照产品/客户定制：',textStyle:{fontWeight:400,fontSize:'14px'} },
+          tooltip : {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+          },
+          series : [
+            {
+              name:'访问来源',
+              type:'pie',
+              radius : '55%',
+              center: ['50%', '50%'],
+              data:[
+                {value:350, name:'产品'},
+                {value:1200, name:'客户定制'},
+              ].sort(function (a, b) { return a.value - b.value; }),
+              roseType: 'radius',
+              animationType: 'scale',
+              animationEasing: 'elasticOut',
+              animationDelay: function (idx) {
+                return Math.random() * 200;
+              }
+            }
+          ]
+        });
       }
     },
     mounted () {
+      this.drawLine();
     }
   };
 </script>
@@ -258,6 +297,10 @@
     margin-left: 10px;
     padding: 0 8px;
     line-height: 20px;
+  }
+  .echart-sty1{
+    border: #ccc solid 1px;
+    padding: 20px;
   }
 
 </style>
