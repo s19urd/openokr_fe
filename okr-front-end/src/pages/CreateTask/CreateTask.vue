@@ -47,6 +47,7 @@
         </div>
         <div class="collapseHeader_right">
           <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
+          <el-button class="el-icon-delete" @click="editItem(item)"> 编辑</el-button>
           <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
@@ -76,7 +77,7 @@
       class="alginCenter">  
     </el-pagination>
 
-    <create-task-form :dialog-visible.sync="isShow"></create-task-form>
+    <create-task-form :dialog-visible.sync="isShow" :task-form="itemFormInfo"></create-task-form>
   </div>
 </template>
 <script>
@@ -105,7 +106,8 @@ export default {
       totalPage: 0,
       taskList: [],
 
-      isShow: false
+      isShow: false,
+      itemFormInfo: {}
     };
   },
 
@@ -116,6 +118,19 @@ export default {
 
     deleteItem () {
       this.tipDialogVisible = true
+    },
+
+    editItem (item) {
+      this.isShow = true
+      console.log(item)
+      this.$api.okr.task.getTaskDetailInfo(item.id).then(res=> {
+        this.itemFormInfo = res.data
+        console.log(this.itemFormInfo)
+        // this.personKeys = res.data.personKeys
+        // this.taskVO = res.data.taskVO
+        // this.taskVO.taskStartTime = timestampsToDate(this.taskVO.taskStartTime)
+        // this.taskVO.taskEndTime = timestampsToDate(this.taskVO.taskEndTime)
+      })
     },
 
     openDetailPage (id) {

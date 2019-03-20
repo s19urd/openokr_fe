@@ -111,33 +111,26 @@
   export default {
     name: 'create-task-form',
 
-    props: {
-      dialogVisible: {
-        type: Boolean,
-        default: false
-      }
-    },
-
     data () {
       return {
         dateRange: '',
-        taskForm: {
-          apportionVOS: [
-            {
-              apportionNameId: '',
-              categoryId: '',
-              apportionRate: ''
-            }
-          ],
-          taskVO: {
-            taskName: '',
-            taskStartTime: '',
-            taskEndTime: '',
-            jiraLabel: ''
-          },
-          userIds: [],
-          krIds: []
-        },
+        // taskForm: {
+        //   apportionVOS: [
+        //     {
+        //       apportionNameId: '',
+        //       categoryId: '',
+        //       apportionRate: ''
+        //     }
+        //   ],
+        //   taskVO: {
+        //     taskName: '',
+        //     taskStartTime: '',
+        //     taskEndTime: '',
+        //     jiraLabel: ''
+        //   },
+        //   userIds: [],
+        //   krIds: []
+        // },
 
         projectList: [],
         projetTypeList: [],
@@ -150,6 +143,36 @@
         KRTrees: [],
         flag: true
       } 
+    },
+
+    props: {
+      dialogVisible: {
+        type: Boolean,
+        default: false
+      },
+
+      taskForm: {
+        type: Object,
+        default () {
+          return {
+            apportionVOS: [
+              {
+                apportionNameId: '',
+                categoryId: '',
+                apportionRate: ''
+              }
+            ],
+            taskVO: {
+              taskName: '',
+              taskStartTime: '',
+              taskEndTime: '',
+              jiraLabel: ''
+            },
+            userIds: [],
+            krIds: []
+          }
+        }
+      }
     },
 
     methods: {
