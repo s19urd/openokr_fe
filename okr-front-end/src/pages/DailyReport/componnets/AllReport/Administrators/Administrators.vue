@@ -253,7 +253,8 @@
   .numall-area .el-tabs__content .m-table-comb{padding-top:5px}
   .numall-area .m-table-comb .table-filter{padding-bottom:20px}
   .daily-report .el-tabs__active-bar{  display:none;}
-  .daily-report .el-tabs__item{margin:0 20px;padding:0}
+  .daily-report .el-tabs__item{margin:0 20px;padding:0;font-size: 15px;
+    font-weight: bold;}
   .daily-report .el-tabs__item.is-top:nth-child(2){margin-left: 0}
   .daily-report  .el-tabs__item.is-active{border-bottom: 2px solid #409eff;}
 </style>

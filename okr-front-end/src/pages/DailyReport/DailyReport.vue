@@ -57,13 +57,13 @@
             :data="tableData">
             <el-table-column
               label="报工日期"
-              width="180"
-            >
+              width="180">
               <template slot-scope="scope">
                 <el-date-picker
                   v-model="scope.row.reportDay"
                   type="date"
                   :clearable="false"
+                  :picker-options="pickerOptions"
                 >
                 </el-date-picker>
               </template>
@@ -214,6 +214,7 @@
           remark: '',
         },
         projectList: [],
+        firstDataList:[],
         multipleSelection: [],
         sumWorkingHour: 0,
         maxLength: -1,
@@ -229,7 +230,12 @@
         weakData:{// 获取周一周天的时间
           mondayData : new Date(new Date().getTime() - (new Date().getDay()-1)*(24*60*60*1000)),
           sundayData : new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000)),
-        }
+        },
+        pickerOptions: { // 日期设置对象
+          disabledDate: (time) => {
+            return this.dealDisabledDate(time)
+          }
+        },
       }
     },
 
@@ -385,6 +391,12 @@
       openTeamDialog() {
         this.$refs.TeamMembers.open();
       },
+      // 设置本周时间可选范围
+      dealDisabledDate (time) {
+        let time1=new Date(new Date().getTime() - (new Date().getDay()-0)*(24*60*60*1000));
+        let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
+        return  time2<time.getTime() || time.getTime() < time1
+      }
     },
     mounted () {
       this.$api.okr.login.isLogin().then(res => {
@@ -402,8 +414,8 @@
           this.projectList.push({ value: item.id, label: item.taskName })
         })
       })
+    },
 
-    }
   }
 </script>
 <style lang="scss">
