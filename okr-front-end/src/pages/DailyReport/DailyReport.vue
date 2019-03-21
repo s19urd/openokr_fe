@@ -14,11 +14,11 @@
               <el-button type="default" @click="openAdminDialog">全部报工</el-button>
               <el-button type="default" @click="toMyTasks">我的任务</el-button>
             </template>
-            <template v-else>
+            <template v-if="isManager==='0'">
               <el-button type="default" @click="openTeamDialog">全部报工</el-button>
               <el-button type="default" @click="toMyTasks">我的任务</el-button>
+              <el-button type="default" @click="openAdminDialog">管理员全部报工</el-button>
             </template>
-            <el-button type="default" @click="openAdminDialog">管理员全部报工</el-button>
           </div>
         </div>
         <!--历史报工-表格-->
@@ -393,7 +393,7 @@
       },
       // 设置本周时间可选范围
       dealDisabledDate (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay()-0)*(24*60*60*1000));
+        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
         let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
         return  time2<time.getTime() || time.getTime() < time1
       }

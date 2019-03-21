@@ -46,7 +46,7 @@ export default {
    },
 
   /**
-   * 全部报工
+   * 全部报工-表格
    * @return {*}
    */
   allDailyWork (condition, pageInfo) {
@@ -58,6 +58,14 @@ export default {
       ...condition,
       ...pageInfo
     })
+  },
+  /**
+   * 全部报工-搜索
+   * @return {*}
+   */
+  getSearchConditionList (vo) {
+    return axios.post('/task/getSearchConditionList.json', vo
+    )
   },
 
 }
