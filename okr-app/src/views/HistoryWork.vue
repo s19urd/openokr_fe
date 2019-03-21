@@ -13,20 +13,24 @@
     <div class="pageContent">
       <tabs v-model="currentTab" color="#1989fa">
         <tab title="本周报工">
-          <!-- <cell-group>
-            <cell :title="work.reportDay + ' ' + work.weekday" value="内容" v-for="(work, key, index) in currentWeekList" :key="index" />
-          </cell-group> -->
           <collapse v-model="activeCollapse">
-            <collapse-item v-for="(work, key, index) in currentWeekList" :key="index" :name="index" :title="work.reportDay + ' ' + work.weekday" :value="'总工时'">
-              <swipe-cell :right-width="65" :on-close="onClose" v-for="(item, index) in work.data" :key="index">
+            <collapse-item v-for="(work, key, index) in currentWeekList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + addWork(work) + 'h'">
+              <swipe-cell :right-width="65" :on-close="onClose" v-for="(item, index) in work" :key="index" :id="item.id">
                 <cell-group>
-                  <cell :title="item.taskName" :value="item.duration + 'h'" />
+                  <cell :value="item.duration + 'h'">
+                    <template slot="title">
+                      <span class="custom-text">{{ item.taskName }}</span>
+                      <Tag plain type="primary" v-if="item.auditStatus == '00'">{{ item.auditStatusStr }}</Tag>
+                      <Tag plain type="success" v-else-if="item.auditStatus == '01'">{{ item.auditStatusStr }}</Tag>
+                      <Tag plain type="danger" v-else>{{ item.auditStatusStr }}</Tag>
+                    </template>
+                  </cell>
                 </cell-group>
                 <span slot="right">删除</span>
               </swipe-cell>
               <div class="collapse-bd">
                 <span class="tip">滑动任务可删除</span>
-                <Button type="info" size="mini" @click="editWork(work.reportDay)">编辑</Button>
+                <Button type="info" size="mini" @click="editWork(key)">编辑</Button>
               </div>
             </collapse-item>
           </collapse>
@@ -45,7 +49,7 @@
 
 <script>
 import Vue from 'vue'
-import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGroup, SwipeCell, Dialog } from 'vant'
+import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGroup, SwipeCell, Dialog, Tag, Toast } from 'vant'
 
 export default {
   name: '',
@@ -68,6 +72,8 @@ export default {
     CellGroup,
     SwipeCell,
     Dialog,
+    Tag,
+    Toast,
   },
   mounted () {
     this.currentWeek()
@@ -76,7 +82,11 @@ export default {
     back () {
       this.$router.replace({ name: 'Login' })
     },
-    addWork () {},
+    addWork (work) {
+      return work.reduce((acc, el) => {
+        return acc + el.duration
+      }, 0)
+    },
     currentWeek () {
       // 获取周一周天的时间
       let now = new Date()
@@ -109,7 +119,8 @@ export default {
       Vue.api.historyWork.getHistoryWork(query).then(res => {
         // console.log(res.data.data)
         const arr = (res.data && res.data.data) || []
-        this.currentWeekList = this.dateToArr(this.dateToObj(arr))
+        // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
+        this.currentWeekList = this.dateToObj(arr)
       })
     },
     dateToObj (arr) {
@@ -124,22 +135,24 @@ export default {
       console.log(result)
       return result
     },
-    dateToArr (obj) {
-      const result = []
-      for (const key in obj) {
-        const tmpObj = {}
-        if (obj.hasOwnProperty(key)) {
-          // console.log(key)
-          tmpObj.reportDay = key
-          tmpObj.weekday = obj[key][0].weekday
-          tmpObj.data = obj[key]
-          result.unshift(tmpObj)
-        }
-      }
-      console.log(result)
-      return result
-    },
+    // dateToArr (obj) {
+    //   const result = []
+    //   for (const key in obj) {
+    //     const tmpObj = {}
+    //     if (obj.hasOwnProperty(key)) {
+    //       // console.log(key)
+    //       tmpObj.reportDay = key
+    //       tmpObj.weekday = obj[key][0].weekday
+    //       tmpObj.data = obj[key]
+    //       result.unshift(tmpObj)
+    //     }
+    //   }
+    //   console.log(result)
+    //   return result
+    // },
     onClose (clickPosition, instance) {
+      // console.log(clickPosition)
+      // console.log(instance)
       switch (clickPosition) {
         case 'left':
         case 'cell':
@@ -150,6 +163,14 @@ export default {
           Dialog.confirm({
             message: '确定删除吗？'
           }).then(() => {
+            Vue.api.historyWork.deleteTask(instance.$attrs.id).then(res => {
+              if (res.code === 0) {
+                Toast('删除成功')
+                this.currentWeek()
+              } else {
+                Toast(`${res.message}`)
+              }
+            })
             instance.close()
           })
           break
@@ -180,6 +201,9 @@ export default {
 .van-collapse-item__content {
   // padding-left: 0;
   // padding-right: 0;
+}
+.custom-text {
+  margin-right: 10px;
 }
 .collapse-bd {
   padding: 10px 15px 0;
