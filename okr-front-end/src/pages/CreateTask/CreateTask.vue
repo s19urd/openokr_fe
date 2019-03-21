@@ -47,6 +47,7 @@
         </div>
         <div class="collapseHeader_right">
           <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
+          <el-button class="el-icon-delete" @click="editItem(item)"> 编辑</el-button>
           <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
@@ -76,7 +77,11 @@
       class="alginCenter">  
     </el-pagination>
 
-    <create-task-form :dialog-visible.sync="isShow"></create-task-form>
+    <template v-if ="isShow">
+      <create-task-form
+        :dialog-visible.sync="isShow"
+        :task-form-edit.sync="itemFormInfo"></create-task-form>
+    </template>
   </div>
 </template>
 <script>
@@ -105,7 +110,8 @@ export default {
       totalPage: 0,
       taskList: [],
 
-      isShow: false
+      isShow: false,
+      itemFormInfo: {}
     };
   },
 
@@ -116,6 +122,24 @@ export default {
 
     deleteItem () {
       this.tipDialogVisible = true
+    },
+
+    editItem (item) {
+      this.$api.okr.task.getTaskDetailInfo(item.id).then(res=> {
+        this.itemFormInfo = res.data
+        this.itemFormInfo.isEdit = true
+        this.itemFormInfo.taskVO.taskStartTime = new Date(this.itemFormInfo.taskVO.taskStartTime)
+        this.itemFormInfo.taskVO.taskEndTime = new Date(this.itemFormInfo.taskVO.taskEndTime)
+        this.itemFormInfo.userIds = []
+        this.itemFormInfo.krIds = []
+        this.itemFormInfo.userInfoVOS.forEach(item=>{
+          (this.itemFormInfo.userIds).push(item.id)
+        })
+        this.itemFormInfo.keys.forEach(item=> {
+          (this.itemFormInfo.krIds).push(item.id)
+        })
+        this.isShow = true
+      })
     },
 
     openDetailPage (id) {

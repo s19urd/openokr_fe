@@ -6,7 +6,7 @@
     @close="close">
     <el-form :model="taskForm" ref="taskForm">
       <el-form-item label="任务名称：" prop="taskName">
-        <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskVO['taskName']"></el-input>
+        <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
       </el-form-item>
    
       <el-row
@@ -76,7 +76,7 @@
   
 
       <el-form-item label="jira标签: ">
-        <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO['jiraLabel']"></el-input>
+        <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
       <el-form-item label="参与人员: ">
@@ -84,6 +84,7 @@
           :data="userTree"
           show-checkbox
           node-key="id"
+          :default-checked-keys="taskForm.userIds"
           ref="userTree"></el-tree>
       </el-form-item >
 
@@ -92,6 +93,7 @@
           :data="KRTrees"
           show-checkbox
           node-key="id"
+          :default-checked-keys="taskForm.krIds"
           ref="KRTrees"></el-tree>
       </el-form-item >  
 
@@ -111,16 +113,9 @@
   export default {
     name: 'create-task-form',
 
-    props: {
-      dialogVisible: {
-        type: Boolean,
-        default: false
-      }
-    },
-
     data () {
       return {
-        dateRange: '',
+        dateRange: [],
         taskForm: {
           apportionVOS: [
             {
@@ -150,6 +145,37 @@
         KRTrees: [],
         flag: true
       } 
+    },
+
+    props: {
+      dialogVisible: {
+        type: Boolean,
+        default: false
+      },
+
+      taskFormEdit: {
+        type: Object,
+        default: function () {
+          return {
+            isEdit: false,
+            apportionVOS: [
+              {
+                apportionNameId: '',
+                categoryId: '',
+                apportionRate: ''
+              }
+            ],
+            taskVO: {
+              taskName: '',
+              taskStartTime: '',
+              taskEndTime: '',
+              jiraLabel: ''
+            },
+            userIds: [],
+            krIds: []
+          }
+        }
+      }
     },
 
     methods: {
@@ -212,7 +238,7 @@
         })
 
         if (totalRate > 100) {
-          this.$message.warning('百分比总合不能大于100%')
+          this.$message.warning('百分比总和不能大于100%')
           this.flag = false
           return
         }
@@ -225,12 +251,14 @@
         if (this.flag) {
           this.$api.okr.task.saveTask(this.taskForm).then(res=> {
             this.$emit('update:dialogVisible', false)
+            this.$message.success('保存成功！')
           })
         }
       },
 
       close () {
-        this.$emit('update:dialogVisible', false)
+        this.$emit('update:dialogVisible', false),
+        this.$emit('update:taskFormEdit', {})
       }
     },
 
@@ -241,7 +269,7 @@
           this.taskForm.taskVO['taskStartTime'] = this.dateRange[0]
           this.taskForm.taskVO['taskEndTime'] = this.dateRange[1]
         }
-      }    
+      }
     },
 
     mounted () {
@@ -260,6 +288,12 @@
       this.$api.okr.task.queryOKRTreeData().then(res => {
         this.KRTrees = res
       })
+
+      if (this.taskFormEdit.isEdit) {
+        this.taskForm = Object.assign({}, this.taskFormEdit)
+        this.dateRange[0] = this.taskForm.taskVO.taskStartTime
+        this.dateRange[1] = this.taskForm.taskVO.taskEndTime
+      }
     }
   }
 </script>
