@@ -22,7 +22,7 @@
 <script>
 import { Field, CellGroup, Button } from 'vant'
 import Vue from 'vue'
-// import { isMobile } from 'utilities/device-identify'
+import { isMobile } from 'utilities/device-identify'
 export default {
   name: 'Login',
 
@@ -53,7 +53,11 @@ export default {
   },
 
   mounted () {
-
+    if (process.env.NODE_ENV === 'production') {
+      if (!isMobile()) {
+        window.location.href = 'http://test.okr.onlyou.com/login.htm'
+      }
+    }
   }
 }
 </script>
