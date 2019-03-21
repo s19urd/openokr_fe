@@ -94,7 +94,7 @@
             width="150"
           >
             <template slot-scope="scope">
-              <el-input-number v-model="scope.row.duration" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+              <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
             </template>
           </el-table-column>
 
