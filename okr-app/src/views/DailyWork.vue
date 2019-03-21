@@ -83,7 +83,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import { NavBar, Popup, Cell, CellGroup, DatetimePicker, Picker, Field, Button, Toast } from 'vant'
+import { NavBar, Popup, Cell, CellGroup, Picker, Field, Button, Toast } from 'vant'
 
 export default {
   name: 'report-working-hour',
@@ -93,7 +93,6 @@ export default {
     Popup,
     Cell,
     CellGroup,
-    DatetimePicker,
     Picker,
     Field,
     Button

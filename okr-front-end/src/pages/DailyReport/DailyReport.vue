@@ -1,193 +1,195 @@
 <template>
   <d2-container>
-    <el-form class="">
-      <div class="tip flex">
-        <div class="flex1">
-          <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～
+    <div class="daily-report">
+      <el-form class="">
+        <div class="tip flex">
+          <div class="flex1">
+            <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～
+          </div>
+          <div class="fr">
+            <!--管理员-->
+            <template v-if="isManager==='1'">
+              <el-button type="default" @click="toMyTeam">我的团队</el-button>
+              <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
+              <el-button type="default" @click="openAdminDialog">全部报工</el-button>
+              <el-button type="default" @click="toMyTasks">我的任务</el-button>
+            </template>
+            <template v-if="isManager==='0'">
+              <el-button type="default" @click="openTeamDialog">全部报工</el-button>
+              <el-button type="default" @click="toMyTasks">我的任务</el-button>
+              <el-button type="default" @click="openAdminDialog">管理员全部报工</el-button>
+            </template>
+          </div>
         </div>
-        <div class="fr">
-          <!--管理员-->
-          <template v-if="isManager==='1'">
-            <el-button type="default" @click="toMyTeam">我的团队</el-button>
-            <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
-            <el-button type="default" @click="openAdminDialog">全部报工</el-button>
-            <el-button type="default" @click="toMyTasks">我的任务</el-button>
-          </template>
-          <template v-else>
-            <el-button type="default" @click="openTeamDialog">全部报工</el-button>
-            <el-button type="default" @click="toMyTasks">我的任务</el-button>
-
-          </template>
-        </div>
-      </div>
-      <!--历史报工-表格-->
-      <el-table
-        name="加班申请详情列表"
-        ref="tableMain"
-        class="fillTable"
-        :data="tableMain">
-        <el-table-column prop="reportDay" width="180" label="报工日期">
-          <template slot-scope="props">
-            {{props.row.reportDay | dateFormat('yyyy-MM-dd') }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="taskName" width="300" label="任务名称"></el-table-column>
-        <el-table-column prop="duration" width="150" label="报工时长(h)"></el-table-column>
-        <el-table-column prop="remark" label="备注"></el-table-column>
-        <el-table-column prop="auditStatus" width="150" label="状态">
-          <template slot-scope="props">
-            <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
-            <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
-            <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column width="150" label="操作">
-          <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
-            <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
-            <el-button size="mini" @click="openEditDialog(props.row)"> 编辑</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <!--新增列表-->
-      <div class="hanle-table-noth">
+        <!--历史报工-表格-->
         <el-table
-          ref="multipleSelectionTable"
+          name="加班申请详情列表"
+          ref="tableMain"
           class="fillTable"
-          :data="tableData">
-          <el-table-column
-            label="报工日期"
-            width="180"
-          >
-            <template slot-scope="scope">
-              <el-date-picker
-                v-model="scope.row.reportDay"
-                type="date"
-                :clearable="false"
-              >
-              </el-date-picker>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            label="任务名称"
-            width="300"
-          >
-            <template slot-scope="scope">
-              <el-select
-                filterable
-                clearable
-                v-model="scope.row.taskId"
-                placeholder="请选择">
-                <el-option
-                  v-for="item in projectList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            prop="name"
-            label="报工时长"
-            width="150"
-          >
-            <template slot-scope="scope">
-              <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            prop="name"
-            label="备注信息"
-          >
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.remark" maxlength="200" placeholder="请输入"></el-input>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            prop="name"
-            label="状态"
-            width="10"
-          >
-            <template slot-scope="scope">
-              <el-input  class="hide" v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
-            </template>
-          </el-table-column>
-
-          <el-table-column width="150" label="操作" type="index">
+          :data="tableMain">
+          <el-table-column prop="reportDay" width="180" label="报工日期">
             <template slot-scope="props">
-              <el-button type="danger" size="mini" @click="removeTableDate(props.row)"> 删除</el-button>
+              {{props.row.reportDay | dateFormat('yyyy-MM-dd') }}
             </template>
           </el-table-column>
-
+          <el-table-column prop="taskName" width="300" label="任务名称"></el-table-column>
+          <el-table-column prop="duration" width="150" label="报工时长(h)"></el-table-column>
+          <el-table-column prop="remark" label="备注"></el-table-column>
+          <el-table-column prop="auditStatus" width="150" label="状态">
+            <template slot-scope="props">
+              <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
+              <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
+              <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column width="150" label="操作">
+            <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
+              <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
+              <el-button size="mini" @click="openEditDialog(props.row)"> 编辑</el-button>
+            </template>
+          </el-table-column>
         </el-table>
-      </div>
-      <div class="formFooter">
-        <div class="sumWorkingHour">
-          <el-button type="default" icon="el-icon-circle-plus" @click="add">添加任务</el-button>
+        <!--新增列表-->
+        <div class="hanle-table-noth">
+          <el-table
+            ref="multipleSelectionTable"
+            class="fillTable"
+            :data="tableData">
+            <el-table-column
+              label="报工日期"
+              width="180">
+              <template slot-scope="scope">
+                <el-date-picker
+                  v-model="scope.row.reportDay"
+                  type="date"
+                  :clearable="false"
+                  :picker-options="pickerOptions"
+                >
+                </el-date-picker>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="任务名称"
+              width="300"
+            >
+              <template slot-scope="scope">
+                <el-select
+                  filterable
+                  clearable
+                  v-model="scope.row.taskId"
+                  placeholder="请选择">
+                  <el-option
+                    v-for="item in projectList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              prop="name"
+              label="报工时长"
+              width="150"
+            >
+              <template slot-scope="scope">
+                <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              prop="name"
+              label="备注信息"
+            >
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.remark" maxlength="200" placeholder="请输入"></el-input>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              prop="name"
+              label="状态"
+              width="10"
+            >
+              <template slot-scope="scope">
+                <el-input  class="hide" v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="150" label="操作">
+              <template slot-scope="props">
+                <el-button type="danger" size="mini" @click="removeTableDate(props.$index, props.row)"> 删除</el-button>
+              </template>
+            </el-table-column>
+
+          </el-table>
         </div>
-        <el-button type="primary" @click="validate" >提交今日报工</el-button>
-        <el-dialog
-          title="提示"
-          :visible.sync="dialogVisible"
-          width="40%">
+        <div class="formFooter">
+          <div class="sumWorkingHour">
+            <el-button type="default" icon="el-icon-circle-plus" @click="add">添加任务</el-button>
+          </div>
+          <el-button type="primary" @click="validate" >提交今日报工</el-button>
+          <el-dialog
+            title="提示"
+            :visible.sync="dialogVisible"
+            width="40%">
           <span class="warning-popup">
             <i class="el-icon-warning"></i>您今日总工时为<em class="c-blue">{{ sumWorkingHour }}</em>小时，确认提交今日报告么
           </span>
-          <span slot="footer" class="dialog-footer">
+            <span slot="footer" class="dialog-footer">
             <div class="buttonWrap">
               <el-button @click="dialogVisible = false">取 消</el-button>
               <el-button type="primary" @click="submit"  v-loading.fullscreen.lock="fullscreenLoading">确 定</el-button>
             </div>
           </span>
-        </el-dialog>
-      </div>
-    </el-form>
-    <!--编辑弹窗-->
-    <el-dialog title="编辑报工" :visible.sync="showSaveDialog" width="600px">
-      <el-form label-width="100px" :model="editWork" ref="saveForm">
-        <el-form-item label="报工日期">
-          <el-date-picker  class="w430"
-            v-model="editWork.reportDay"
-            type="date"
-            format="yyyy-MM-dd"
-          >
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="任务名称">
-          <el-select class="w430"
-            filterable
-            clearable
-            v-model="editWork.taskId"
-            placeholder="请选择">
-            <el-option
-              v-for="item in projectList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="报工时长(h)">
-          <el-input-number v-model="editWork.duration" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
-        </el-form-item>
-        <el-form-item label="状态" class="hide">
-          <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
-        </el-form-item>
-        <el-form-item label="备注">
-          <el-input class="w430" v-model="editWork.remark" type="textarea" :rows="3" placeholder="请输入"></el-input>
-        </el-form-item>
+          </el-dialog>
+        </div>
       </el-form>
-      <div slot="footer" class="dialog-footer tr">
-        <el-button @click="showSaveDialog = false">取 消</el-button>
-        <el-button type="primary"  @click="saveEditWork">确 定</el-button>
-      </div>
-    </el-dialog>
-    <administrators ref="Administrators"></administrators>
-    <team-members ref="TeamMembers"></team-members>
+      <!--编辑弹窗-->
+      <el-dialog title="编辑报工" :visible.sync="showSaveDialog" width="600px">
+        <el-form label-width="100px" :model="editWork" ref="saveForm">
+          <el-form-item label="报工日期">
+            <el-date-picker  class="w430"
+                             v-model="editWork.reportDay"
+                             type="date"
+                             format="yyyy-MM-dd"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="任务名称">
+            <el-select class="w430"
+                       filterable
+                       clearable
+                       v-model="editWork.taskId"
+                       placeholder="请选择">
+              <el-option
+                v-for="item in projectList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="报工时长(h)">
+            <el-input-number v-model="editWork.duration" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+          </el-form-item>
+          <el-form-item label="状态" class="hide">
+            <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input class="w430" v-model="editWork.remark" type="textarea" :rows="3" placeholder="请输入"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer tr">
+          <el-button @click="showSaveDialog = false">取 消</el-button>
+          <el-button type="primary"  @click="saveEditWork">确 定</el-button>
+        </div>
+      </el-dialog>
+      <administrators ref="Administrators"></administrators>
+      <team-members ref="TeamMembers"></team-members>
+    </div>
   </d2-container>
 </template>
 <script>
@@ -212,6 +214,7 @@
           remark: '',
         },
         projectList: [],
+        firstDataList:[],
         multipleSelection: [],
         sumWorkingHour: 0,
         maxLength: -1,
@@ -223,40 +226,39 @@
         tempMinIndex: '',
         editWork:{},
         showSaveDialog:false,
-        fullscreenLoading: false
+        fullscreenLoading: false,
+        weakData:{// 获取周一周天的时间
+          mondayData : new Date(new Date().getTime() - (new Date().getDay()-1)*(24*60*60*1000)),
+          sundayData : new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000)),
+        },
+        pickerOptions: { // 日期设置对象
+          disabledDate: (time) => {
+            return this.dealDisabledDate(time)
+          }
+        },
       }
     },
 
     methods:{
       //历史报工
+      formatDate(date) {
+        let d = new Date(date),
+          month = '' + (d.getMonth() + 1),
+          day = '' + d.getDate(),
+          year = d.getFullYear();
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+        return [year, month, day].join('-');
+      },
       historyData(){
         // 获取周一周天的时间
-        let now = new Date();
-        let nowTime = now.getTime() ;
-        let nowDay = now.getDay();
-        let oneDayTime = 24*60*60*1000 ;
-        let MondayTime = nowTime - (nowDay-1)*oneDayTime ;
-        let SundayTime =  nowTime + (7-nowDay)*oneDayTime ;
-        let monday = new Date(MondayTime);
-        let sunday = new Date(SundayTime);
-        function formatDate(date) {
-          let d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-          if (month.length < 2) month = '0' + month;
-          if (day.length < 2) day = '0' + day;
-          return [year, month, day].join('-');
-        }
-        console.log(formatDate(monday) ) ;
-        console.log(formatDate(sunday)) ;
+        console.log(this.formatDate(this.weakData.mondayData));
+        console.log(this.formatDate(this.weakData.sundayData));
         let historyList={
           currentPage:'',
           pageSize:'',
-          reportStartDayStr:formatDate(monday),
-          reportEndDayStr:formatDate(sunday),
-//        reportStartDayStr:'2019-03-04',
-//        reportEndDayStr:'2019-03-10'
+          reportStartDayStr:this.formatDate(this.weakData.mondayData),
+          reportEndDayStr:this.formatDate(this.weakData.sundayData),
         }
         this.$api.okr.dailyWork.historyDailyWork(historyList).then(res => {
           this.tableMain = res.data.data;
@@ -267,6 +269,7 @@
         let taskItem = Object.assign({}, this.initItemData)
         taskItem.index= this.tableData.length;
         this.tableData.push(taskItem)
+        console.log(taskItem.index)
       },
       changeTime () {
         let sumTemp = 0
@@ -367,8 +370,8 @@
         });
       },
       //删除输入框里的报工
-      removeTableDate(item){
-        this.tableData.splice(item.index, 1)
+      removeTableDate(index){
+        this.tableData.splice(index, 1)
       },
       // 跳转页面
       toMyTeam(){
@@ -388,6 +391,12 @@
       openTeamDialog() {
         this.$refs.TeamMembers.open();
       },
+      // 设置本周时间可选范围
+      dealDisabledDate (time) {
+        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
+        let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
+        return  time2<time.getTime() || time.getTime() < time1
+      }
     },
     mounted () {
       this.$api.okr.login.isLogin().then(res => {
@@ -402,11 +411,11 @@
       this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
         let resData = res.data.data
         resData.forEach(item => {
-          this.projectList.push({ value: item.taskCode, label: item.taskName })
+          this.projectList.push({ value: item.id, label: item.taskName })
         })
       })
+    },
 
-    }
   }
 </script>
 <style lang="scss">
@@ -466,14 +475,14 @@
     .el-select{
       width: 280px;
     }
-   .el-date-editor.el-input{
+    .el-date-editor.el-input{
       &.el-input{
         width:150px;
         input{
           padding-right: 10px
         }
       }
-     }
+    }
     .el-table__empty-text{display: none;}
     .el-table__empty-block{min-height:0;}
   }
@@ -498,6 +507,13 @@
   .w430.el-date-editor.el-input{
     width: 430px;
   }
-</style>
 
+  .daily-report{
+    .el-table th, .el-table td{padding-top:10px;padding-bottom: 10px}
+    .el-table th {
+      color: #333;
+      background-color: #f9f9f9;
+    }
+  }
+</style>
 

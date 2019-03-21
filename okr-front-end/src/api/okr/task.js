@@ -6,7 +6,6 @@ export default {
    * @return {*}
    */
   saveTask (taskInfo) {
-    console.log(taskInfo)
     return axios.post('/task/saveTask.json', {
       ...taskInfo
     })
@@ -20,8 +19,8 @@ export default {
     return axios.get(`/task/getTaskDetailInfo.json?id=${id}`)
   },
 
-  deleteTask (taskId) {
-    return axios.get('/task/deleteTask.json', taskId)
+  deleteTask (id) {
+    return axios.get(`/task/deleteTask.json?id=${id}`)
   },
 
   getApportionCategoryList () {
@@ -46,13 +45,13 @@ export default {
   */
   queryOKRTreeData () {
     return axios.post('/manage/okrObject/findAllOkrTreeData.json')
-  }
+  },
 
-  // /**
-  //  * 任务列表
-  //  * @return {*}
-  //  */
-  // queryTaskList (vo) {
-  //   return axios.post('/task/getTaskListByPage.json')
-  // }
+  /**
+   * 团队Okr详情
+   * @return {*}
+   */
+  queryTeamOKR (searchKey) {
+    return axios.get(`/task/getTeamTaskCountInfoVO.json?searchKey=${searchKey}`)
+  }
 }
