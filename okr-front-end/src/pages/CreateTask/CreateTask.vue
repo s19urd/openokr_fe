@@ -46,27 +46,27 @@
           </div>
         </div>
         <div class="collapseHeader_right">
-          <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
-          <el-button class="el-icon-delete" @click="editItem(item)"> 编辑</el-button>
+          <el-button class="el-icon-delete" @click="deleteItem(item)"> 删除</el-button>
+          <el-button class="el-icon-edit" @click="editItem(item)"> 编辑</el-button>
           <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
         </div>
-
-        <el-dialog
-          title="提示"
-          :visible.sync="tipDialogVisible"
-          class="warning"
-          width="30%">
-          <span><i class="el-icon-warning"></i>删除后将无法恢复，确认删除吗？</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="tipDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="confirm(item, index)">确 定</el-button>
-          </span>
-        </el-dialog>
       </li>
     </ul>
+
+     <el-dialog
+        title="提示"
+        :visible.sync="tipDialogVisible"
+        class="warning"
+        width="30%">
+        <span><i class="el-icon-warning"></i>删除后将无法恢复，确认删除吗？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="tipDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirm(item)">确 定</el-button>
+        </span>
+      </el-dialog>
 
     <el-pagination
       ref="pagination"
@@ -120,8 +120,9 @@ export default {
       this.isShow = true;
     },
 
-    deleteItem () {
+    deleteItem (item) {
       this.tipDialogVisible = true
+      this.confirm(item)
     },
 
     editItem (item) {
@@ -146,9 +147,14 @@ export default {
       this.$router.push({ name : 'TaskDetailPage', params: { id: id } })
     },
     
-    confirm (item, index) {
+    confirm (item) {
       this.tipDialogVisible = false
-      this.taskList.splice(index, 1)
+      this.$api.okr.task.deleteTask(item.id).then(res => {
+        if(res.code === 0) {
+          this.$message.success('删除成功')
+          this.serach(this.searchForm)
+        }
+      })
     },
 
     serach (searchForm) {

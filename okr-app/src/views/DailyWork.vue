@@ -39,8 +39,6 @@
           <field v-model="item.remark" label="备注信息" rows="1" type="textarea" autosize></field>
         </cell-group>
 
-        
-
         <popup
           v-model="show"
           position="bottom"
@@ -83,7 +81,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import { NavBar, Popup, Cell, CellGroup, DatetimePicker, Picker, Field, Button, Toast } from 'vant'
+import { NavBar, Popup, Cell, CellGroup, Picker, Field, Button, Toast } from 'vant'
 
 export default {
   name: 'report-working-hour',
@@ -93,7 +91,6 @@ export default {
     Popup,
     Cell,
     CellGroup,
-    DatetimePicker,
     Picker,
     Field,
     Button

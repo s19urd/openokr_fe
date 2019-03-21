@@ -19,8 +19,8 @@ export default {
     return axios.get(`/task/getTaskDetailInfo.json?id=${id}`)
   },
 
-  deleteTask (taskId) {
-    return axios.get('/task/deleteTask.json', taskId)
+  deleteTask (id) {
+    return axios.get(`/task/deleteTask.json?id=${id}`)
   },
 
   getApportionCategoryList () {

@@ -22,7 +22,7 @@
 <script>
 import { Field, CellGroup, Button } from 'vant'
 import Vue from 'vue'
-// import AppInput from 'components/input'
+// import { isMobile } from 'utilities/device-identify'
 export default {
   name: 'Login',
 
@@ -50,6 +50,10 @@ export default {
         }
       })
     }
+  },
+
+  mounted () {
+
   }
 }
 </script>
