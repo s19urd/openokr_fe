@@ -61,7 +61,7 @@
             <el-table-column
               prop="reportDay"
               label="报工日期"
-              width="120px"
+              width="100px"
               fixed
             >
               <template slot-scope="props">
@@ -73,11 +73,11 @@
               label="任务名称">
             </el-table-column>
             <el-table-column
-              prop="reportDay"
+              prop="productName"
               label="产品名称">
             </el-table-column>
             <el-table-column
-              prop="reportDay"
+              prop="categoryName"
               label="分摊类别"
               width="150px">
             </el-table-column>
@@ -86,11 +86,11 @@
               label="填报人">
             </el-table-column>
             <el-table-column
-              prop="reportDay"
+              prop="jobType"
               label="人员岗位类型">
             </el-table-column>
             <el-table-column
-              prop="reportDay"
+              prop="teamName"
               label="所属团队">
             </el-table-column>
             <el-table-column
@@ -101,7 +101,7 @@
             <el-table-column
               prop="auditStatus"
               label="当前状态"
-              width="100"
+              width="80"
               fixed="right"
             >
               <template slot-scope="props">

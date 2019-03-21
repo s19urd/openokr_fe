@@ -14,10 +14,10 @@
             <el-button type="default" @click="toMyTasks">我的任务</el-button>
           </template>
           <template v-else>
-            <el-button type="default" @click="openTeamDialog()">全部报工</el-button>
+            <el-button type="default" @click="openTeamDialog">全部报工</el-button>
             <el-button type="default" @click="toMyTasks">我的任务</el-button>
-
           </template>
+          <el-button type="default" @click="openAdminDialog">管理员全部报工</el-button>
         </div>
       </div>
       <!--历史报工-表格-->
