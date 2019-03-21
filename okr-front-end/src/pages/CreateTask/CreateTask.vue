@@ -77,7 +77,11 @@
       class="alginCenter">  
     </el-pagination>
 
-    <create-task-form :dialog-visible.sync="isShow" :task-form="itemFormInfo"></create-task-form>
+    <template v-if ="isShow">
+      <create-task-form
+        :dialog-visible.sync="isShow"
+        :task-form-edit.sync="itemFormInfo"></create-task-form>
+    </template>
   </div>
 </template>
 <script>
@@ -121,15 +125,20 @@ export default {
     },
 
     editItem (item) {
-      this.isShow = true
-      console.log(item)
       this.$api.okr.task.getTaskDetailInfo(item.id).then(res=> {
         this.itemFormInfo = res.data
-        console.log(this.itemFormInfo)
-        // this.personKeys = res.data.personKeys
-        // this.taskVO = res.data.taskVO
-        // this.taskVO.taskStartTime = timestampsToDate(this.taskVO.taskStartTime)
-        // this.taskVO.taskEndTime = timestampsToDate(this.taskVO.taskEndTime)
+        this.itemFormInfo.isEdit = true
+        this.itemFormInfo.taskVO.taskStartTime = new Date(this.itemFormInfo.taskVO.taskStartTime)
+        this.itemFormInfo.taskVO.taskEndTime = new Date(this.itemFormInfo.taskVO.taskEndTime)
+        this.itemFormInfo.userIds = []
+        this.itemFormInfo.krIds = []
+        this.itemFormInfo.userInfoVOS.forEach(item=>{
+          (this.itemFormInfo.userIds).push(item.id)
+        })
+        this.itemFormInfo.keys.forEach(item=> {
+          (this.itemFormInfo.krIds).push(item.id)
+        })
+        this.isShow = true
       })
     },
 
