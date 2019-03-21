@@ -6,30 +6,30 @@
         <!--全部报工-管理者-->
         历史报工
       </template>
-      <div class="">
+      <div class="numall-area">
         <el-row>
           <el-col :span="6">
             <div class="grid-content-top">
               <p class="key">耗费总工时</p>
-              <p class="value">{{totalData.costTimeNum||0}}h</p>
+              <p class="value">{{totalData.costTimeNum||0}}<em>h</em></p>
             </div>
           </el-col>
           <el-col :span="6">
             <div class="grid-content-top">
               <p class="key">任务总数</p>
-              <p class="value">{{totalData.taskNum||0}}个</p>
+              <p class="value">{{totalData.taskNum||0}}<em>个</em></p>
             </div>
           </el-col>
           <el-col :span="6">
             <div class="grid-content-top">
               <p class="key">产品总数</p>
-              <p class="value">{{totalData.productNum||0}}项</p>
+              <p class="value">{{totalData.productNum||0}}<em>项</em></p>
             </div>
           </el-col>
           <el-col :span="6">
             <div class="grid-content-top">
               <p class="key">人员总数</p>
-              <p class="value">{{totalData.personnelNum||0}}个</p>
+              <p class="value">{{totalData.personnelNum||0}}<em>个</em></p>
             </div>
           </el-col>
         </el-row>
@@ -199,6 +199,11 @@
       margin:10px 0;
       font-size: 24px;
       font-weight: 700;
+      color: #409eff;
+      em{    font-size: 20px;
+        margin-left: 5px;
+        vertical-align: 1px;
+      }
     }
   }
   .el-col+.el-col .grid-content-top{border-left: 1px solid #e5e5e5;}
