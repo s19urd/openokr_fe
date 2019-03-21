@@ -6,7 +6,13 @@
     @close="close">
     <el-form :model="taskForm" ref="taskForm">
       <el-form-item label="任务名称：" prop="taskName">
-        <el-input style="width: 80%" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
+        <el-input style="width: 60%" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
+      </el-form-item>
+
+      <el-form-item label="预计耗时:" prop="estimateTime" label-width="80px">
+        <el-input type="number" :min="0" style="width: 30%" placeholder="请输入预计耗时" v-model="taskForm.taskVO.estimateTime">
+          <template slot="append">h</template>
+        </el-input >
       </el-form-item>
    
       <el-row

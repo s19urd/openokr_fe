@@ -37,6 +37,7 @@
       <li class="taskItem" v-for="(item, index) in taskList" :key="index">
         <div class="collapseHeader_left">
           <span class="taskName" v-text="item.taskName"></span>
+          <el-tag style="margin-left: 12px">该任务预计耗时：{{ item.estimateTime }}</el-tag>
           <div class="text">
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
               <el-tag>{{ item.taskStartTime }}</el-tag> ~ <el-tag>{{ item.taskEndTime }}</el-tag>
@@ -161,6 +162,7 @@ export default {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data.data
         this.totalPage = res.data.totalPage
+        console.log(this.taskList)
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime) 
           item.taskEndTime = timestampsToDate(item.taskEndTime) 
