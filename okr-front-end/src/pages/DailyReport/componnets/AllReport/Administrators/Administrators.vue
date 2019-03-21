@@ -12,51 +12,23 @@
   export default {
     // 如果需要缓存页面
     // name 字段需要设置为和本页路由 name 字段一致
-    name: "TeamMembers",
+    name: "Administrators",
     mixins: [
       listMixin
     ],
     data() {
       return {
-        activeTabName: "first",
-        officeId:null,
-        totalData:{
-          workHoursNum:0,
-          taskNum:0,
-          productNum:0,
-          personnelNum:0
-        },
-        tableMainSearchModelBase:{
-          officeOptions: [],
-          shopTypeId:[],
-          searchStartEndDate: '',
-          shopName: '',
-        },
-        officeOptions:[],
         isVisible:false,
-        shopTypeOptions:[],
-        shopTypeProps:{
-          value: 'id',
-          label:'typeName',
-          children: 'childLists'
-        },
+
       };
     },
     computed: {
-      getActionWhere(){
-        return {
-          officeId : this.officeId
-        }
-      },
-      siteId() {
-        return this.$route.params.siteId
-      },
+
     },
     methods: {
       open(vo) {
         this.isVisible = true;
         this.loading = false;
-        this.officeId = vo.officeId;
 
       },
       back() {
@@ -64,11 +36,8 @@
         this.$emit("ok");
       },
 
-
-
     },
     mounted() {
-      const _this = this;
 
     }
   };

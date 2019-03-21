@@ -7,7 +7,7 @@
         </div>
         <div class="fr">
           <!--管理员-->
-          <template v-if="isManager==='0'">
+          <template v-if="isManager==='1'">
             <el-button type="default" @click="toMyTeam">我的团队</el-button>
             <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
             <el-button type="default" @click="openAdminDialog">全部报工</el-button>
@@ -129,7 +129,7 @@
         <div class="sumWorkingHour">
           <el-button type="default" icon="el-icon-circle-plus" @click="add">添加任务</el-button>
         </div>
-        <el-button type="primary" @click="validate" >完成今日报工</el-button>
+        <el-button type="primary" @click="validate" >提交今日报工</el-button>
         <el-dialog
           title="提示"
           :visible.sync="dialogVisible"
@@ -385,11 +385,11 @@
       },
       // 全部报工-管理者
       openAdminDialog() {
-        this.$refs.adminDialog.open();
+        this.$refs.Administrators.open();
       },
       // 全部报工-团队成员
       openTeamDialog() {
-        this.$refs.teamDialog.open();
+        this.$refs.TeamMembers.open();
       },
     },
     mounted () {
