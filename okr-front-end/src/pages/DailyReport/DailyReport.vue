@@ -334,13 +334,11 @@
         this.$api.okr.dailyWork.submitDailyWork([this.editWork]).then(res => {
           this.showSaveDialog = false
           if(res.code==0){
-            _this.openEditDialog = false;
             _this.$message({
               message: '修改成功!',
               type: 'success'
             });
             this.historyData();
-            this.tableData=[]
           }else{
             _this.$message.error(res.message);
           }
@@ -361,7 +359,6 @@
               if (res.code === 0) {
                 this.$message.success(`删除数据成功`);
                 this.historyData();
-                this.tableData=[]
               } else {
                 this.$message.error(res.message)
               }
