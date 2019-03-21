@@ -6,7 +6,7 @@
     @close="close">
     <el-form :model="taskForm" ref="taskForm">
       <el-form-item label="任务名称：" prop="taskName">
-        <el-input class="maxWidth" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
+        <el-input style="width: 80%" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
       </el-form-item>
    
       <el-row
@@ -64,7 +64,7 @@
       </el-col>
 
   
-      <el-form-item label="起止时间：" class="dateItem">
+      <el-form-item label="起止时间:" class="dateItem">
         <el-date-picker
           v-model="dateRange"
           type="daterange"
@@ -75,7 +75,7 @@
       </el-form-item>
   
 
-      <el-form-item label="jira标签: ">
+      <el-form-item label="jira标签: " label-width="72px">
         <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
@@ -128,7 +128,8 @@
             taskName: '',
             taskStartTime: '',
             taskEndTime: '',
-            jiraLabel: ''
+            jiraLabel: '',
+            estimateTime: 0
           },
           userIds: [],
           krIds: []
@@ -169,7 +170,8 @@
               taskName: '',
               taskStartTime: '',
               taskEndTime: '',
-              jiraLabel: ''
+              jiraLabel: '',
+              estimateTime: 0
             },
             userIds: [],
             krIds: []
@@ -328,6 +330,10 @@
 
     .el-icon-circle-plus {
       border: solid 2px transparent;
+    }
+
+    .el-tree-node {
+      margin-left: -8px;
     }
 
     .plusIcon {
