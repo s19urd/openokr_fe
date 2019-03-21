@@ -103,7 +103,7 @@
             label="备注信息"
           >
             <template slot-scope="scope">
-              <el-input v-model="scope.row.remark" placeholder="请输入"></el-input>
+              <el-input v-model="scope.row.remark" maxlength="200" placeholder="请输入"></el-input>
             </template>
           </el-table-column>
 
