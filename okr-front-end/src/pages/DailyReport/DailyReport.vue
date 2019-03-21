@@ -14,7 +14,7 @@
             <el-button type="default" @click="toMyTasks">我的任务</el-button>
           </template>
           <template v-else>
-            <el-button type="default" @click="openTeamDialog">全部报工</el-button>
+            <el-button type="default" @click="openTeamDialog()">全部报工</el-button>
             <el-button type="default" @click="toMyTasks">我的任务</el-button>
 
           </template>
@@ -151,18 +151,18 @@
       <el-form label-width="100px" :model="editWork" ref="saveForm">
         <el-form-item label="报工日期">
           <el-date-picker  class="w430"
-            v-model="editWork.reportDay"
-            type="date"
-            format="yyyy-MM-dd"
+                           v-model="editWork.reportDay"
+                           type="date"
+                           format="yyyy-MM-dd"
           >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="任务名称">
           <el-select class="w430"
-            filterable
-            clearable
-            v-model="editWork.taskId"
-            placeholder="请选择">
+                     filterable
+                     clearable
+                     v-model="editWork.taskId"
+                     placeholder="请选择">
             <el-option
               v-for="item in projectList"
               :key="item.value"
@@ -223,40 +223,34 @@
         tempMinIndex: '',
         editWork:{},
         showSaveDialog:false,
-        fullscreenLoading: false
+        fullscreenLoading: false,
+        weakData:{// 获取周一周天的时间
+          mondayData : new Date(new Date().getTime() - (new Date().getDay()-1)*(24*60*60*1000)),
+          sundayData : new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000)),
+        }
       }
     },
 
     methods:{
       //历史报工
+      formatDate(date) {
+        let d = new Date(date),
+          month = '' + (d.getMonth() + 1),
+          day = '' + d.getDate(),
+          year = d.getFullYear();
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+        return [year, month, day].join('-');
+      },
       historyData(){
         // 获取周一周天的时间
-        let now = new Date();
-        let nowTime = now.getTime() ;
-        let nowDay = now.getDay();
-        let oneDayTime = 24*60*60*1000 ;
-        let MondayTime = nowTime - (nowDay-1)*oneDayTime ;
-        let SundayTime =  nowTime + (7-nowDay)*oneDayTime ;
-        let monday = new Date(MondayTime);
-        let sunday = new Date(SundayTime);
-        function formatDate(date) {
-          let d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-          if (month.length < 2) month = '0' + month;
-          if (day.length < 2) day = '0' + day;
-          return [year, month, day].join('-');
-        }
-        console.log(formatDate(monday) ) ;
-        console.log(formatDate(sunday)) ;
+        console.log(this.formatDate(this.weakData.mondayData));
+        console.log(this.formatDate(this.weakData.sundayData));
         let historyList={
           currentPage:'',
           pageSize:'',
-          reportStartDayStr:formatDate(monday),
-          reportEndDayStr:formatDate(sunday),
-//        reportStartDayStr:'2019-03-04',
-//        reportEndDayStr:'2019-03-10'
+          reportStartDayStr:this.formatDate(this.weakData.mondayData),
+          reportEndDayStr:this.formatDate(this.weakData.sundayData),
         }
         this.$api.okr.dailyWork.historyDailyWork(historyList).then(res => {
           this.tableMain = res.data.data;
@@ -402,7 +396,7 @@
       this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
         let resData = res.data.data
         resData.forEach(item => {
-          this.projectList.push({ value: item.taskCode, label: item.taskName })
+          this.projectList.push({ value: item.id, label: item.taskName })
         })
       })
 
@@ -466,14 +460,14 @@
     .el-select{
       width: 280px;
     }
-   .el-date-editor.el-input{
+    .el-date-editor.el-input{
       &.el-input{
         width:150px;
         input{
           padding-right: 10px
         }
       }
-     }
+    }
     .el-table__empty-text{display: none;}
     .el-table__empty-block{min-height:0;}
   }
