@@ -173,7 +173,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="报工时长(h)">
-            <el-input-number v-model="editWork.duration" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+            <el-input-number v-model="editWork.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
           </el-form-item>
           <el-form-item label="状态" class="hide">
             <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
