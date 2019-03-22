@@ -97,14 +97,26 @@
       //渲染表1
       drawPie(){
         let names = [];
+        let data = [];
         let colors = ['#409EFF','#67C23A','#E6A23C','#F56C6C','#909399','##FFEF40'];
-        let data = this.pageData.map((item,index)=>{
-          names.push(item.orgName);
-          return {
-            value:item.duration,
-            name:item.orgName,
-          }
-        });
+        //如果有数据
+        if(this.pageData.length>0){
+          data = this.pageData.map((item,index)=>{
+            names.push(item.orgName);
+            return {
+              value:item.duration,
+              name:item.orgName,
+            }
+          });
+        }else{
+          data =[
+            {
+              value:0,
+              name:'无数据',
+            }
+          ]
+        }
+
         // 绘制图表
         this.myChart.setOption({
           title: { text: '按照人员所属部门统计 '+ this.searchParam.reportStartDateShow,textStyle:{fontWeight:400,fontSize:'14px'} },
