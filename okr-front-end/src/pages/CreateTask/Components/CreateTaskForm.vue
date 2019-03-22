@@ -282,8 +282,13 @@
       },
 
       confirm () {
-        this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
-        this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
+        if(this.$refs.KRTrees) {
+          this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
+        }
+        
+        if (this.$refs.userTree) {
+          this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
+        }
         console.log(this.taskForm)
         this.validate()
         if (this.flag) {
