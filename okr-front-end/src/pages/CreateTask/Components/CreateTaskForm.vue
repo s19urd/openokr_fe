@@ -33,27 +33,31 @@
         :key="index"
         >
 
-          <el-col :span="7">
-            <el-form-item label="分摊名称：" prop="apportionNameId">
-              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
+         <el-col :span="7">
+            <el-form-item label="分摊类别:" prop="categoryId">
+              <el-select
+                v-model="item.categoryId"
+                placeholder="请选择"
+                @change="changeReleatedProjectList(item)">
                 <el-option
-                  v-for="item in projectList"
+                  v-for="item in projetTypeList"
                   :key="item.id"
-                  :label="item.name"
+                  :label="item.categoryName"
                   :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
 
+
           <el-col :span="7">
-            <el-form-item label="分摊类别:" prop="categoryId">
-              <el-select v-model="item.categoryId" placeholder="请选择">
+            <el-form-item label="分摊名称：" prop="apportionNameId">
+              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
                 <el-option
-                  v-for="item in projetTypeList"
-                  :key="item.id"
-                  :label="item.categoryName"
-                  :value="item.id">
+                  v-for="projectItem in item.projectReleatedList"
+                  :key="projectItem.id"
+                  :label="projectItem.name"
+                  :value="projectItem.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -96,7 +100,7 @@
         <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
-      <el-form-item label="参与人员: ">
+      <el-form-item label="参与人员: " v-if="taskForm.userIds.length > 0">
         <el-tree
           :data="userTree"
           show-checkbox
@@ -105,7 +109,7 @@
           ref="userTree"></el-tree>
       </el-form-item >
 
-      <el-form-item label="关联KR: ">
+      <el-form-item label="关联KR: " v-if="taskForm.krIds.length > 0">
         <el-tree
           :data="KRTrees"
           show-checkbox
@@ -139,7 +143,8 @@
               apportionName: '',
               apportionNameId: '',
               categoryId: '',
-              apportionRate: ''
+              apportionRate: '',
+              projectReleatedList: []
             }
           ],
           taskVO: {
@@ -154,7 +159,6 @@
           krIds: []
         },
 
-        projectList: [],
         projetTypeList: [],
         initItem: {
           apportionName: '',
@@ -185,7 +189,8 @@
                 apportionName: '',
                 apportionNameId: '',
                 categoryId: '',
-                apportionRate: ''
+                apportionRate: '',
+                projectReleatedList
               }
             ],
             taskVO: {
@@ -215,6 +220,12 @@
           return null
         }
         this.taskForm['apportionVOS'].splice(index, 1)
+      },
+
+      changeReleatedProjectList (item) {
+        this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
+          item.projectReleatedList = res.data
+        })
       },
 
       cancel () {
@@ -271,8 +282,13 @@
       },
 
       confirm () {
-        this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
-        this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
+        if(this.$refs.KRTrees) {
+          this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
+        }
+        
+        if (this.$refs.userTree) {
+          this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
+        }
         console.log(this.taskForm)
         this.validate()
         if (this.flag) {
@@ -300,10 +316,6 @@
     },
 
     mounted () {
-      this.$api.okr.task.getApportionSelectList().then(res=> {
-        this.projectList = res.data
-      })
-
       this.$api.okr.task.getApportionCategoryList().then(res=> {
         this.projetTypeList = res.data
       })

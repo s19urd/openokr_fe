@@ -1,20 +1,22 @@
 <template>
-  <div class="Login">
-    <div class="LoginHeader">
-      <h1>Hello</h1>
-      <p>欢迎来到OKR管理系统</p>
-    </div>
+  <div>
+    <div class="Login">
+      <div class="LoginHeader">
+        <h1>Hello</h1>
+        <p>欢迎来到OKR管理系统</p>
+      </div>
 
-    <cell-group class="LoginForm">
-      <Field v-model="userInfo.username"  label="账号/手机号" required></Field>
-      <Field v-model="userInfo.password"  label="请输入密码" required></Field>
-       <!-- <app-input :value="account" label="账号/手机号"/>
-       <app-input :value="password" label="请输入密码"/> -->
-      <Button type="info" class="submit" @click="submit">登陆</Button>
-    </cell-group>
+      <cell-group class="LoginForm">
+        <Field v-model="userInfo.username"  label="账号/手机号" required></Field>
+        <Field v-model="userInfo.password"  label="请输入密码" required></Field>
+        <!-- <app-input :value="account" label="账号/手机号"/>
+        <app-input :value="password" label="请输入密码"/> -->
+        <Button type="info" class="submit" @click="submit">登陆</Button>
+      </cell-group>
 
-    <div class="LoginFooter">
-      <img :src="imgUrl">
+      <div class="LoginFooter">
+        <img :src="imgUrl">
+      </div>
     </div>
   </div>
 </template>
@@ -46,7 +48,7 @@ export default {
     submit () {
       Vue.api.login.signIn(this.userInfo).then(res => {
         if (res.success) {
-          this.$router.push({ name: 'HistoryWork' })
+          this.$router.replace({ name: 'HistoryWork' })
         }
       })
     }
@@ -55,7 +57,7 @@ export default {
   mounted () {
     if (process.env.NODE_ENV === 'production') {
       if (!isMobile()) {
-        window.location.href = 'http://test.okr.onlyou.com/login.htm'
+        window.location.href = '/login.htm'
       }
     }
   }

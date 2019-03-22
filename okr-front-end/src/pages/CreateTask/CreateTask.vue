@@ -177,6 +177,7 @@ export default {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data.data
         this.totalPage = res.data.totalPage
+        console.log(this.taskList)
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime) 
           item.taskEndTime = timestampsToDate(item.taskEndTime) 

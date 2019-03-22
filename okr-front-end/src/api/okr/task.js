@@ -27,8 +27,8 @@ export default {
     return axios.get('/task/getApportionCategoryList.json')
   },
 
-  getApportionSelectList () {
-    return axios.get('/task/getApportionSelectList.json')
+  getApportionSelectList (categoryId) {
+    return axios.get(`/task/getApportionSelectList.json?categoryId=${categoryId}`)
   },
 
    /*

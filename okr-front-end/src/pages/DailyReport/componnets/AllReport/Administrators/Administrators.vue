@@ -6,7 +6,7 @@
         <!--全部报工-管理者-->
         历史报工
       </template>
-      <div class="numall-area">
+      <div class="numall-area admin-area">
         <el-row>
           <el-col :span="6">
             <div class="grid-content-top">
@@ -50,8 +50,8 @@
                 >
                   <!--基础查询-->
                   <template slot="baseSearchForm" slot-scope="scope">
-                    <div class="inline-block mr10">
-                      <span> 当前统计周期：</span>
+                    <div class="inline-block">
+                      <span class="lab"> 当前统计周期：</span>
                       <el-date-picker
                         v-model="scope.form.searchStartEndDate"
                         type="daterange"
@@ -60,10 +60,97 @@
                         end-placeholder="结束日期"
                         format="yyyy-MM-dd"
                         value-format="yyyy-MM-dd"
-                        style="width: 226px;"
+                        class="w70off"
                       >
                       </el-date-picker>
                     </div>
+
+                    <div class="inline-block">
+                      <span class="lab"> 产品名称：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.productId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in productList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block">
+                      <span class="lab"> 任务名称：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.taskId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in taskList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block">
+                      <span class="lab">分摊类型：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.categoryId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in categoryList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block">
+                      <span class="lab">团队：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.teamId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in teamList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block mr10">
+                      <span class="lab">OKR：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.okrId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in okrList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+
                   </template>
                   <template slot="tableColumns">
                     <el-table-column
@@ -125,7 +212,7 @@
               </el-tab-pane>
               <el-tab-pane label="团队报工" name="second">
                 <table-comb
-                  name="管理者历史报工列表"
+                  name="团队报工列表"
                   ref="tableMain"
                   :search-model-base="tableMainSearchModelBase"
                   :get-action="$api.okr.dailyWork.allDailyWork"
@@ -136,8 +223,8 @@
                 >
                   <!--基础查询-->
                   <template slot="baseSearchForm" slot-scope="scope">
-                    <div class="inline-block mr10">
-                      <span> 当前统计周期：</span>
+                    <div class="inline-block">
+                      <span class="lab"> 当前统计周期：</span>
                       <el-date-picker
                         v-model="scope.form.searchStartEndDate"
                         type="daterange"
@@ -146,12 +233,154 @@
                         end-placeholder="结束日期"
                         format="yyyy-MM-dd"
                         value-format="yyyy-MM-dd"
-                        style="width: 226px;"
+                        class="w70off"
                       >
                       </el-date-picker>
                     </div>
-                  </template>
 
+                    <div class="inline-block">
+                      <span class="lab"> 产品名称：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.productId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in productList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block">
+                      <span class="lab"> 任务名称：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.taskId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in taskList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block">
+                      <span class="lab">分摊类型：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.categoryId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in categoryList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block">
+                      <span class="lab">团队：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.teamId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in teamList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                    <div class="inline-block mr10">
+                      <span class="lab">OKR：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.okrId"
+                        placeholder="请选择"
+                        class="w70off"
+                      >
+                        <el-option
+                          v-for="item in okrList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+
+                  </template>
+                  <!--表格-->
+                  <template slot="tableColumns">
+                    <el-table-column
+                      prop="reportDay"
+                      label="报工日期"
+                      width="100px"
+                      fixed
+                    >
+                      <template slot-scope="props">
+                        {{props.row.reportDay | dateFormat('yyyy-MM-dd') }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column
+                      prop="taskName"
+                      label="任务名称">
+                    </el-table-column>
+                    <el-table-column
+                      prop="productName"
+                      label="产品名称">
+                    </el-table-column>
+                    <el-table-column
+                      prop="categoryName"
+                      label="分摊类别"
+                      width="150px">
+                    </el-table-column>
+                    <el-table-column
+                      prop="reportUserName"
+                      label="填报人">
+                    </el-table-column>
+                    <el-table-column
+                      prop="jobType"
+                      label="人员岗位类型">
+                    </el-table-column>
+                    <el-table-column
+                      prop="teamName"
+                      label="所属团队">
+                    </el-table-column>
+                    <el-table-column
+                      prop="duration"
+                      label="耗费工时（h）"
+                      width="120">
+                    </el-table-column>
+                    <el-table-column
+                      prop="auditStatus"
+                      label="当前状态"
+                      width="80"
+                      fixed="right"
+                    >
+                      <template slot-scope="props">
+                        <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
+                        <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
+                        <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
+                      </template>
+                    </el-table-column>
+
+                  </template>
                 </table-comb>
                 <template slot="footer"></template>
               </el-tab-pane>
@@ -183,11 +412,18 @@
         },
         tableMainSearchModelBase:{
           searchStartEndDate: [],
-//          taskId:[],
+          taskId:'',
+          productId:'',
+          categoryId:'',
+          teamId:'',
+          okrId:''
         },
-        projectList: [],
+        taskList: [],
+        productList:[],
+        categoryList:[],
+        teamList:[],
+        okrList:[],
         activeTabName: "first",
-        activeName: "first",
       };
     },
     computed: {
@@ -202,7 +438,79 @@
       open(vo) {
         this.isVisible = true;
         this.loading = false;
+        this. activeTabName= "first";
 
+        let searchVo={};
+        //任务名称-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.taskList=[]
+          let taskId=[]
+          resData.map(item => {
+            if(item.taskId!==null || item.taskName!==null){
+              if(taskId.indexOf(item.taskId)==-1){
+                taskId.push(item.taskId)
+                this.taskList.push({ value: item.taskId, label: item.taskName })
+              }
+            }
+          })
+        })
+        //产品名称-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.productList=[]
+          let productId=[]
+          resData.map(item => {
+            if(item.productId!==null || item.productName!==null){
+              if(productId.indexOf(item.productId)==-1){
+                productId.push(item.productId)
+                this.productList.push({ value: item.productId, label: item.productName })
+              }
+            }
+          })
+        })
+        //分摊类型-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.categoryList=[]
+          let categoryIds=[]
+          resData.map(item => {
+            if(item.categoryId!==null || item.categoryName!==null){
+              if(categoryIds.indexOf(item.categoryId)==-1){
+                categoryIds.push(item.categoryId)
+                this.categoryList.push({value: item.categoryId, label: item.categoryName})
+              }
+            }
+          })
+        })
+        //团队-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.teamList=[]
+          let teamId=[]
+          resData.map(item => {
+            if(item.teamId!==null || item.teamName!==null){
+              if(teamId.indexOf(item.teamId)==-1){
+                teamId.push(item.teamId)
+                this.teamList.push({ value: item.teamId, label: item.teamName })
+              }
+            }
+          })
+        })
+        //okr-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.okrList=[]
+          let okrId=[]
+          resData.map(item => {
+            if(item.okrId!==null || item.okrName!==null){
+              if(okrId.indexOf(item.okrId)==-1){
+                okrId.push(item.okrId)
+                this.okrList.push({ value: item.okrId, label: item.okrName })
+              }
+            }
+          })
+        })
       },
       back() {
         this.isVisible = false
@@ -213,13 +521,6 @@
       },
     },
     mounted() {
-      //任务名称
-      this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
-        let resData = res.data.data
-        resData.forEach(item => {
-          this.projectList.push({ value: item.id, label: item.taskName })
-        })
-      })
 
     }
   };
@@ -247,11 +548,21 @@
     }
   }
   .el-col+.el-col .grid-content-top{border-left: 1px solid #e5e5e5;}
-  .inline-block{ display:inline-block;}
+  .inline-block{
+    display:inline-block;width: 370px;margin:5px 0;
+    .lab{
+      display: inline-block;min-width: 100px;text-align: right;
+    }
+    .w70off{
+      width: 70%;
+      box-sizing: border-box;
+    }
+  }
 </style>
+
 <style>
-  .numall-area .el-tabs__content .m-table-comb{padding-top:5px}
-  .numall-area .m-table-comb .table-filter{padding-bottom:20px}
+  .admin-area .el-tabs__content .m-table-comb{padding-top:5px}
+  .admin-area .m-table-comb .table-filter{padding-bottom:15px}
   .daily-report .el-tabs__active-bar{  display:none;}
   .daily-report .el-tabs__item{margin:0 20px;padding:0;font-size: 15px;
     font-weight: bold;}
