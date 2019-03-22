@@ -1,8 +1,8 @@
 const path = require('path')
-const env = process.env.NODE_ENV
+// const env = process.env.NODE_ENV
 
 // 拼接路径
-function resolve(dir) {
+function resolve (dir) {
   return path.join(__dirname, dir)
 }
 
