@@ -7,18 +7,17 @@
             <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～
           </div>
           <div class="fr">
-            <!--管理员-->
-            <template v-if="isManager==='1'">
-              <el-button type="default" @click="toMyTeam">我的团队</el-button>
-              <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
-              <el-button type="default" @click="openAdminDialog">全部报工</el-button>
-              <el-button type="default" @click="toMyTasks">我的任务</el-button>
-            </template>
-            <template v-else="">
-              <el-button type="default" @click="openTeamDialog">全部报工</el-button>
-              <el-button type="default" @click="toMyTasks">我的任务</el-button>
-              <el-button type="default" @click="openAdminDialog">管理员全部报工</el-button>
-            </template>
+            <!--&lt;!&ndash;管理员&ndash;&gt;-->
+            <!--<template v-if="role.roleType==='00' || role.roleType==='01' || role.roleType==='02'">-->
+              <!--<el-button type="default" @click="toMyTeam">我的团队</el-button>-->
+              <!--<el-button type="default" @click="toDataAggregation">数据汇总</el-button>-->
+              <!--<el-button type="default" @click="openAdminDialog">全部报工</el-button>-->
+              <!--<el-button type="default" @click="toMyTasks">我的任务</el-button>-->
+            <!--</template>-->
+            <!--<template v-else="">-->
+              <!--<el-button type="default" @click="openTeamDialog">全部报工</el-button>-->
+              <!--<el-button type="default" @click="toMyTasks">我的任务</el-button>-->
+            <!--</template>-->
           </div>
         </div>
         <!--历史报工-表格-->
@@ -203,7 +202,7 @@
     components: {Administrators,TeamMembers},
     data () {
       return {
-        isManager: false,
+        role:{},
         tableMain: [],
         tableData: [],
         initItemData:{
@@ -239,7 +238,11 @@
         },
       }
     },
-
+    computed:{
+      teamId(){
+        this.$route.params.teamId
+      }
+    },
     methods:{
       //历史报工
       formatDate(date) {
@@ -271,7 +274,7 @@
         let taskItem = Object.assign({}, this.initItemData)
         taskItem.index= this.tableData.length;
         this.tableData.push(taskItem)
-        console.log(taskItem.index)
+//        console.log(taskItem.index)
       },
       changeTime () {
         let sumTemp = 0
@@ -380,10 +383,10 @@
         this.$router.push({path: '/MyTeam.vhtml'})
       },
       toDataAggregation(){
-        this.$router.push({path: '/DataAggregation.vhtml'})
+        this.$router.push({path: '/daily/dashboard/'+this.teamId})
       },
       toMyTasks(){
-        this.$router.push({path: '/MyTasks.vhtml'})
+        this.$router.push({path: '/CreateTask.vhtml'})
       },
       // 全部报工-管理者
       openAdminDialog() {
@@ -401,6 +404,10 @@
       }
     },
     mounted () {
+      this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
+        this.role = res.data;
+
+      });
       this.$api.okr.login.isLogin().then(res => {
         if (!res.success) {
           this.$router.replace({
@@ -410,7 +417,12 @@
       });
       this.historyData()
       //任务名称
-      this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
+      let projectVo={
+        isFilterTime:'1',
+        currentPage:'',
+        pageSize:'',
+      }
+      this.$api.okr.dailyWork.queryTaskListByPage(projectVo).then(res => {
         let resData = res.data.data
         resData.forEach(item => {
           this.projectList.push({ value: item.id, label: item.taskName })
