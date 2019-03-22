@@ -7,14 +7,23 @@
       :fixed="true"
       :z-index="1"
       left-arrow>
-      <icon name="search" slot="right" size="20px" />
+      <icon name="search" slot="right" size="20px" @click="searchShow = !searchShow" />
     </nav-bar>
 
     <div class="pageContent">
+      <search
+        v-model="keyWord"
+        placeholder="请输入搜索关键词"
+        show-action
+        @search="onSearch"
+        @cancel="searchShow = false"
+        v-show="searchShow"
+      />
+
       <tabs v-model="currentTab" color="#1989fa">
         <tab title="本周报工">
           <collapse v-model="activeCollapse">
-            <collapse-item v-for="(work, key, index) in currentWeekList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + addWork(work) + 'h'">
+            <collapse-item v-for="(work, key, index) in currentWeekList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + countWork(work) + 'h'">
               <swipe-cell :right-width="65" :on-close="onClose" v-for="(item, index) in work" :key="index" :id="item.id">
                 <cell-group>
                   <cell :value="item.duration + 'h'">
@@ -36,11 +45,13 @@
           </collapse>
 
           <div class="inner">
-            <Button size="large" type="info" @click="$router.push({ name: 'DailyWork' })">+ 添加报工</Button>
+            <Button size="large" type="info" @click="$router.push({ name: 'EditWork' })">+ 添加报工</Button>
           </div>
 
         </tab>
-        <tab title="历史报工">内容 2</tab>
+        <tab title="历史报工">
+          <inlineCalendar :dayClick="dayClick"/>
+        </tab>
       </tabs>
     </div>
 
@@ -49,7 +60,7 @@
 
 <script>
 import Vue from 'vue'
-import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGroup, SwipeCell, Dialog, Tag, Toast } from 'vant'
+import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGroup, SwipeCell, Dialog, Tag, Toast, Search } from 'vant'
 
 export default {
   name: '',
@@ -58,6 +69,8 @@ export default {
       currentTab: 0,
       activeCollapse: [],
       currentWeekList: {},
+      searchShow: false,
+      keyWord: '',
     }
   },
   components: {
@@ -74,6 +87,7 @@ export default {
     Dialog,
     Tag,
     Toast,
+    Search,
   },
   mounted () {
     this.currentWeek()
@@ -82,7 +96,7 @@ export default {
     back () {
       this.$router.replace({ name: 'Login' })
     },
-    addWork (work) {
+    countWork (work) {
       return work.reduce((acc, el) => {
         return acc + el.duration
       }, 0)
@@ -97,23 +111,15 @@ export default {
       let SundayTime = nowTime + (7 - nowDay) * oneDayTime
       let monday = new Date(MondayTime)
       let sunday = new Date(SundayTime)
-      function formatDate (date) {
-        let d = new Date(date)
-        let month = '' + (d.getMonth() + 1)
-        let day = '' + d.getDate()
-        let year = d.getFullYear()
-        if (month.length < 2) month = '0' + month
-        if (day.length < 2) day = '0' + day
-        return [year, month, day].join('-')
-      }
-      // console.log(formatDate(monday))
-      // console.log(formatDate(sunday))
+
+      // console.log(Vue.filter('dateFormat')(monday, 'yyyy-MM-dd'))
+      // console.log(Vue.filter('dateFormat')(sunday, 'yyyy-MM-dd'))
 
       let query = {
         currentPage: '',
         pageSize: '',
-        reportStartDayStr: formatDate(monday),
-        reportEndDayStr: formatDate(sunday)
+        reportStartDayStr: Vue.filter('dateFormat')(monday, 'yyyy-MM-dd'),
+        reportEndDayStr: Vue.filter('dateFormat')(sunday, 'yyyy-MM-dd')
       }
 
       Vue.api.historyWork.getHistoryWork(query).then(res => {
@@ -178,7 +184,13 @@ export default {
     },
     editWork (day) {
       // console.log(day)
-      this.$router.push({ name: 'DailyWork', query: { day } })
+      this.$router.push({ name: 'EditWork', query: { day } })
+    },
+    onSearch (keyWord) {
+      console.log(keyWord)
+    },
+    dayClick (date) {
+      console.log(date)
     },
   },
 }
@@ -195,18 +207,11 @@ export default {
   // margin-top: -46px;
   padding-top: 46px;
 }
-.van-collapse-item {
-  // margin-bottom: 20px;
-}
-.van-collapse-item__content {
-  // padding-left: 0;
-  // padding-right: 0;
-}
 .custom-text {
   margin-right: 10px;
 }
 .collapse-bd {
-  padding: 10px 15px 0;
+  padding: 10px 0 0;
   border-top: 1px solid #ebedf0;
   text-align: right;
 
