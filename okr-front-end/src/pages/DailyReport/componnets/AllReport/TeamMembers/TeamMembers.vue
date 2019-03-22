@@ -34,7 +34,7 @@
           :search-model-base="tableMainSearchModelBase"
           :get-action="$api.okr.dailyWork.allDailyWork"
           :get-action-where="getActionWhere"
-          :auto-fetch="true"
+          :auto-fetch="false"
           :afterFetchData="afterFetchData"
 
         >
@@ -55,6 +55,74 @@
               </el-date-picker>
             </div>
 
+            <div class="inline-block">
+              <span class="lab"> 产品名称：</span>
+              <el-select
+                filterable
+                clearable
+                v-model="scope.form.productId"
+                placeholder="请选择"
+                class="w70off"
+              >
+                <el-option
+                  v-for="item in productList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="inline-block">
+              <span class="lab"> 任务名称：</span>
+              <el-select
+                filterable
+                clearable
+                v-model="scope.form.taskId"
+                placeholder="请选择"
+                class="w70off"
+              >
+                <el-option
+                  v-for="item in projectList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="inline-block">
+              <span class="lab">分摊类型：</span>
+              <el-select
+                filterable
+                clearable
+                v-model="scope.form.categoryId"
+                placeholder="请选择"
+                class="w70off"
+              >
+                <el-option
+                  v-for="item in categoryList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+            <div class="inline-block">
+              <span class="lab">团队：</span>
+              <el-select
+                filterable
+                clearable
+                v-model="scope.form.teamId"
+                placeholder="请选择"
+                class="w70off"
+              >
+                <el-option
+                  v-for="item in teamList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
             <div class="inline-block mr10">
               <span class="lab">OKR：</span>
               <el-select
@@ -157,10 +225,16 @@
         },
         tableMainSearchModelBase:{
           searchStartEndDate: [],
-          taskId:[],
-          okrId:[]
+          taskId:'',
+          productId:'',
+          categoryId:'',
+          teamId:'',
+          okrId:''
         },
         projectList: [],
+        productList:[],
+        categoryList:[],
+        teamList:[],
         okrList:[],
       };
     },
@@ -176,12 +250,50 @@
       open(vo) {
         this.isVisible = true;
         this.loading = false;
-
+        let searchVo={};
+        //任务名称-下拉
+        this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
+          let resData = res.data.data
+          this.projectList=[]
+          resData.forEach(item => {
+            this.projectList.push({ value: item.id, label: item.taskName })
+          })
+        })
+        //产品名称-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.productList=[]
+          resData.map(item => {
+            this.productList.push({ value: item.productId, label: item.productName })
+          })
+        })
+        //分摊类型-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.categoryList=[]
+          resData.map(item => {
+            this.categoryList.push({value: item.categoryId, label: item.categoryName})
+          })
+          let hash = {};
+          let arrData=this.categoryList;
+          arrData = arrData.reduce(function(item, next) {
+            hash[next.categoryId] ? '' : hash[next.categoryId] = true && item.push(next);
+            return item
+          }, [])
+          console.log("111111：")
+          console.log(arrData);
+        })
+        //团队-下拉
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.teamList=[]
+          resData.map(item => {
+            this.teamList.push({ value: item.teamId, label: item.teamName })
+          })
+        })
         //okr-下拉
-        let okrVo={}
-        this.$api.okr.dailyWork.getSearchConditionList(okrVo).then(res => {
-          let resData = res.data.data;
-          console.log(resData)
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
           this.okrList=[]
           resData.map(item => {
             this.okrList.push({ value: item.okrId, label: item.okrName })
