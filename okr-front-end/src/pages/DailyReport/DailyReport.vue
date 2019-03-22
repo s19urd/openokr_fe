@@ -8,16 +8,16 @@
           </div>
           <div class="fr">
             <!--管理员-->
-            <!--<template >-->
-              <!--<el-button type="default" @click="toMyTeam">我的团队</el-button>-->
-              <!--<el-button type="default" @click="toDataAggregation">数据汇总</el-button>-->
-              <!--<el-button type="default" @click="openAdminDialog">全部报工</el-button>-->
-              <!--<el-button type="default" @click="toMyTasks">我的任务</el-button>-->
-            <!--</template>-->
-            <!--<template >-->
-              <!--<el-button type="default" @click="openTeamDialog">全部报工</el-button>-->
-              <!--<el-button type="default" @click="toMyTasks">我的任务</el-button>-->
-            <!--</template>-->
+            <template v-if="isManage===false">
+              <el-button type="default" @click="openTeamDialog">全部报工</el-button>
+              <el-button type="default" @click="toMyTasks">我的任务</el-button>
+            </template>
+            <template v-if="isManage===true">
+              <el-button type="default" @click="toMyTeam">我的团队</el-button>
+              <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
+              <el-button type="default" @click="openAdminDialog">全部报工</el-button>
+              <el-button type="default" @click="toMyTasks">我的任务</el-button>
+            </template>
           </div>
         </div>
         <!--历史报工-表格-->
@@ -200,7 +200,7 @@
     components: {Administrators,TeamMembers},
     data () {
       return {
-        isManage:'0',
+        isManage:false,
         tableMain: [],
         tableData: [],
         initItemData:{
@@ -402,7 +402,24 @@
       }
     },
     mounted () {
+      this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
+        let resData = res.data;
+        let roleTypeList=[];
+        let roleTypeData=[];
+        resData.map(item => {
+            if(roleTypeList.indexOf(item.roleType)==-1) {
+              roleTypeData.push(item.roleType)
+            }
+        })
+        roleTypeData.map(item => {
+          let strData=item;
+          if (strData[0] == '0') {
+            this.isManage  = true;
+            console.log(this.isManage)
+          }
+        })
 
+      });
       this.$api.okr.login.isLogin().then(res => {
         if (!res.success) {
           this.$router.replace({
