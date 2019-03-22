@@ -23,7 +23,7 @@
         </div>
         <!--历史报工-表格-->
         <el-table
-          name="加班申请详情列表"
+          name="本周报工详情列表"
           ref="tableMain"
           class="fillTable"
           :data="tableMain">
@@ -136,7 +136,7 @@
             :visible.sync="dialogVisible"
             width="40%">
           <span class="warning-popup">
-            <i class="el-icon-warning"></i>您今日总工时为<em class="c-blue">{{ sumWorkingHour }}</em>小时，确认提交今日报告么
+            <i class="el-icon-warning"></i>您此次总工时为<em class="c-blue">{{ sumWorkingHour }}</em>小时，确认提交此次报告么？
           </span>
             <span slot="footer" class="dialog-footer">
             <div class="buttonWrap">
@@ -487,6 +487,7 @@
     .el-table__empty-block{min-height:0;}
   }
   .hanle-table-noth+.formFooter{border-top:none}
+  .hanle-table-noth .el-table__header-wrapper{display: none;}
   .warning-popup{
     font-size:18px;
     .el-icon-warning{color: #e6a23c}
