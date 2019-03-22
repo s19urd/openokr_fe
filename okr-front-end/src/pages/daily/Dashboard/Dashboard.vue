@@ -16,7 +16,7 @@
       </el-radio-group>
       <span class="d2-ml-20">
          当前统计周期：
-        <el-select v-model="reportStartDateStr">
+        <el-select v-model="reportStartDateStr" @change="changeStartDate">
           <el-option
             v-for="item in reportStartDateStrOptions"
             :key="item.value"
@@ -33,10 +33,7 @@
   </div>
 </template>
 <script>
-  import Vue from 'vue'
   import util from '@/libs/util.js'
-  import echarts from 'echarts'
-  Vue.prototype.$echarts = echarts;
   import StatisticByProduct from "./components/StatisticByProduct";
   import StatisticByMember from "./components/StatisticByMember";
 
@@ -59,14 +56,15 @@
         ],
         pageType:'1',
         searchTypeOptions:[
-          {name:'周', type:'1'},
-          {name:'月', type:'2'},
-          {name:'年度', type:'3'},
+          {name:'周', type:'0'},
+          {name:'月', type:'1'},
+          {name:'年度', type:'2'},
         ],
-        searchType:'1',
+        searchType:'0',
         reportStartDateStr:'',
+        reportStartDateShow:'',
         weekSearchType:'1',
-        tabLoading:true,
+        tabLoading:false,
 
       };
     },
@@ -76,7 +74,7 @@
         let _optionsCount = 5;
         let {monday,monthStart,yearStart} = this.weekInfo();
         switch (this.searchType) {
-          case "1":
+          case "0":
             //按周
             function getLabelName(date){
               let _date = new Date(util.dateFormat(date,'yyyy-MM-dd'));
@@ -108,7 +106,7 @@
               monday.setDate(monday.getDate()-7);
             }
             break;
-          case "2":
+          case "1":
             //按月份
             let year = monthStart.getFullYear();
             for(let i=0;i<_optionsCount;i++){
@@ -122,7 +120,7 @@
               monthStart.setMonth(monthStart.getMonth()-1);
             }
             break;
-          case "3":
+          case "2":
             for(let i=0;i<_optionsCount;i++){
               let year = yearStart.getFullYear();
               _options.push({
@@ -134,10 +132,12 @@
 
         }
         //切换之后设置默认选择第一个
-        if(this.searchType==='1'){
+        if(this.searchType==='0'){
           this.reportStartDateStr =_options.length>0 ? (_options[1].value||''):'';
+          this.reportStartDateShow = _options.length>0 ? (_options[1].label||''):''
         }else{
           this.reportStartDateStr =_options.length>0 ? (_options[0].value||''):'';
+          this.reportStartDateShow = _options.length>0 ? (_options[0].label||''):''
         }
 
         return _options;
@@ -176,56 +176,42 @@
           teamId:this.teamId||this.$route.params.teamId,
           searchType:this.searchType,
           reportStartDateStr:this.reportStartDateStr,
+          reportStartDateShow:this.reportStartDateShow
         }
+      },
+      //切换区间
+      changeStartDate(val){
+        this.reportStartDateStrOptions.map(item=>{
+          if(val ===item.value){
+            this.reportStartDateShow = item.label;
+          }
+        })
       },
       //获取数据
       getData(){
-        this.tabLoading = true;
-        let vo = this.getSearchParam();
-        if(this.pageType==='1'){
-          this.$refs.statisticByMember.getData(vo).then(res=>{
-            this.tabLoading = false;
-          }).catch(e=>{
-            this.tabLoading = false;
-            this.$message.error(`数据获取失败！`)
-          });
-        }else if(this.pageType==='2'){
-          this.$refs.statisticByProduct.getData(vo).then(res=>{
-            this.tabLoading = false;
-          }).catch(res=>{
-            this.tabLoading = false;
-            this.$message.error(`数据获取失败！`)
-          });
-        }
+        this.$nextTick(()=>{
+          this.tabLoading = true;
+          let vo = this.getSearchParam();
+          if(this.pageType==='1'){
+            this.$refs.statisticByMember.getData(vo).then(res=>{
+              this.tabLoading = false;
+            }).catch(e=>{
+              this.tabLoading = false;
+              this.$message.error(`数据获取失败！`)
+            });
+          }else if(this.pageType==='2'){
+            this.$refs.statisticByProduct.getData(vo).then(res=>{
+              this.tabLoading = false;
+            }).catch(res=>{
+              this.tabLoading = false;
+              this.$message.error(`数据获取失败！`)
+            });
+          }
+        })
       },
-      //渲染表1
-      drawLine(){
-        let myChart = this.$echarts.init(document.getElementById('echart-pie'))
-        // 绘制图表
-        myChart.setOption({
-          title: { text: '按照产品/客户定制：',textStyle:{fontWeight:400,fontSize:'14px'} },
-          tooltip : {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
-          },
-          series : [
-            {
-              x: 'center',
-              name: '工时',
-              type: 'pie',
-              radius : [90, 170],
-              center: ['50%', '50%'],
-              data:[
-                {value:350, name:'产品'},
-                {value:1200, name:'客户定制'},
-              ],
-            }
-          ]
-        });
-      }
     },
     mounted () {
-      this.drawLine();
+
     }
   };
 </script>
@@ -234,7 +220,7 @@
   .dailyDashboard{
     background: #fff;
     min-height: 500px;
-    padding: 0 40px;
+    padding: 0 10px;
   }
   .tab-wrap{
     padding: 20px 0;
