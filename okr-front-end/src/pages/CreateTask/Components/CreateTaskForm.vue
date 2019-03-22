@@ -33,27 +33,31 @@
         :key="index"
         >
 
-          <el-col :span="7">
-            <el-form-item label="分摊名称：" prop="apportionNameId">
-              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
+         <el-col :span="7">
+            <el-form-item label="分摊类别:" prop="categoryId">
+              <el-select
+                v-model="item.categoryId"
+                placeholder="请选择"
+                @change="changeReleatedProjectList(item)">
                 <el-option
-                  v-for="item in projectList"
+                  v-for="item in projetTypeList"
                   :key="item.id"
-                  :label="item.name"
+                  :label="item.categoryName"
                   :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
 
+
           <el-col :span="7">
-            <el-form-item label="分摊类别:" prop="categoryId">
-              <el-select v-model="item.categoryId" placeholder="请选择">
+            <el-form-item label="分摊名称：" prop="apportionNameId">
+              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
                 <el-option
-                  v-for="item in projetTypeList"
-                  :key="item.id"
-                  :label="item.categoryName"
-                  :value="item.id">
+                  v-for="projectItem in item.projectReleatedList"
+                  :key="projectItem.id"
+                  :label="projectItem.name"
+                  :value="projectItem.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -139,7 +143,8 @@
               apportionName: '',
               apportionNameId: '',
               categoryId: '',
-              apportionRate: ''
+              apportionRate: '',
+              projectReleatedList: []
             }
           ],
           taskVO: {
@@ -154,7 +159,6 @@
           krIds: []
         },
 
-        projectList: [],
         projetTypeList: [],
         initItem: {
           apportionName: '',
@@ -185,7 +189,8 @@
                 apportionName: '',
                 apportionNameId: '',
                 categoryId: '',
-                apportionRate: ''
+                apportionRate: '',
+                projectReleatedList
               }
             ],
             taskVO: {
@@ -215,6 +220,12 @@
           return null
         }
         this.taskForm['apportionVOS'].splice(index, 1)
+      },
+
+      changeReleatedProjectList (item) {
+        this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
+          item.projectReleatedList = res.data
+        })
       },
 
       cancel () {
@@ -300,10 +311,6 @@
     },
 
     mounted () {
-      this.$api.okr.task.getApportionSelectList().then(res=> {
-        this.projectList = res.data
-      })
-
       this.$api.okr.task.getApportionCategoryList().then(res=> {
         this.projetTypeList = res.data
       })
