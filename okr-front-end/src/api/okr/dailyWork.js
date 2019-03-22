@@ -2,6 +2,13 @@ import axios from 'axios'
 
 export default {
   /**
+   * 查询当前用户权限列表
+   * @return {*}
+   */
+  getCurrentUserRole() {
+    return axios.post('/sys/getCurrentUserRole.json' )
+  },
+  /**
    * 本周历史报工
    * @return {*}
    */
@@ -39,11 +46,10 @@ export default {
    * @return {*}
    */
 
-  queryTaskListByPage () {
-     return axios.post('/task/getTaskListByPage.json', {
-        pageSize: 200
-     })
-   },
+  queryTaskListByPage (vo) {
+     return axios.post('/task/getTaskListByCondition.json', vo
+     )
+  },
 
   /**
    * 全部报工-表格
@@ -54,6 +60,12 @@ export default {
       currentPage: 1,
       pageSize: 10
     }, pageInfo)
+    //收款管理页面有这个字段
+    if(condition.searchStartEndDate && condition.searchStartEndDate.length==2){
+      condition.deportTimeBegin = condition.searchStartEndDate[0];
+      condition.deportTimeEnd = condition.searchStartEndDate[1];
+      delete condition.searchStartEndDate;
+    }
     return axios.post('/api/daily/getDailyPage.json', {
       ...condition,
       ...pageInfo

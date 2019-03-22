@@ -34,7 +34,7 @@
           :search-model-base="tableMainSearchModelBase"
           :get-action="$api.okr.dailyWork.allDailyWork"
           :get-action-where="getActionWhere"
-          :auto-fetch="false"
+          :auto-fetch="true"
           :afterFetchData="afterFetchData"
 
         >
@@ -82,7 +82,7 @@
                 class="w70off"
               >
                 <el-option
-                  v-for="item in projectList"
+                  v-for="item in taskList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -231,7 +231,7 @@
           teamId:'',
           okrId:''
         },
-        projectList: [],
+        taskList: [],
         productList:[],
         categoryList:[],
         teamList:[],
@@ -252,51 +252,73 @@
         this.loading = false;
         let searchVo={};
         //任务名称-下拉
-        this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
-          let resData = res.data.data
-          this.projectList=[]
-          resData.forEach(item => {
-            this.projectList.push({ value: item.id, label: item.taskName })
+        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+          let resData = res.data;
+          this.taskList=[]
+          let taskId=[]
+          resData.map(item => {
+            if(item.taskId!==null || item.taskName!==null){
+              if(taskId.indexOf(item.taskId)==-1){
+                taskId.push(item.taskId)
+                this.taskList.push({ value: item.taskId, label: item.taskName })
+              }
+            }
           })
         })
         //产品名称-下拉
         this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
           let resData = res.data;
           this.productList=[]
+          let productId=[]
           resData.map(item => {
-            this.productList.push({ value: item.productId, label: item.productName })
+            if(item.productId!==null || item.productName!==null){
+              if(productId.indexOf(item.productId)==-1){
+                productId.push(item.productId)
+                this.productList.push({ value: item.productId, label: item.productName })
+              }
+            }
           })
         })
         //分摊类型-下拉
         this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
           let resData = res.data;
           this.categoryList=[]
+          let categoryIds=[]
           resData.map(item => {
-            this.categoryList.push({value: item.categoryId, label: item.categoryName})
+            if(item.categoryId!==null || item.categoryName!==null){
+              if(categoryIds.indexOf(item.categoryId)==-1){
+                categoryIds.push(item.categoryId)
+                this.categoryList.push({value: item.categoryId, label: item.categoryName})
+              }
+            }
           })
-          let hash = {};
-          let arrData=this.categoryList;
-          arrData = arrData.reduce(function(item, next) {
-            hash[next.categoryId] ? '' : hash[next.categoryId] = true && item.push(next);
-            return item
-          }, [])
-          console.log("111111：")
-          console.log(arrData);
         })
         //团队-下拉
         this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
           let resData = res.data;
           this.teamList=[]
+          let teamId=[]
           resData.map(item => {
-            this.teamList.push({ value: item.teamId, label: item.teamName })
+            if(item.teamId!==null || item.teamName!==null){
+              if(teamId.indexOf(item.teamId)==-1){
+                teamId.push(item.teamId)
+                this.teamList.push({ value: item.teamId, label: item.teamName })
+              }
+            }
           })
         })
         //okr-下拉
         this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
           let resData = res.data;
           this.okrList=[]
+          let okrId=[]
           resData.map(item => {
-            this.okrList.push({ value: item.okrId, label: item.okrName })
+            if(item.okrId!==null || item.okrName!==null){
+              if(okrId.indexOf(item.okrId)==-1){
+                okrId.push(item.okrId)
+                this.okrList.push({ value: item.okrId, label: item.okrName })
+              }
+            }
           })
         })
       },
