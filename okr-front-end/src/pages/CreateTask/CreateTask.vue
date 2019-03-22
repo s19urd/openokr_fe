@@ -12,7 +12,7 @@
           </el-form-item>
 
           <el-form-item label="所属团队: ">
-            <el-select v-model="searchForm.belongTeam" placeholder="请选择团队名称">
+            <el-select v-model="searchForm.teamId" placeholder="请选择团队名称">
               <el-option
                 v-for="item in teamList"
                 :key="item.id"
@@ -62,7 +62,7 @@
           <el-button class="el-icon-edit" @click="editItem(item)"> 编辑</el-button>
           <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
           <p class="text">所属团队：
-            <span class="count">{{ item.belongTeam }}</span>
+            <span class="belongTeam">{{ item.belongTeamName }}</span>
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
         </div>
@@ -177,7 +177,6 @@ export default {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data.data
         this.totalPage = res.data.totalPage
-        console.log(this.taskList)
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime) 
           item.taskEndTime = timestampsToDate(item.taskEndTime) 
@@ -276,6 +275,12 @@ export default {
 
     .timeRange {
       display: inline;
+    }
+
+    .belongTeam {
+      margin-right: 58px;
+      color: #4c84ff;
+      font-size: 14px;
     }
   }
 
