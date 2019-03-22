@@ -55,9 +55,9 @@ export default {
   mounted () {
     if (process.env.NODE_ENV === 'production') {
       if (!isMobile()) {
-        window.location.href = 'http://test.okr.onlyou.com/login.htm'
+         window.location.href = '/login.htm';
       }
-    }
+    } 
   }
 }
 </script>

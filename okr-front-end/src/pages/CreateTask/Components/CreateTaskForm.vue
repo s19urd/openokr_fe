@@ -100,7 +100,7 @@
         <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
-      <el-form-item label="参与人员: ">
+      <el-form-item label="参与人员: " v-if="taskForm.userIds.length > 0">
         <el-tree
           :data="userTree"
           show-checkbox
@@ -109,7 +109,7 @@
           ref="userTree"></el-tree>
       </el-form-item >
 
-      <el-form-item label="关联KR: ">
+      <el-form-item label="关联KR: " v-if="taskForm.krIds.length > 0">
         <el-tree
           :data="KRTrees"
           show-checkbox
