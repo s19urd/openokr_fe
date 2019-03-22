@@ -14,6 +14,17 @@
           <template slot="append">h</template>
         </el-input >
       </el-form-item>
+
+      <el-form-item label="关联团队: ">
+        <el-select v-model="taskForm.taskVO.belongTeam" placeholder="请选择项目名称">
+          <el-option
+            v-for="item in teamList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item >  
    
       <el-row
         :gutter="12"
@@ -125,6 +136,7 @@
         taskForm: {
           apportionVOS: [
             {
+              apportionName: '',
               apportionNameId: '',
               categoryId: '',
               apportionRate: ''
@@ -135,7 +147,8 @@
             taskStartTime: '',
             taskEndTime: '',
             jiraLabel: '',
-            estimateTime: 0
+            estimateTime: 0,
+            belongTeam: ''
           },
           userIds: [],
           krIds: []
@@ -144,12 +157,14 @@
         projectList: [],
         projetTypeList: [],
         initItem: {
+          apportionName: '',
           apportionNameId: '',
           categoryId: '',
           apportionRate: ''
         },
         userTree: [],
         KRTrees: [],
+        teamList: [],
         flag: true
       } 
     },
@@ -167,6 +182,7 @@
             isEdit: false,
             apportionVOS: [
               {
+                apportionName: '',
                 apportionNameId: '',
                 categoryId: '',
                 apportionRate: ''
@@ -177,7 +193,8 @@
               taskStartTime: '',
               taskEndTime: '',
               jiraLabel: '',
-              estimateTime: 0
+              estimateTime: 0,
+              belongTeam: ''
             },
             userIds: [],
             krIds: []
@@ -217,6 +234,7 @@
 
             let apportionVOS = this.taskForm.apportionVOS
             apportionVOS.forEach(item => {
+              console.log(item)
               if(!item.apportionNameId) {
                   this.$message.warning('分摊名称不能为空')
                   this.flag = false
@@ -255,6 +273,7 @@
       confirm () {
         this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
         this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
+        console.log(this.taskForm)
         this.validate()
         if (this.flag) {
           this.$api.okr.task.saveTask(this.taskForm).then(res=> {
@@ -295,6 +314,11 @@
 
       this.$api.okr.task.queryOKRTreeData().then(res => {
         this.KRTrees = res
+      })
+
+      this.$api.okr.task.queryTeamList().then(res => {
+        this.teamList = res.data
+        console.log(this.teamList)
       })
 
       if (this.taskFormEdit.isEdit) {
