@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav-bar
-      title="待办事项"
+      title="报工汇总"
       @click-left="back"
       :fixed="true"
       :z-index="1"
@@ -15,7 +15,7 @@
       </div>
 
       <div class="报工日期">
-        <Cell title="报工日期" is-link :value="selectedTime.toLocaleDateString()" @click="showPopup('calendar')"></Cell>
+        <Cell title="报工日期" is-link :value="selectedTime | dateFormat('yyyy-MM-dd')" @click="showPopup('calendar')"></Cell>
       </div>
 
       <div class="projectWorkingHour"
@@ -38,8 +38,6 @@
           <field v-model="item.duration" type="number" label="报工时长"></field>
           <field v-model="item.remark" label="备注信息" rows="1" type="textarea" autosize></field>
         </cell-group>
-
-        
 
         <popup
           v-model="show"
@@ -66,7 +64,9 @@
         </popup>
       </div>
 
-      <Button size="large" @click="add" class="textBlue">+ 增加报工</Button>
+      <div class="inner">
+        <Button size="large" type="info" plain @click="add">+ 增加报工</Button>
+      </div>
     </div>
 
     <div class="fixed-toolbar">
@@ -76,14 +76,14 @@
           <span class="time">{{ sumWorkingHour }}</span>
           <label>h</label>
         </div>
-        <Button type="info" @click="submit">完成今日报工</Button>
+        <Button type="info" @click="submit" :disabled="disabled">提交报工</Button>
       </div>
     </div>
   </div>
 </template>
 <script>
 import Vue from 'vue'
-import { NavBar, Popup, Cell, CellGroup, DatetimePicker, Picker, Field, Button, Toast } from 'vant'
+import { NavBar, Popup, Cell, CellGroup, Picker, Field, Button, Toast } from 'vant'
 
 export default {
   name: 'report-working-hour',
@@ -93,7 +93,6 @@ export default {
     Popup,
     Cell,
     CellGroup,
-    DatetimePicker,
     Picker,
     Field,
     Button
@@ -108,7 +107,8 @@ export default {
       projectList: [],
       initProjectReport: {},
       totalProjectReport: [],
-      inValid: false
+      inValid: false,
+      disabled: false,
     }
   },
 
@@ -119,33 +119,31 @@ export default {
         sumTemp = sumTemp + Number(item.duration)
       })
       return sumTemp
-    }
+    },
+    queryDay () {
+      return this.$route.query.day
+    },
   },
 
   methods: {
     back () {
-      this.$router.replace({ name: 'Login' })
+      this.$router.replace({ name: 'HistoryWork' })
     },
-
     dayClick (date) {
       this.hidePopup()
       this.selectedTime = date.$d
     },
-
     showPopup (type, index) {
       this.show = true
       this.showType = type
       this.popIndex = index
     },
-
     hidePopup () {
       this.show = false
     },
-
     cancel () {
       this.hidePopup()
     },
-
     confirm (value, index) {
       if (this.showType === 'projectList') {
         this.totalProjectReport[this.popIndex].taskName = value.text
@@ -153,16 +151,13 @@ export default {
       }
       this.hidePopup()
     },
-
     add () {
       let projectItem = Object.assign({}, this.initProjectReport)
       this.totalProjectReport.push(projectItem)
     },
-
     removeProjectItem (index) {
       this.totalProjectReport.splice(index, 1)
     },
-
     validate () {
       this.totalProjectReport.forEach(item => {
         if (!item.duration) {
@@ -175,9 +170,9 @@ export default {
           this.inValid = true
           return null
         }
+        this.inValid = false
       })
     },
-
     submit () {
       this.totalProjectReport.forEach(item => {
         item.reportDay = this.selectedTime
@@ -187,146 +182,168 @@ export default {
 
       if (this.inValid) return null
 
+      console.log('这里')
+
       Vue.api.dailyWork.saveTask(this.totalProjectReport).then(res => {
         if (res.code === 0) {
           Toast('保存成功')
+          this.$router.replace({ name: 'HistoryWork' })
         } else {
           Toast(`${res.message}`)
+          // 重置数据
+          this.queryDay && (this.disabled = true)
         }
       })
     },
-
     handelChange () {
       console.log('3333')
-    }
+    },
+    loadQueryDay () {
+      // 重置为查询日期
+      this.selectedTime = new Date(this.queryDay)
+      let query = {
+        currentPage: '',
+        pageSize: '',
+        reportStartDayStr: this.queryDay,
+        reportEndDayStr: this.queryDay
+      }
+      Vue.api.historyWork.getHistoryWork(query).then(res => {
+        // console.log(res.data.data)
+        const arr = (res.data && res.data.data) || []
+        console.log(arr)
+        arr.length && (this.totalProjectReport = arr)
+        // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
+      })
+    },
   },
 
   mounted () {
+    // 查询当前日期数据
+    this.queryDay && this.loadQueryDay()
+
     Vue.api.dailyWork.queryTaskListByPage().then(res => {
       let resPrject = res.data.data.data
       resPrject.forEach((item, index) => {
         this.projectList.push({ text: item.taskName, taskId: item.id })
-
-        if (index === 0) {
-          this.initProjectReport = Object.assign({}, {
-            taskName: item.taskName,
-            taskId: item.id,
-            duration: 8.0,
-            remark: '',
-            reportDay: ''
-          })
-          this.totalProjectReport.push({
-            taskName: item.taskName,
-            taskId: item.id,
-            duration: 8.0,
-            remark: '',
-            reportDay: ''
-          })
-        }
       })
+      this.initProjectReport = {
+        taskName: this.projectList[0].text,
+        taskId: this.projectList[0].taskId,
+        duration: 8.0,
+        remark: '',
+        reportDay: ''
+      }
+      // 非查询日期模式时新增初始任务
+      !this.queryDay && this.add()
     })
   }
 }
 </script>
 <style lang="scss">
-  .van-nav-bar__title {
-    font-size: 18px;
+.inner {
+padding: 15px;
+}
+.van-nav-bar__title {
+  font-size: 18px;
+}
+
+.tipWrap {
+  display: flex;
+  padding: 5px 15px;
+  vertical-align: middle;
+  height: 25px;
+  line-height: 25px;
+  color: #4c84ff;
+  font-size: 13px;
+  background-color: #edf2ff;
+
+  img {
+    width: 25px;
+    margin-right: 5px;
   }
 
-  .tipWrap {
-    display: flex;
-    padding: 5px 15px;
-    vertical-align: middle;
-    height: 25px;
-    line-height: 25px;
-    color: #4c84ff;
-    font-size: 13px;
-    background-color: #edf2ff;
-
-    img {
-      width: 25px;
-      margin-right: 5px;
-    }
-
-    .tip {
-      margin: 0;
-    }
-  }
-
-  .pageContent {
-    padding-top: 2.875rem;
-    padding-bottom: 2.875rem;
-  }
-
-  .van-cell__title {
-    text-align: left;
-  }
-
-  .itemTitleWrap {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .itemTitle {
-    padding: 11px 15px;
-    color: #848484;
-    font-size: 14px;
-    line-height: 22px;
+  .tip {
     margin: 0;
-    text-align: left;
-
-    .num {
-      display: inline-block;
-      border: 1px solid #b5b5b5;
-      border-radius: 50%;
-      width: 13px;
-      height: 13px;
-      line-height: 13px;
-      text-align: center;
-      margin-left: 5px;
-    }
   }
+}
 
-  .delete {
-    border: none;
+.pageContent {
+  padding-top: 2.875rem;
+  padding-bottom: 2.875rem;
+}
+
+.van-cell__title {
+  text-align: left;
+}
+
+.itemTitleWrap {
+  display: flex;
+  justify-content: space-between;
+}
+
+.itemTitle {
+  padding: 11px 15px;
+  color: #848484;
+  font-size: 14px;
+  line-height: 22px;
+  margin: 0;
+  text-align: left;
+
+  .num {
+    display: inline-block;
+    border: 1px solid #b5b5b5;
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+    font-size: 12px;
+    line-height: 14px;
+    font-style: normal;
+    font-weight: normal;
+    text-align: center;
+    margin-left: 5px;
   }
+}
 
+.delete {
+  border: none;
+}
+
+.van-field__control {
+  text-align: right;
+}
+
+.textLeft {
   .van-field__control {
-    text-align: right;
+    text-align: left;
   }
+}
 
-  .textLeft {
-    .van-field__control {
-      text-align: left;
-    }
-  }
+.sumWorkingHourWrap {
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 0 0.05rem rgba(0,0,0,.1);
+}
 
-  .sumWorkingHourWrap {
-    display: flex;
-    justify-content: space-between;
-    box-shadow: 0 0 0.05rem rgba(0,0,0,.1);
-  }
+.sumWorkingHour {
+  display: flex;
+  align-items: center;
+  padding-left: 5px;
 
-  .sumWorkingHour {
-    display: flex;
-    align-items: center;
-    padding-left: 5px;
-
-    .time {
-      margin-left: 6px;
-      margin-right: 6px;
-      color: #4c84ff;
-    }
-  }
-
-  .fixed-toolbar {
-    background: #fff;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-  }
-
-  .textBlue {
+  .time {
+    margin-left: 6px;
+    margin-right: 6px;
     color: #4c84ff;
   }
+}
+
+.fixed-toolbar {
+  background: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+// .textBlue {
+//   color: #4c84ff;
+// }
 </style>

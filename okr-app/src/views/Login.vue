@@ -22,7 +22,7 @@
 <script>
 import { Field, CellGroup, Button } from 'vant'
 import Vue from 'vue'
-// import AppInput from 'components/input'
+import { isMobile } from 'utilities/device-identify'
 export default {
   name: 'Login',
 
@@ -46,9 +46,17 @@ export default {
     submit () {
       Vue.api.login.signIn(this.userInfo).then(res => {
         if (res.success) {
-          this.$router.push({ name: 'DailyWork' })
+          this.$router.push({ name: 'HistoryWork' })
         }
       })
+    }
+  },
+
+  mounted () {
+    if (process.env.NODE_ENV === 'production') {
+      if (!isMobile()) {
+        window.location.href = 'http://test.okr.onlyou.com/login.htm'
+      }
     }
   }
 }

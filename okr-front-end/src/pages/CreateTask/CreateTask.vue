@@ -37,6 +37,7 @@
       <li class="taskItem" v-for="(item, index) in taskList" :key="index">
         <div class="collapseHeader_left">
           <span class="taskName" v-text="item.taskName"></span>
+          <el-tag style="margin-left: 12px">该任务预计耗时：{{ item.estimateTime }}</el-tag>
           <div class="text">
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
               <el-tag>{{ item.taskStartTime }}</el-tag> ~ <el-tag>{{ item.taskEndTime }}</el-tag>
@@ -46,26 +47,27 @@
           </div>
         </div>
         <div class="collapseHeader_right">
-          <el-button class="el-icon-delete" @click="deleteItem(item, index)"> 删除</el-button>
+          <el-button class="el-icon-delete" @click="deleteItem(item)"> 删除</el-button>
+          <el-button class="el-icon-edit" @click="editItem(item)"> 编辑</el-button>
           <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
           <p class="text">共
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
         </div>
-
-        <el-dialog
-          title="提示"
-          :visible.sync="tipDialogVisible"
-          class="warning"
-          width="30%">
-          <span><i class="el-icon-warning"></i>删除后将无法恢复，确认删除吗？</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="tipDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="confirm(item, index)">确 定</el-button>
-          </span>
-        </el-dialog>
       </li>
     </ul>
+
+     <el-dialog
+        title="提示"
+        :visible.sync="tipDialogVisible"
+        class="warning"
+        width="30%">
+        <span><i class="el-icon-warning"></i>删除后将无法恢复，确认删除吗？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="tipDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirm(item)">确 定</el-button>
+        </span>
+      </el-dialog>
 
     <el-pagination
       ref="pagination"
@@ -76,7 +78,11 @@
       class="alginCenter">  
     </el-pagination>
 
-    <create-task-form :dialog-visible.sync="isShow"></create-task-form>
+    <template v-if ="isShow">
+      <create-task-form
+        :dialog-visible.sync="isShow"
+        :task-form-edit.sync="itemFormInfo"></create-task-form>
+    </template>
   </div>
 </template>
 <script>
@@ -105,7 +111,8 @@ export default {
       totalPage: 0,
       taskList: [],
 
-      isShow: false
+      isShow: false,
+      itemFormInfo: {}
     };
   },
 
@@ -114,23 +121,48 @@ export default {
       this.isShow = true;
     },
 
-    deleteItem () {
+    deleteItem (item) {
       this.tipDialogVisible = true
+      this.confirm(item)
+    },
+
+    editItem (item) {
+      this.$api.okr.task.getTaskDetailInfo(item.id).then(res=> {
+        this.itemFormInfo = res.data
+        this.itemFormInfo.isEdit = true
+        this.itemFormInfo.taskVO.taskStartTime = new Date(this.itemFormInfo.taskVO.taskStartTime)
+        this.itemFormInfo.taskVO.taskEndTime = new Date(this.itemFormInfo.taskVO.taskEndTime)
+        this.itemFormInfo.userIds = []
+        this.itemFormInfo.krIds = []
+        this.itemFormInfo.userInfoVOS.forEach(item=>{
+          (this.itemFormInfo.userIds).push(item.id)
+        })
+        this.itemFormInfo.keys.forEach(item=> {
+          (this.itemFormInfo.krIds).push(item.id)
+        })
+        this.isShow = true
+      })
     },
 
     openDetailPage (id) {
       this.$router.push({ name : 'TaskDetailPage', params: { id: id } })
     },
     
-    confirm (item, index) {
+    confirm (item) {
       this.tipDialogVisible = false
-      this.taskList.splice(index, 1)
+      this.$api.okr.task.deleteTask(item.id).then(res => {
+        if(res.code === 0) {
+          this.$message.success('删除成功')
+          this.serach(this.searchForm)
+        }
+      })
     },
 
     serach (searchForm) {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data.data
         this.totalPage = res.data.totalPage
+        console.log(this.taskList)
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime) 
           item.taskEndTime = timestampsToDate(item.taskEndTime) 

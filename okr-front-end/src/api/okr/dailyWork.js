@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export default {
   /**
-   * 历史报工
+   * 本周历史报工
    * @return {*}
    */
   historyDailyWork (historyList) {
@@ -11,7 +11,7 @@ export default {
   },
 
   /**
-   * 删除历史报工
+   * 删除本周历史报工
    * @return {*}
    */
 
@@ -41,7 +41,31 @@ export default {
 
   queryTaskListByPage () {
      return axios.post('/task/getTaskListByPage.json', {
-        pageSize: 100
+        pageSize: 200
      })
-   }
+   },
+
+  /**
+   * 全部报工-表格
+   * @return {*}
+   */
+  allDailyWork (condition, pageInfo) {
+    pageInfo = Object.assign({
+      currentPage: 1,
+      pageSize: 10
+    }, pageInfo)
+    return axios.post('/api/daily/getDailyPage.json', {
+      ...condition,
+      ...pageInfo
+    })
+  },
+  /**
+   * 全部报工-搜索
+   * @return {*}
+   */
+  getSearchConditionList (vo) {
+    return axios.post('/task/getSearchConditionList.json', vo
+    )
+  },
+
 }
