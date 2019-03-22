@@ -59,9 +59,10 @@
               width="180">
               <template slot-scope="scope">
                 <el-date-picker
-                  v-model="scope.row.reportDay"
+                  v-model="date"
                   type="date"
                   :clearable="false"
+                  :picker-options="pickerOptions"
                 >
                 </el-date-picker>
               </template>
@@ -153,6 +154,7 @@
                              v-model="editWork.reportDay"
                              type="date"
                              format="yyyy-MM-dd"
+                             :picker-options="pickerOptions"
             >
             </el-date-picker>
           </el-form-item>
@@ -203,6 +205,7 @@
         isManage:false,
         tableMain: [],
         tableData: [],
+        date: new Date(),
         initItemData:{
           id:'',
           reportDay: new Date(),
@@ -272,7 +275,6 @@
         let taskItem = Object.assign({}, this.initItemData)
         taskItem.index= this.tableData.length;
         this.tableData.push(taskItem)
-//        console.log(taskItem.index)
       },
       changeTime () {
         let sumTemp = 0
@@ -311,6 +313,10 @@
       },
       //提交数据，关闭弹窗
       submit () {
+        //每条task添加日期
+        this.tableData.forEach(item => {
+          item.reportDay = this.date
+        })
         this.$api.okr.dailyWork.submitDailyWork(this.tableData).then(res=> {
           this.dialogVisible = false
           if (res.code === 0) {
@@ -396,8 +402,8 @@
       },
       // 设置本周时间可选范围
       dealDisabledDate (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay()+7)*(24*60*60*1000));
-        let time2=new Date(new Date().getTime()- (new Date().getDay()-7)*(24*60*60*1000));
+        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
+        let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
         return  time2<time.getTime() || time.getTime() < time1
       }
     },
