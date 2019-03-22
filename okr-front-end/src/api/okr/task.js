@@ -53,5 +53,13 @@ export default {
    */
   queryTeamOKR (searchKey) {
     return axios.get(`/task/getTeamTaskCountInfoVO.json?searchKey=${searchKey}`)
+  },
+
+  /**
+   * 团队列表
+   * @return {*}
+   */
+  queryTeamList () {
+    return axios.get('/manage/okrTeam/getTaskListByUser.json')
   }
 }
