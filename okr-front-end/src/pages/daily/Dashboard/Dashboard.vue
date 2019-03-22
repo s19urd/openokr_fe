@@ -185,10 +185,16 @@
         if(this.pageType==='1'){
           this.$refs.statisticByMember.getData(vo).then(res=>{
             this.tabLoading = false;
+          }).catch(e=>{
+            this.tabLoading = false;
+            this.$message.error(`数据获取失败！`)
           });
         }else if(this.pageType==='2'){
           this.$refs.statisticByProduct.getData(vo).then(res=>{
             this.tabLoading = false;
+          }).catch(res=>{
+            this.tabLoading = false;
+            this.$message.error(`数据获取失败！`)
           });
         }
       },
