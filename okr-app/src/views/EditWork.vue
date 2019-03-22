@@ -27,15 +27,15 @@
               项目报工<i class="num">{{ index + 1 }}</i>
             </h4>
             <Button
+              type="danger"
               v-if="index!== 0"
-              class="textBlue delete"
               @click="removeProjectItem(index)">
               删除
             </Button>
           </div>
         <cell-group v-if ="totalProjectReport.length > 0">
           <Cell title="项目/产品名称" is-link :value="item.taskName" @click="showPopup('projectList', index)"></Cell>
-          <field v-model="item.duration" type="number" label="报工时长"></field>
+          <field v-model="item.duration" type="number" label="报工时长" input-align="right"></field>
           <field v-model="item.remark" label="备注信息" rows="1" type="textarea" autosize></field>
         </cell-group>
 
@@ -182,9 +182,7 @@ export default {
 
       if (this.inValid) return null
 
-      console.log('这里')
-
-      Vue.api.dailyWork.saveTask(this.totalProjectReport).then(res => {
+      Vue.api.editWork.saveTask(this.totalProjectReport).then(res => {
         if (res.code === 0) {
           Toast('保存成功')
           this.$router.replace({ name: 'HistoryWork' })
@@ -194,9 +192,6 @@ export default {
           this.queryDay && (this.disabled = true)
         }
       })
-    },
-    handelChange () {
-      console.log('3333')
     },
     loadQueryDay () {
       // 重置为查询日期
@@ -221,7 +216,7 @@ export default {
     // 查询当前日期数据
     this.queryDay && this.loadQueryDay()
 
-    Vue.api.dailyWork.queryTaskListByPage().then(res => {
+    Vue.api.editWork.queryTaskListByPage().then(res => {
       let resPrject = res.data.data.data
       resPrject.forEach((item, index) => {
         this.projectList.push({ text: item.taskName, taskId: item.id })
@@ -306,16 +301,6 @@ padding: 15px;
 
 .delete {
   border: none;
-}
-
-.van-field__control {
-  text-align: right;
-}
-
-.textLeft {
-  .van-field__control {
-    text-align: left;
-  }
 }
 
 .sumWorkingHourWrap {
