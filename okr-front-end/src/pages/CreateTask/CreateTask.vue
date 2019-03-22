@@ -11,6 +11,17 @@
             <el-input placeholder="请输入" v-model="searchForm.searchKey"></el-input>
           </el-form-item>
 
+          <el-form-item label="所属团队: ">
+            <el-select v-model="searchForm.belongTeam" placeholder="请选择团队名称">
+              <el-option
+                v-for="item in teamList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item >
+
           <el-form-item label="创建日期:">
             <el-date-picker
               v-model="dateRange"
@@ -50,7 +61,8 @@
           <el-button class="el-icon-delete" @click="deleteItem(item)"> 删除</el-button>
           <el-button class="el-icon-edit" @click="editItem(item)"> 编辑</el-button>
           <el-button class="el-icon-more" @click="openDetailPage(item.id)"> 查看详情</el-button>
-          <p class="text">共
+          <p class="text">所属团队：
+            <span class="count">{{ item.belongTeam }}</span>
             <span class="count">{{ item.count }}</span>条关联的kr
           </p>
         </div>
@@ -105,8 +117,11 @@ export default {
         queryStartDate: '',
         queryEndDate: '',
         pageSize: 3,
-        currentPage: 1
+        currentPage: 1,
+        teamId: ''
       },
+
+      teamList: [],
 
       totalPage: 0,
       taskList: [],
@@ -187,6 +202,10 @@ export default {
   },
 
   mounted () {
+    this.$api.okr.task.queryTeamList().then(res => {
+      this.teamList = res.data
+    })
+
     this.serach(this.searchForm)
   }
 };

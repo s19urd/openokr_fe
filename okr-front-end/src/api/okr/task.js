@@ -27,8 +27,8 @@ export default {
     return axios.get('/task/getApportionCategoryList.json')
   },
 
-  getApportionSelectList () {
-    return axios.get('/task/getApportionSelectList.json')
+  getApportionSelectList (categoryId) {
+    return axios.get(`/task/getApportionSelectList.json?categoryId=${categoryId}`)
   },
 
    /*
@@ -53,5 +53,13 @@ export default {
    */
   queryTeamOKR (searchKey) {
     return axios.get(`/task/getTeamTaskCountInfoVO.json?searchKey=${searchKey}`)
+  },
+
+  /**
+   * 团队列表
+   * @return {*}
+   */
+  queryTeamList () {
+    return axios.get('/manage/okrTeam/getTaskListByUser.json')
   }
 }

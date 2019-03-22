@@ -9,7 +9,7 @@ export default new Router({
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
+      path: '/Login',
       name: 'Login',
       // route level code-splitting
       // this generates a separate chunk (reportWorkingTime.[hash].js) for this route

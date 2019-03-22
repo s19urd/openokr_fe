@@ -14,6 +14,17 @@
           <template slot="append">h</template>
         </el-input >
       </el-form-item>
+
+      <el-form-item label="关联团队: ">
+        <el-select v-model="taskForm.taskVO.belongTeam" placeholder="请选择项目名称">
+          <el-option
+            v-for="item in teamList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item >  
    
       <el-row
         :gutter="12"
@@ -22,27 +33,31 @@
         :key="index"
         >
 
-          <el-col :span="7">
-            <el-form-item label="分摊名称：" prop="apportionNameId">
-              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
+         <el-col :span="7">
+            <el-form-item label="分摊类别:" prop="categoryId">
+              <el-select
+                v-model="item.categoryId"
+                placeholder="请选择"
+                @change="changeReleatedProjectList(item)">
                 <el-option
-                  v-for="item in projectList"
+                  v-for="item in projetTypeList"
                   :key="item.id"
-                  :label="item.name"
+                  :label="item.categoryName"
                   :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
 
+
           <el-col :span="7">
-            <el-form-item label="分摊类别:" prop="categoryId">
-              <el-select v-model="item.categoryId" placeholder="请选择">
+            <el-form-item label="分摊名称：" prop="apportionNameId">
+              <el-select v-model="item.apportionNameId" placeholder="请选择项目名称">
                 <el-option
-                  v-for="item in projetTypeList"
-                  :key="item.id"
-                  :label="item.categoryName"
-                  :value="item.id">
+                  v-for="projectItem in item.projectReleatedList"
+                  :key="projectItem.id"
+                  :label="projectItem.name"
+                  :value="projectItem.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -85,7 +100,7 @@
         <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
-      <el-form-item label="参与人员: ">
+      <el-form-item label="参与人员: " v-if="taskForm.userIds.length > 0">
         <el-tree
           :data="userTree"
           show-checkbox
@@ -94,7 +109,7 @@
           ref="userTree"></el-tree>
       </el-form-item >
 
-      <el-form-item label="关联KR: ">
+      <el-form-item label="关联KR: " v-if="taskForm.krIds.length > 0">
         <el-tree
           :data="KRTrees"
           show-checkbox
@@ -125,9 +140,11 @@
         taskForm: {
           apportionVOS: [
             {
+              apportionName: '',
               apportionNameId: '',
               categoryId: '',
-              apportionRate: ''
+              apportionRate: '',
+              projectReleatedList: []
             }
           ],
           taskVO: {
@@ -135,21 +152,23 @@
             taskStartTime: '',
             taskEndTime: '',
             jiraLabel: '',
-            estimateTime: 0
+            estimateTime: 0,
+            belongTeam: ''
           },
           userIds: [],
           krIds: []
         },
 
-        projectList: [],
         projetTypeList: [],
         initItem: {
+          apportionName: '',
           apportionNameId: '',
           categoryId: '',
           apportionRate: ''
         },
         userTree: [],
         KRTrees: [],
+        teamList: [],
         flag: true
       } 
     },
@@ -167,9 +186,11 @@
             isEdit: false,
             apportionVOS: [
               {
+                apportionName: '',
                 apportionNameId: '',
                 categoryId: '',
-                apportionRate: ''
+                apportionRate: '',
+                projectReleatedList
               }
             ],
             taskVO: {
@@ -177,7 +198,8 @@
               taskStartTime: '',
               taskEndTime: '',
               jiraLabel: '',
-              estimateTime: 0
+              estimateTime: 0,
+              belongTeam: ''
             },
             userIds: [],
             krIds: []
@@ -200,6 +222,12 @@
         this.taskForm['apportionVOS'].splice(index, 1)
       },
 
+      changeReleatedProjectList (item) {
+        this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
+          item.projectReleatedList = res.data
+        })
+      },
+
       cancel () {
         this.$emit('update:dialogVisible', false)
       },
@@ -217,6 +245,7 @@
 
             let apportionVOS = this.taskForm.apportionVOS
             apportionVOS.forEach(item => {
+              console.log(item)
               if(!item.apportionNameId) {
                   this.$message.warning('分摊名称不能为空')
                   this.flag = false
@@ -255,6 +284,7 @@
       confirm () {
         this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
         this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
+        console.log(this.taskForm)
         this.validate()
         if (this.flag) {
           this.$api.okr.task.saveTask(this.taskForm).then(res=> {
@@ -281,10 +311,6 @@
     },
 
     mounted () {
-      this.$api.okr.task.getApportionSelectList().then(res=> {
-        this.projectList = res.data
-      })
-
       this.$api.okr.task.getApportionCategoryList().then(res=> {
         this.projetTypeList = res.data
       })
@@ -295,6 +321,11 @@
 
       this.$api.okr.task.queryOKRTreeData().then(res => {
         this.KRTrees = res
+      })
+
+      this.$api.okr.task.queryTeamList().then(res => {
+        this.teamList = res.data
+        console.log(this.teamList)
       })
 
       if (this.taskFormEdit.isEdit) {
