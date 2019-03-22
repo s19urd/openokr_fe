@@ -3,6 +3,7 @@ import common from './common'
 // okr reprot hour
 
 import dailyWork from './okr/dailyWork'
+import dailyWeekly from './daily/weekly'
 import login from './okr/login'
 import task from './okr/task'
 
@@ -12,5 +13,8 @@ export default {
     dailyWork: dailyWork,
     login: login,
     task: task
+  },
+  daily:{
+    weekly:dailyWeekly
   }
 }
