@@ -65,7 +65,7 @@ const routerConfig = [
     }
   },
   {
-    path: '/daily/dashboard.vhtml',
+    path: '/daily/dashboard/:teamId',
     name: 'dailyDashboard',
     layout: Blank,
     component: dailyDashboard,

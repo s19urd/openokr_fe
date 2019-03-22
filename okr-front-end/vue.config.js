@@ -8,19 +8,19 @@ function resolve (dir) {
 
 // 基础路径 注意发布之前要先修改这里
 
-const baseUrl = env === 'development' ? '/' : '/vue/'
+const publicPath = env === 'development' ? '/' : '/vue/'
 
 module.exports = {
-  baseUrl, // 根据你的实际情况更改这里
+  publicPath, // 根据你的实际情况更改这里
   outputDir: 'build',
   // lintOnSave: true,
   devServer: {
     // 和 baseUrl 保持一致
-    publicPath: process.env.BASE_URL,
+    publicPath,
     // 代理设置
     proxy: {
       '/.*\.(json|htm)': {
-        target: 'http://172.16.135.169:8892/',
+        target: 'http://172.16.135.212:8892',
         changeOrigin: true,
         pathRewrite: {
           '^/': '/'

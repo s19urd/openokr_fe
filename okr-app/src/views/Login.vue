@@ -46,7 +46,7 @@ export default {
     submit () {
       Vue.api.login.signIn(this.userInfo).then(res => {
         if (res.success) {
-          this.$router.push({ name: 'DailyWork' })
+          this.$router.push({ name: 'HistoryWork' })
         }
       })
     }

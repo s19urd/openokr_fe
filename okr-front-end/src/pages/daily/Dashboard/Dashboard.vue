@@ -16,9 +16,9 @@
       </el-radio-group>
       <span class="d2-ml-20">
          当前统计周期：
-        <el-select v-model="searchDate">
+        <el-select v-model="reportStartDateStr">
           <el-option
-            v-for="item in searchDateOptions"
+            v-for="item in reportStartDateStrOptions"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -27,36 +27,8 @@
       </span>
     </div>
     <div class="tab-content-wrap" v-loading="tabLoading"  element-loading-text="加载中">
-      <div class="tab-content" v-if="pageType==='1'">
-        <el-row>
-          <el-col :span="12"  style="padding: 20px">
-            <el-table
-              :data="tableData1"
-              style="width: 100%">
-              <el-table-column
-                prop="date"
-                :render-header="getHeader"
-                width="180">
-              </el-table-column>
-              <el-table-column
-                prop="name"
-                label="姓名"
-                width="180">
-              </el-table-column>
-              <el-table-column
-                prop="address"
-                label="地址">
-              </el-table-column>
-            </el-table>
-          </el-col>
-          <el-col :span="12" style="padding: 40px">
-            <div class="echart-sty1" id="echart-pie" style="width:100%; min-height: 400px"></div>
-          </el-col>
-        </el-row>
-      </div>
-      <div class="tab-content" v-if="pageType==='2'">
-        按产品类别
-      </div>
+      <statistic-by-member ref="statisticByMember" v-show="pageType==='1'"></statistic-by-member>
+      <statistic-by-product ref="statisticByProduct" v-show="pageType==='2'"></statistic-by-product>
     </div>
   </div>
 </template>
@@ -65,10 +37,15 @@
   import util from '@/libs/util.js'
   import echarts from 'echarts'
   Vue.prototype.$echarts = echarts;
+  import StatisticByProduct from "./components/StatisticByProduct";
+  import StatisticByMember from "./components/StatisticByMember";
+
   export default {
     name: "Dashboard",
 
     components: {
+      StatisticByProduct,
+      StatisticByMember,
     },
 
     data() {
@@ -87,18 +64,14 @@
           {name:'年度', type:'3'},
         ],
         searchType:'1',
-        searchDate:'',
+        reportStartDateStr:'',
         weekSearchType:'1',
         tabLoading:true,
-        //表格1的数据
-        tableData1:[],
-        //表格1的数据
-        tableData2:[]
 
       };
     },
     computed:{
-      searchDateOptions(){
+      reportStartDateStrOptions(){
         let _options = [];
         let _optionsCount = 5;
         let {monday,monthStart,yearStart} = this.weekInfo();
@@ -106,7 +79,7 @@
           case "1":
             //按周
             function getLabelName(date){
-              let _date = new Date(util.dateFormat(date,'yyyy/MM/dd'));
+              let _date = new Date(util.dateFormat(date,'yyyy-MM-dd'));
               let number_CN = ['一','二','三','四','五','六','七'];
               let month = _date.getMonth();
               let weekIndex = -1;
@@ -119,8 +92,8 @@
             };
             let labelName = '';
             for(let i=0;i<_optionsCount;i++){
-              let _mondayStr = util.dateFormat(monday,'yyyy/MM/dd');
-              let dataregenStr =' (' + util.dateFormat(monday,'MM/dd') +'-'+ util.dateFormat(new Date(monday).setDate(monday.getDate()+7),'MM/dd') + ')'
+              let _mondayStr = util.dateFormat(monday,'yyyy-MM-dd');
+              let dataregenStr =' (' + util.dateFormat(monday,'MM/dd') +'-'+ util.dateFormat(new Date(monday).setDate(monday.getDate()+6),'MM/dd') + ')'
               if(i==0){
                 labelName = '本周'+ dataregenStr;
               }else if(i==1){
@@ -144,7 +117,7 @@
               let labelName = year===yearItem ? (monthItem+'月份'):(yearItem+'年'+monthItem+'月份');
               _options.push({
                 label:labelName,
-                value:  util.dateFormat(monthStart,'yyyy/MM/dd')
+                value:  util.dateFormat(monthStart,'yyyy-MM-dd')
               });
               monthStart.setMonth(monthStart.getMonth()-1);
             }
@@ -154,7 +127,7 @@
               let year = yearStart.getFullYear();
               _options.push({
                 label:year+'年',
-                value:  util.dateFormat(yearStart,'yyyy/MM/dd')
+                value:  util.dateFormat(yearStart,'yyyy-MM-dd')
               });
               yearStart.setFullYear(year-1);
             }
@@ -162,19 +135,22 @@
         }
         //切换之后设置默认选择第一个
         if(this.searchType==='1'){
-          this.searchDate =_options.length>0 ? (_options[1].value||''):'';
+          this.reportStartDateStr =_options.length>0 ? (_options[1].value||''):'';
         }else{
-          this.searchDate =_options.length>0 ? (_options[0].value||''):'';
+          this.reportStartDateStr =_options.length>0 ? (_options[0].value||''):'';
         }
 
         return _options;
+      },
+      teamId(){
+        this.$route.params.teamId
       }
     },
     watch:{
       pageType(){
 
       },
-      searchDate(){
+      reportStartDateStr(){
         this.getData();
       }
     },
@@ -195,35 +171,32 @@
           yearStart
         }
       },
-      //获取表头
-      getHeader(h){
-        let weekSearchType = this.weekSearchType;
-        let weekSearchTpyeStrs ={
-          "1":"产品",
-          "2":"客户定制"
-        };
-        return h('span', [
-          weekSearchType==='1'?'产品':'客户定制',
-          h('span', {
-            class:'change-btn',
-            domProps:{
-              innerHTML:'切换到'+(weekSearchType==='2'?'产品':'客户定制')
-            },
-            on: {
-              click: () => {
-                this.weekSearchType= this.weekSearchType==='1'?'2':'1';
-                this.getData();
-              }
-            }
-          })
-        ])
+      getSearchParam(){
+        return {
+          teamId:this.teamId||this.$route.params.teamId,
+          searchType:this.searchType,
+          reportStartDateStr:this.reportStartDateStr,
+        }
       },
       //获取数据
       getData(){
         this.tabLoading = true;
-        setTimeout(()=>{
-          this.tabLoading = false;
-        },2000)
+        let vo = this.getSearchParam();
+        if(this.pageType==='1'){
+          this.$refs.statisticByMember.getData(vo).then(res=>{
+            this.tabLoading = false;
+          }).catch(e=>{
+            this.tabLoading = false;
+            this.$message.error(`数据获取失败！`)
+          });
+        }else if(this.pageType==='2'){
+          this.$refs.statisticByProduct.getData(vo).then(res=>{
+            this.tabLoading = false;
+          }).catch(res=>{
+            this.tabLoading = false;
+            this.$message.error(`数据获取失败！`)
+          });
+        }
       },
       //渲染表1
       drawLine(){
@@ -237,20 +210,15 @@
           },
           series : [
             {
-              name:'访问来源',
-              type:'pie',
-              radius : '55%',
+              x: 'center',
+              name: '工时',
+              type: 'pie',
+              radius : [90, 170],
               center: ['50%', '50%'],
               data:[
                 {value:350, name:'产品'},
                 {value:1200, name:'客户定制'},
-              ].sort(function (a, b) { return a.value - b.value; }),
-              roseType: 'radius',
-              animationType: 'scale',
-              animationEasing: 'elasticOut',
-              animationDelay: function (idx) {
-                return Math.random() * 200;
-              }
+              ],
             }
           ]
         });
@@ -276,7 +244,7 @@
     text-align: center;
   }
   .radio-sty2{
-    width: 120px;
+    width: 80px;
     input{
       width: 100%;
     }
