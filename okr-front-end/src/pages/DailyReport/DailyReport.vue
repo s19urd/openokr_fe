@@ -155,6 +155,7 @@
                              v-model="editWork.reportDay"
                              type="date"
                              format="yyyy-MM-dd"
+                             :picker-options="pickerOptions"
             >
             </el-date-picker>
           </el-form-item>
@@ -393,8 +394,8 @@
       },
       // 设置本周时间可选范围
       dealDisabledDate (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
-        let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
+        let time1=new Date(new Date().getTime() - (new Date().getDay()+7)*(24*60*60*1000));
+        let time2=new Date(new Date().getTime()- (new Date().getDay()-7)*(24*60*60*1000));
         return  time2<time.getTime() || time.getTime() < time1
       }
     },
