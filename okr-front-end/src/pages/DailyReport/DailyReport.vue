@@ -7,17 +7,17 @@
             <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～
           </div>
           <div class="fr">
-            <!--&lt;!&ndash;管理员&ndash;&gt;-->
-            <!--<template v-if="role.roleType==='00' || role.roleType==='01' || role.roleType==='02'">-->
-              <!--<el-button type="default" @click="toMyTeam">我的团队</el-button>-->
-              <!--<el-button type="default" @click="toDataAggregation">数据汇总</el-button>-->
-              <!--<el-button type="default" @click="openAdminDialog">全部报工</el-button>-->
-              <!--<el-button type="default" @click="toMyTasks">我的任务</el-button>-->
-            <!--</template>-->
-            <!--<template v-else="">-->
-              <!--<el-button type="default" @click="openTeamDialog">全部报工</el-button>-->
-              <!--<el-button type="default" @click="toMyTasks">我的任务</el-button>-->
-            <!--</template>-->
+            <!--管理员-->
+            <template v-if="isManage===false">
+              <el-button type="default" @click="openTeamDialog">全部报工</el-button>
+              <el-button type="default" @click="toMyTasks">我的任务</el-button>
+            </template>
+            <template v-if="isManage===true">
+              <el-button type="default" @click="toMyTeam">我的团队</el-button>
+              <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
+              <el-button type="default" @click="openAdminDialog">全部报工</el-button>
+              <el-button type="default" @click="toMyTasks">我的任务</el-button>
+            </template>
           </div>
         </div>
         <!--历史报工-表格-->
@@ -62,7 +62,6 @@
                   v-model="scope.row.reportDay"
                   type="date"
                   :clearable="false"
-                  :picker-options="pickerOptions"
                 >
                 </el-date-picker>
               </template>
@@ -154,7 +153,6 @@
                              v-model="editWork.reportDay"
                              type="date"
                              format="yyyy-MM-dd"
-                             :picker-options="pickerOptions"
             >
             </el-date-picker>
           </el-form-item>
@@ -202,7 +200,7 @@
     components: {Administrators,TeamMembers},
     data () {
       return {
-        role:{},
+        isManage:false,
         tableMain: [],
         tableData: [],
         initItemData:{
@@ -405,7 +403,21 @@
     },
     mounted () {
       this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
-        this.role = res.data;
+        let resData = res.data;
+        let roleTypeList=[];
+        let roleTypeData=[];
+        resData.map(item => {
+            if(roleTypeList.indexOf(item.roleType)==-1) {
+              roleTypeData.push(item.roleType)
+            }
+        })
+        roleTypeData.map(item => {
+          let strData=item;
+          if (strData[0] == '0') {
+            this.isManage  = true;
+            console.log(this.isManage)
+          }
+        })
 
       });
       this.$api.okr.login.isLogin().then(res => {
