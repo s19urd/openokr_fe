@@ -255,6 +255,7 @@
   .echart-sty1{
     border: #ccc solid 1px;
     padding: 20px;
+    margin-right: 20px;
   }
 
 </style>
