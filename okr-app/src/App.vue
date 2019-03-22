@@ -57,4 +57,32 @@ export default {
     opacity: 0;
     transform: translate(-100%, 0);
   }
+
+.m-prev-btn,
+.m-next-btn {
+  display :inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  // margin-right: 20px;
+}
+
+.m-prev-btn::after,
+.m-next-btn::after {
+  display: inline-block;
+  content: " ";
+  height: 10px;
+  width: 10px;
+  border-width: 1px 1px 0 0;
+  border-color: #1989fa;
+  border-style: solid;
+  transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  margin-top: -5px;
+}
+.m-prev-btn::after {
+  border-width: 0 0 1px 1px;
+}
 </style>

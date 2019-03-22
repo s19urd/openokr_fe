@@ -153,7 +153,7 @@
             taskEndTime: '',
             jiraLabel: '',
             estimateTime: 0,
-            belongTeam: ''
+            belongTeamName: ''
           },
           userIds: [],
           krIds: []
@@ -199,7 +199,7 @@
               taskEndTime: '',
               jiraLabel: '',
               estimateTime: 0,
-              belongTeam: ''
+              belongTeamName: ''
             },
             userIds: [],
             krIds: []
@@ -289,12 +289,16 @@
         if (this.$refs.userTree) {
           this.taskForm['userIds'] = this.$refs.userTree.getCheckedKeys()
         }
-        console.log(this.taskForm)
         this.validate()
         if (this.flag) {
           this.$api.okr.task.saveTask(this.taskForm).then(res=> {
             this.$emit('update:dialogVisible', false)
-            this.$message.success('保存成功！')
+            if (res.code === 0) {
+              this.$message.success('保存成功！')
+              this.$router.go(0)
+            } else {
+              this.$message.success(res.message)
+            }
           })
         }
       },
