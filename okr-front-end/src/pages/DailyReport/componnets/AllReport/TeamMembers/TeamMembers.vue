@@ -40,8 +40,8 @@
         >
           <!--基础查询-->
           <template slot="baseSearchForm" slot-scope="scope">
-            <div class="inline-block mr10">
-              <span> 当前统计周期：</span>
+            <div class="inline-block">
+              <span class="lab"> 当前统计周期：</span>
               <el-date-picker
                 v-model="scope.form.searchStartEndDate"
                 type="daterange"
@@ -50,9 +50,27 @@
                 end-placeholder="结束日期"
                 format="yyyy-MM-dd"
                 value-format="yyyy-MM-dd"
-                style="width: 226px;"
+                class="w70off"
               >
               </el-date-picker>
+            </div>
+
+            <div class="inline-block mr10">
+              <span class="lab">OKR：</span>
+              <el-select
+                filterable
+                clearable
+                v-model="scope.form.okrId"
+                placeholder="请选择"
+                class="w70off"
+              >
+                <el-option
+                  v-for="item in okrList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </div>
 
           </template>
@@ -139,9 +157,11 @@
         },
         tableMainSearchModelBase:{
           searchStartEndDate: [],
-//          taskId:[],
+          taskId:[],
+          okrId:[]
         },
         projectList: [],
+        okrList:[],
       };
     },
     computed: {
@@ -157,6 +177,16 @@
         this.isVisible = true;
         this.loading = false;
 
+        //okr-下拉
+        let okrVo={}
+        this.$api.okr.dailyWork.getSearchConditionList(okrVo).then(res => {
+          let resData = res.data.data;
+          console.log(resData)
+          this.okrList=[]
+          resData.map(item => {
+            this.okrList.push({ value: item.okrId, label: item.okrName })
+          })
+        })
       },
       back() {
         this.isVisible = false
@@ -167,13 +197,6 @@
       },
     },
     mounted() {
-      //任务名称
-      this.$api.okr.dailyWork.queryTaskListByPage().then(res => {
-        let resData = res.data.data
-        resData.forEach(item => {
-          this.projectList.push({ value: item.id, label: item.taskName })
-        })
-      })
 
     }
   };
@@ -201,10 +224,21 @@
     }
   }
   .el-col+.el-col .grid-content-top{border-left: 1px solid #e5e5e5;}
-  .inline-block{ display:inline-block;}
+  .inline-block{
+    display:inline-block;width: 370px;margin:5px 0;
+    .lab{
+      display: inline-block;min-width: 100px;text-align: right;
+    }
+    .w70off{
+      width: 70%;
+      box-sizing: border-box;
+    }
+  }
 </style>
 
 <style>
+  .mr30{margin-right: 30px}
+  .mr40{margin-right: 60px}
   .numall-area .table-filter .fl{line-height: 40px}
   .numall-area .table-filter .fwb{font-weight: bold}
   .numall-area .el-row{  background-color: #f2f9ff;

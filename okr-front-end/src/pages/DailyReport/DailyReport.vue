@@ -14,7 +14,7 @@
               <el-button type="default" @click="openAdminDialog">全部报工</el-button>
               <el-button type="default" @click="toMyTasks">我的任务</el-button>
             </template>
-            <template v-if="isManager==='0'">
+            <template v-else="">
               <el-button type="default" @click="openTeamDialog">全部报工</el-button>
               <el-button type="default" @click="toMyTasks">我的任务</el-button>
               <el-button type="default" @click="openAdminDialog">管理员全部报工</el-button>
@@ -264,6 +264,7 @@
         this.$api.okr.dailyWork.historyDailyWork(historyList).then(res => {
           this.tableMain = res.data.data;
         });
+
       },
       //添加任务
       add () {
