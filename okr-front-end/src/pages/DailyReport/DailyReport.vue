@@ -403,7 +403,7 @@
       },
       // 跳转页面
       toMyTeam(){
-        this.$router.push({path: '/MyTeam.vhtml'})
+        this.$router.push({path: '/TeamOKR'})
       },
       toDataAggregation(){
         this.$router.push({path: '/daily/dashboard/'+this.teamId})

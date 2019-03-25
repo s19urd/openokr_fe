@@ -51,7 +51,7 @@
                   <!--基础查询-->
                   <template slot="baseSearchForm" slot-scope="scope">
                     <div class="inline-block">
-                      <span class="lab"> 当前统计周期：</span>
+                      <span class="lab"> 选择时间区间：</span>
                       <el-date-picker
                         v-model="scope.form.searchStartEndDate"
                         type="daterange"
@@ -164,7 +164,7 @@
                   <!--基础查询-->
                   <template slot="baseSearchForm" slot-scope="scope">
                     <div class="inline-block">
-                      <span class="lab"> 当前统计周期：</span>
+                      <span class="lab"> 选择时间区间：</span>
                       <el-date-picker
                         v-model="scope.form.searchStartEndDate"
                         type="daterange"
