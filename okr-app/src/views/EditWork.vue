@@ -131,8 +131,18 @@ export default {
     queryDay () {
       return this.$route.query.day
     },
+    pickableDays () {
+      let result = []
+      let now = new Date()
+      let nowTime = now.getTime()
+      let nowDay = now.getDay() || 7
+      let oneDayTime = 24 * 60 * 60 * 1000
+      let startMondayTime = nowTime - (nowDay + 6) * oneDayTime
+      let endSundayTime = nowTime + (7 - nowDay) * oneDayTime
+      result.push(startMondayTime, endSundayTime)
+      return result
+    }
   },
-
   methods: {
     back () {
       this.$router.replace({ name: 'HistoryWork' })
@@ -143,8 +153,16 @@ export default {
     },
 
     dayClick (date) {
-      this.hidePopup()
-      this.selectedTime = date.$d
+      let pickDay = Vue.filter('dateFormat')(date.$d, 'yyyy-MM-dd')
+      // console.log(pickDay)
+      // console.log(Vue.filter('dateFormat')(this.pickableDays[0], 'yyyy-MM-dd'))
+      // console.log(Vue.filter('dateFormat')(this.pickableDays[1], 'yyyy-MM-dd'))
+      if (Vue.filter('dateFormat')(this.pickableDays[0], 'yyyy-MM-dd') <= pickDay && pickDay <= Vue.filter('dateFormat')(this.pickableDays[1], 'yyyy-MM-dd')) {
+        this.hidePopup()
+        this.selectedTime = date.$d
+      } else {
+        Toast('只允许填报最近两周的报工噢')
+      }
     },
     showPopup (type, index) {
       this.show = true
@@ -180,6 +198,11 @@ export default {
         }
         if (!item.taskId) {
           Toast('任务不能为空')
+          this.inValid = true
+          return null
+        }
+        if (this.sumWorkingHour > 15) {
+          Toast('今日报工时长不超过15个小时')
           this.inValid = true
           return null
         }
@@ -229,8 +252,14 @@ export default {
     // 查询当前日期数据
     this.queryDay && this.loadQueryDay()
 
-    Vue.api.editWork.queryTaskListByPage().then(res => {
-      let resPrject = res.data.data.data
+    const query = {
+      isFilterTime: '1',
+      currentPage: '',
+      pageSize: ''
+    }
+
+    Vue.api.editWork.getTaskListByCondition(query).then(res => {
+      let resPrject = res.data.data
       resPrject.forEach((item, index) => {
         this.projectList.push({ text: item.taskName, taskId: item.id })
       })
@@ -280,8 +309,15 @@ padding: 15px;
   padding-bottom: 2.875rem;
 }
 
-.van-cell__title {
-  text-align: left;
+.projectWorkingHour {
+  .van-cell__title {
+    flex-grow: .5;
+    text-align: left;
+  }
+}
+.van-cell__value {
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .itemTitleWrap {

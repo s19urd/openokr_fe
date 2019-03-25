@@ -6,11 +6,10 @@ export default function (instance) {
         .then(response => response.data)
     },
 
-    queryTaskListByPage () {
+    getTaskListByCondition (query) {
       return instance
-        .post('/task/getTaskListByPage.json', {
-          pageSize: 100
-        })
+        .post('/task/getTaskListByCondition.json', query)
+        .then(response => response.data)
     }
   }
 }

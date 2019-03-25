@@ -40,14 +40,14 @@
             <span class="s-title">总工时</span>
             <span class="title">{{totalDuration}}h</span>
           </div>
-          <div class="echart-sty1" id="echart-bar"></div>
+          <div class="echart-sty1" id="echart-line"></div>
         </el-col>
         <el-col :span="12" style="position: relative;" v-if="searchParam.searchType==='2'">
           <div class="echart-pie-total">
             <span class="s-title">总工时</span>
             <span class="title">{{totalDuration}}h</span>
           </div>
-          <div class="echart-sty1" id="echart-bar"></div>
+          <div class="echart-sty1" id="echart-line"></div>
         </el-col>
       </el-row>
     </div>

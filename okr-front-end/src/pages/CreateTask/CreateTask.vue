@@ -83,8 +83,10 @@
 
     <el-pagination
       ref="pagination"
+      @size-change="handleSizeChange"
       :page-size="searchForm.pageSize"
-      layout="prev, pager, next"
+      :page-sizes="[3, 5, 7, 10]"
+      layout="sizes, prev, pager, next"
       :total="totalPage"
       @current-change="fetchData"
       class="alginCenter">  
@@ -183,6 +185,11 @@ export default {
         })
 
       })
+    },
+
+    handleSizeChange (val) {
+      this.searchForm.pageSize = val
+      this.fetchData()
     },
     
     fetchData (pageIndex) {
@@ -351,6 +358,12 @@ export default {
       height: 42px;
       line-height: 42px;
     }
+  }
+
+  .el-input__inner {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border: none;
   }
 }
 </style>
