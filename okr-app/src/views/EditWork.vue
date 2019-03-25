@@ -35,7 +35,15 @@
           </div>
         <cell-group v-if ="totalProjectReport.length > 0">
           <Cell title="项目/产品名称" is-link :value="item.taskName" @click="showPopup('projectList', index)"></Cell>
-          <field v-model="item.duration" type="number" label="报工时长" input-align="right"></field>
+          <field
+            v-model="item.duration"
+            :min="0"
+            max="24"
+            type="number"
+            label="报工时长"
+            input-align="right"
+            @focus="focus($event)">
+          </field>
           <field v-model="item.remark" label="备注信息" rows="1" type="textarea" autosize></field>
         </cell-group>
 
@@ -139,6 +147,11 @@ export default {
     back () {
       this.$router.replace({ name: 'HistoryWork' })
     },
+
+    focus (event) {
+      event.target.select()
+    },
+
     dayClick (date) {
       let pickDay = Vue.filter('dateFormat')(date.$d, 'yyyy-MM-dd')
       // console.log(pickDay)

@@ -94,7 +94,7 @@
               width="150"
             >
               <template slot-scope="scope">
-                <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+                <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入"></el-input-number>
               </template>
             </el-table-column>
 
@@ -113,7 +113,7 @@
               width="10"
             >
               <template slot-scope="scope">
-                <el-input  class="hide" v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
+                <el-input  class="hide" v-model="scope.row.duration" type="number" placeholder="请输入"></el-input>
               </template>
             </el-table-column>
 
@@ -127,9 +127,9 @@
         </div>
         <div class="formFooter">
           <div class="sumWorkingHour">
-            <el-button type="default" icon="el-icon-circle-plus" @click="add">添加任务</el-button>
+            <el-button type="default" icon="el-icon-circle-plus" @click="add">添加报工</el-button>
           </div>
-          <el-button type="primary" @click="validate" >提交今日报工</el-button>
+          <el-button type="primary" @click="validate" >提交报工</el-button>
           <el-dialog
             title="提示"
             :visible.sync="dialogVisible"
@@ -173,7 +173,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="报工时长(h)">
-            <el-input-number v-model="editWork.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+            <el-input-number v-model="editWork.duration" :precision="1" :min="0" :max="24"  placeholder="请输入"></el-input-number>
           </el-form-item>
           <el-form-item label="状态" class="hide">
             <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
@@ -193,6 +193,7 @@
   </d2-container>
 </template>
 <script>
+  import Vue from 'vue'
   import listMixin from "@/mixins/list.mixin";
   import Administrators from "./componnets/AllReport/Administrators";
   import TeamMembers from "./componnets/AllReport/TeamMembers";
@@ -208,30 +209,24 @@
         date: new Date(),
         initItemData:{
           id:'',
-          reportDay: new Date(),
+          reportDay: '',
           taskId: '',
-          duration: '',
+          duration: '8',
           auditStatus: '00',
           remark: '',
         },
         projectList: [],
         firstDataList:[],
         multipleSelection: [],
-        sumWorkingHour: 0,
         maxLength: -1,
         dialogVisible: false,
         flag: '',
-        publicPath: process.env.BASE_URL,
         imageUrl: require('@/assets/okr/icon-happy.png'),
         tempMaxIndex: '',
         tempMinIndex: '',
         editWork:{},
         showSaveDialog:false,
         fullscreenLoading: false,
-        weakData:{// 获取周一周天的时间
-          mondayData : new Date(new Date().getTime() - (new Date().getDay()-1)*(24*60*60*1000)),
-          sundayData : new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000)),
-        },
         pickerOptions: { // 日期设置对象
           disabledDate: (time) => {
             return this.dealDisabledDate(time)
@@ -242,28 +237,55 @@
     computed:{
       teamId(){
         this.$route.params.teamId
-      }
+      },
+      currentWeek () {// 获取周一周天的时间
+        let now = new Date()
+        let nowTime = now.getTime()
+        let nowDay = now.getDay()
+        let oneDayTime = 24 * 60 * 60 * 1000
+        let MondayTime = nowTime - (nowDay - 1) * oneDayTime
+        let SundayTime = nowTime + (7 - nowDay) * oneDayTime
+        let monday = new Date(MondayTime)
+        let sunday = new Date(SundayTime)
+        let arrWeek=[monday,sunday]
+        return arrWeek
+      },
+      sumWorkingHour () {
+        let sumTemp = 0
+        this.tableData.forEach(item => {
+          sumTemp = sumTemp + Number(item.duration)
+        })
+        return sumTemp
+      },
+      tableDataDate () {
+        let addiDay='';
+        this.tableData.forEach(item => {
+          addiDay=this.date;
+        })
+        return Vue.filter('dateFormat')(addiDay)
+      },
+      sunTableMainHour () {
+        let sumTemp2 = 0;
+        this.tableMain.forEach(item => {
+          let mainTime= Vue.filter('dateFormat')(item.reportDay)
+          if(mainTime==this.tableDataDate){
+            sumTemp2 = sumTemp2+ Number(item.duration)
+          }
+        })
+        return sumTemp2
+      },
     },
     methods:{
       //历史报工
-      formatDate(date) {
-        let d = new Date(date),
-          month = '' + (d.getMonth() + 1),
-          day = '' + d.getDate(),
-          year = d.getFullYear();
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-        return [year, month, day].join('-');
-      },
       historyData(){
         // 获取周一周天的时间
-        console.log(this.formatDate(this.weakData.mondayData));
-        console.log(this.formatDate(this.weakData.sundayData));
+        console.log(Vue.filter('dateFormat')(this.currentWeek[0]));
+        console.log(Vue.filter('dateFormat')(this.currentWeek[1]));
         let historyList={
           currentPage:'',
           pageSize:'',
-          reportStartDayStr:this.formatDate(this.weakData.mondayData),
-          reportEndDayStr:this.formatDate(this.weakData.sundayData),
+          reportStartDayStr:Vue.filter('dateFormat')(this.currentWeek[0]),
+          reportEndDayStr:Vue.filter('dateFormat')(this.currentWeek[1]),
         }
         this.$api.okr.dailyWork.historyDailyWork(historyList).then(res => {
           this.tableMain = res.data.data;
@@ -275,13 +297,6 @@
         let taskItem = Object.assign({}, this.initItemData)
         taskItem.index= this.tableData.length;
         this.tableData.push(taskItem)
-      },
-      changeTime () {
-        let sumTemp = 0
-        this.tableData.forEach(item => {
-          sumTemp = sumTemp + Number(item.duration)
-        })
-        this.sumWorkingHour = sumTemp
       },
       //验证formData
       validate () {
@@ -299,13 +314,13 @@
               this.flag = false
               return
             }
-            if(item.duration === '') {
-              this.$message.warning('报工时长不能为空！')
-              this.dialogVisible = false
-              this.flag = false
-              return
-            }
           })
+          if(this.sumWorkingHour+this.sunTableMainHour>15){
+            this.$message.warning('每天的报工时长不能超过15小时！')
+            this.dialogVisible = false
+            this.flag = false
+            return
+          }
         }
         if (this.flag) {
           this.dialogVisible = true
@@ -402,7 +417,7 @@
       },
       // 设置本周时间可选范围
       dealDisabledDate (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
+        let time1=new Date(new Date().getTime() - (new Date().getDay()+7)*(24*60*60*1000));
         let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
         return  time2<time.getTime() || time.getTime() < time1
       }
@@ -413,9 +428,9 @@
         let roleTypeList=[];
         let roleTypeData=[];
         resData.map(item => {
-            if(roleTypeList.indexOf(item.roleType)==-1) {
-              roleTypeData.push(item.roleType)
-            }
+          if(roleTypeList.indexOf(item.roleType)==-1) {
+            roleTypeData.push(item.roleType)
+          }
         })
         roleTypeData.map(item => {
           let strData=item;
@@ -517,9 +532,14 @@
     }
     .el-table__empty-text{display: none;}
     .el-table__empty-block{min-height:0;}
+    .el-table__body-wrapper{
+      tr+tr>td:first-child .cell{
+        display:none;
+      }
+    }
   }
   .hanle-table-noth+.formFooter{border-top:none}
-  .hanle-table-noth .el-table__header-wrapper{display: none;}
+  .hanle-table-noth .el-table__header-wrapper{  display: none;  }
   .warning-popup{
     font-size:18px;
     .el-icon-warning{color: #e6a23c}

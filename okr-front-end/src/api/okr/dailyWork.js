@@ -62,8 +62,8 @@ export default {
     }, pageInfo)
     //收款管理页面有这个字段
     if(condition.searchStartEndDate && condition.searchStartEndDate.length==2){
-      condition.deportTimeBegin = condition.searchStartEndDate[0];
-      condition.deportTimeEnd = condition.searchStartEndDate[1];
+      condition.queryStartDate = condition.searchStartEndDate[0];
+      condition.queryEndDate = condition.searchStartEndDate[1];
       delete condition.searchStartEndDate;
     }
     return axios.post('/api/daily/getDailyPage.json', {
@@ -79,5 +79,8 @@ export default {
     return axios.post('/task/getSearchConditionList.json', vo
     )
   },
-
+  getDailyStastics(vo){
+    return axios.post('/api/daily/getDailyStastics.json', vo
+  )
+  },
 }

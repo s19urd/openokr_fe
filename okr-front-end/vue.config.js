@@ -8,27 +8,19 @@ function resolve (dir) {
 
 // 基础路径 注意发布之前要先修改这里
 
-const baseUrl = '/vue/'
+const publicPath = env === 'development' ? '/' : '/vue/'
 
 module.exports = {
-  baseUrl, // 根据你的实际情况更改这里
+  publicPath, // 根据你的实际情况更改这里
   outputDir: 'build',
   // lintOnSave: true,
   devServer: {
     // 和 baseUrl 保持一致
-    publicPath: process.env.BASE_URL,
+    publicPath,
     // 代理设置
     proxy: {
       '/.*\.(json|htm)': {
-        //target: 'http://172.16.135.204:8077/tenement-app-web/',
-        //小郑
-        //target:'http://172.16.135.36:8077/tenement-app-web',
-        //阿二
-        // target:'http://172.16.135.169:8077/tenement-app-web',
-        target: 'http://172.16.135.169:8892',
-        //广荣
-        // target:'http://localhost:8077/tenement-app-web',
-        // target:'http://192.168.0.5:8077/tenement-app-web',
+        target: 'http://172.16.141.207:8892',
         changeOrigin: true,
         pathRewrite: {
           '^/': '/'
@@ -39,6 +31,7 @@ module.exports = {
   // webpack 设置
   // 默认设置: https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-service/lib/config/base.js
   chainWebpack: (config) => {
+
     // svg
     const svgRule = config.module.rule('svg')
     svgRule.uses.clear()
