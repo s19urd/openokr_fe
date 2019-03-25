@@ -8,9 +8,7 @@
 
       <cell-group class="LoginForm">
         <Field v-model="userInfo.username"  label="账号/手机号" required></Field>
-        <Field v-model="userInfo.password"  label="请输入密码" required></Field>
-        <!-- <app-input :value="account" label="账号/手机号"/>
-        <app-input :value="password" label="请输入密码"/> -->
+        <Field v-model="userInfo.password"  label="请输入密码" required  type="password"></Field>
         <Button type="info" class="submit" @click="submit">登陆</Button>
       </cell-group>
 
