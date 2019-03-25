@@ -17,5 +17,19 @@ Vue.use(Filter)
 new Vue({
   router,
   store,
+  created () {
+    setTimeout(() => {
+      this.$api.login.loginCheck().then(res => {
+        console.log(res)
+        if (res && res.data) {
+          console.log(this.$router)
+          console.log(this.$router.history.current.name)
+          this.$router.history.current.name === 'Login' && this.$router.replace({ name: 'HistoryWork' })
+        } else {
+          this.$router.replace({ name: 'Login' })
+        }
+      })
+    }, 0)
+  },
   render: h => h(App)
 }).$mount('#app')

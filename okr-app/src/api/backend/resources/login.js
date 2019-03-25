@@ -1,13 +1,13 @@
 export default function (instance) {
   return {
-    saveTask (taskArray) {
+    loginCheck () {
       return instance
-        .post('/devLogin.json?username=admin', taskArray)
+        .get('/checkLoginStatus.json')
         .then(response => response.data)
     },
 
     signIn (userInfo) {
-      console.log(userInfo)
+      // console.log(userInfo)
       return instance
         .post('/devLogin.json', userInfo)
         .then(response => response.data)
