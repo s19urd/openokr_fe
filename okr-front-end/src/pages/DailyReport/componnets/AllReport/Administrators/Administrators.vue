@@ -66,23 +66,6 @@
                     </div>
 
                     <div class="inline-block">
-                      <span class="lab"> 产品名称：</span>
-                      <el-select
-                        filterable
-                        clearable
-                        v-model="scope.form.productId"
-                        placeholder="请选择"
-                        class="w70off"
-                      >
-                        <el-option
-                          v-for="item in productList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </div>
-                    <div class="inline-block">
                       <span class="lab"> 任务名称：</span>
                       <el-select
                         filterable
@@ -93,23 +76,6 @@
                       >
                         <el-option
                           v-for="item in taskList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </div>
-                    <div class="inline-block">
-                      <span class="lab">分摊类型：</span>
-                      <el-select
-                        filterable
-                        clearable
-                        v-model="scope.form.categoryId"
-                        placeholder="请选择"
-                        class="w70off"
-                      >
-                        <el-option
-                          v-for="item in categoryList"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value">
@@ -133,30 +99,12 @@
                         </el-option>
                       </el-select>
                     </div>
-                    <div class="inline-block mr10">
-                      <span class="lab">OKR：</span>
-                      <el-select
-                        filterable
-                        clearable
-                        v-model="scope.form.okrId"
-                        placeholder="请选择"
-                        class="w70off"
-                      >
-                        <el-option
-                          v-for="item in okrList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </div>
-
                   </template>
                   <template slot="tableColumns">
                     <el-table-column
                       prop="reportDay"
                       label="报工日期"
-                      width="100px"
+                      width="150px"
                       fixed
                     >
                       <template slot-scope="props">
@@ -168,21 +116,9 @@
                       label="任务名称">
                     </el-table-column>
                     <el-table-column
-                      prop="productName"
-                      label="产品名称">
-                    </el-table-column>
-                    <el-table-column
-                      prop="categoryName"
-                      label="分摊类别"
-                      width="150px">
-                    </el-table-column>
-                    <el-table-column
                       prop="reportUserName"
-                      label="填报人">
-                    </el-table-column>
-                    <el-table-column
-                      prop="jobType"
-                      label="人员岗位类型">
+                      label="填报人"
+                      width="150">
                     </el-table-column>
                     <el-table-column
                       prop="teamName"
@@ -191,13 +127,12 @@
                     <el-table-column
                       prop="duration"
                       label="耗费工时（h）"
-                      width="120">
+                      width="150">
                     </el-table-column>
                     <el-table-column
                       prop="auditStatus"
                       label="当前状态"
                       width="80"
-                      fixed="right"
                     >
                       <template slot-scope="props">
                         <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
@@ -205,7 +140,12 @@
                         <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                       </template>
                     </el-table-column>
-
+                    <el-table-column width="150" label="操作" fixed="right">
+                      <template slot-scope="props">
+                        <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
+                        <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                      </template>
+                    </el-table-column>
                   </template>
                 </table-comb>
                 <template slot="footer"></template>
@@ -239,23 +179,6 @@
                     </div>
 
                     <div class="inline-block">
-                      <span class="lab"> 产品名称：</span>
-                      <el-select
-                        filterable
-                        clearable
-                        v-model="scope.form.productId"
-                        placeholder="请选择"
-                        class="w70off"
-                      >
-                        <el-option
-                          v-for="item in productList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </div>
-                    <div class="inline-block">
                       <span class="lab"> 任务名称：</span>
                       <el-select
                         filterable
@@ -266,23 +189,6 @@
                       >
                         <el-option
                           v-for="item in taskList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </div>
-                    <div class="inline-block">
-                      <span class="lab">分摊类型：</span>
-                      <el-select
-                        filterable
-                        clearable
-                        v-model="scope.form.categoryId"
-                        placeholder="请选择"
-                        class="w70off"
-                      >
-                        <el-option
-                          v-for="item in categoryList"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value">
@@ -306,23 +212,6 @@
                         </el-option>
                       </el-select>
                     </div>
-                    <div class="inline-block mr10">
-                      <span class="lab">OKR：</span>
-                      <el-select
-                        filterable
-                        clearable
-                        v-model="scope.form.okrId"
-                        placeholder="请选择"
-                        class="w70off"
-                      >
-                        <el-option
-                          v-for="item in okrList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value">
-                        </el-option>
-                      </el-select>
-                    </div>
 
                   </template>
                   <!--表格-->
@@ -330,7 +219,7 @@
                     <el-table-column
                       prop="reportDay"
                       label="报工日期"
-                      width="100px"
+                      width="150px"
                       fixed
                     >
                       <template slot-scope="props">
@@ -341,22 +230,11 @@
                       prop="taskName"
                       label="任务名称">
                     </el-table-column>
-                    <el-table-column
-                      prop="productName"
-                      label="产品名称">
-                    </el-table-column>
-                    <el-table-column
-                      prop="categoryName"
-                      label="分摊类别"
-                      width="150px">
-                    </el-table-column>
+
                     <el-table-column
                       prop="reportUserName"
-                      label="填报人">
-                    </el-table-column>
-                    <el-table-column
-                      prop="jobType"
-                      label="人员岗位类型">
+                      label="填报人"
+                      width="150">
                     </el-table-column>
                     <el-table-column
                       prop="teamName"
@@ -365,12 +243,12 @@
                     <el-table-column
                       prop="duration"
                       label="耗费工时（h）"
-                      width="120">
+                      width="150">
                     </el-table-column>
                     <el-table-column
                       prop="auditStatus"
                       label="当前状态"
-                      width="80"
+                      width="150"
                       fixed="right"
                     >
                       <template slot-scope="props">
@@ -379,7 +257,12 @@
                         <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                       </template>
                     </el-table-column>
-
+                    <el-table-column width="150" label="操作" fixed="right">
+                      <template slot-scope="props">
+                        <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
+                        <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                      </template>
+                    </el-table-column>
                   </template>
                 </table-comb>
                 <template slot="footer"></template>
@@ -440,84 +323,104 @@
         this.loading = false;
         this. activeTabName= "first";
 
-        let searchVo={};
-        //任务名称-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.taskList=[]
-          let taskId=[]
-          resData.map(item => {
-            if(item.taskId!==null || item.taskName!==null){
-              if(taskId.indexOf(item.taskId)==-1){
-                taskId.push(item.taskId)
-                this.taskList.push({ value: item.taskId, label: item.taskName })
+        setTimeout(()=>{
+          this.$refs.tableMain.fetchData();
+          let searchVo={};
+          let allDaily={
+            reportStartDayStr:'',
+            reportEndDayStr:'',
+          }
+          this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
+            this.tableMain = res.data.data;
+          });
+          this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+            //任务名称-下拉
+            let resData = res.data;
+            this.taskList=[]
+            let taskId=[]
+            resData.map(item => {
+              if(item.taskId!==null || item.taskName!==null){
+                if(taskId.indexOf(item.taskId)==-1){
+                  taskId.push(item.taskId)
+                  this.taskList.push({ value: item.taskId, label: item.taskName })
+                }
               }
-            }
-          })
-        })
-        //产品名称-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.productList=[]
-          let productId=[]
-          resData.map(item => {
-            if(item.productId!==null || item.productName!==null){
-              if(productId.indexOf(item.productId)==-1){
-                productId.push(item.productId)
-                this.productList.push({ value: item.productId, label: item.productName })
+              //团队-下拉
+              this.teamList=[]
+              let teamId=[]
+              if(item.teamId!==null || item.teamName!==null){
+                if(teamId.indexOf(item.teamId)==-1){
+                  teamId.push(item.teamId)
+                  this.teamList.push({ value: item.teamId, label: item.teamName })
+                }
               }
-            }
+            })
           })
-        })
-        //分摊类型-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.categoryList=[]
-          let categoryIds=[]
-          resData.map(item => {
-            if(item.categoryId!==null || item.categoryName!==null){
-              if(categoryIds.indexOf(item.categoryId)==-1){
-                categoryIds.push(item.categoryId)
-                this.categoryList.push({value: item.categoryId, label: item.categoryName})
-              }
-            }
-          })
-        })
-        //团队-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.teamList=[]
-          let teamId=[]
-          resData.map(item => {
-            if(item.teamId!==null || item.teamName!==null){
-              if(teamId.indexOf(item.teamId)==-1){
-                teamId.push(item.teamId)
-                this.teamList.push({ value: item.teamId, label: item.teamName })
-              }
-            }
-          })
-        })
-        //okr-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.okrList=[]
-          let okrId=[]
-          resData.map(item => {
-            if(item.okrId!==null || item.okrName!==null){
-              if(okrId.indexOf(item.okrId)==-1){
-                okrId.push(item.okrId)
-                this.okrList.push({ value: item.okrId, label: item.okrName })
-              }
-            }
-          })
-        })
+        },0)
       },
       back() {
-        this.isVisible = false
-        this.$emit("ok");
+//        this.isVisible = false
+//        this.$emit("ok");
+        let NewPage = '_empty' + '?time=' + new Date().getTime()/500;
+        this.$router.push(NewPage);
+        this.$router.go(-1);
       },
 
       afterFetchData(){
+        let vo = this.$refs.tableMain.getPageVo();
+        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
+          this.totalData = res.data;
+        });
+      },
+
+      //确认
+      openConfirm(item){
+        const _this = this;
+        this.$msgbox({
+          title: '提示',
+          message: `是否确定该任务？`,
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(action => {
+          if (action === 'confirm') {
+            let vo={
+              auditStatus:item.auditStatus='01'
+            }
+            this.$api.okr.dailyWork.allDailyWork(vo).then(res => {
+              if (res.code === 0) {
+                this.$message.success(`确认成功！`)
+                this.$refs.tableMain.fetchData()
+              } else {
+                this.$message.error(res.message);
+              }
+            });
+          }
+        })
+      },
+      //驳回
+      openReject(item){
+        this.$msgbox({
+          title: '提示',
+          message: `是否确定驳回？`,
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(action => {
+          if (action === 'confirm') {
+            let vo={
+              auditStatus:item.auditStatus='02'
+            }
+            this.$api.okr.dailyWork.allDailyWork(vo).then(res => {
+              if (res.code === 0) {
+                this.$message.success(`驳回成功！`)
+                this.$refs.tableMain.fetchData()
+              } else {
+                this.$message.error(res.message);
+              }
+            });
+          }
+        })
       },
     },
     mounted() {

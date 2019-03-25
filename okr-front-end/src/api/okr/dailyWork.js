@@ -60,10 +60,10 @@ export default {
       currentPage: 1,
       pageSize: 10
     }, pageInfo)
-    //收款管理页面有这个字段
+    //
     if(condition.searchStartEndDate && condition.searchStartEndDate.length==2){
-      condition.queryStartDate = condition.searchStartEndDate[0];
-      condition.queryEndDate = condition.searchStartEndDate[1];
+      condition.reportStartDayStr = condition.searchStartEndDate[0];
+      condition.reportEndDayStr = condition.searchStartEndDate[1];
       delete condition.searchStartEndDate;
     }
     return axios.post('/api/daily/getDailyPage.json', {
@@ -79,8 +79,18 @@ export default {
     return axios.post('/task/getSearchConditionList.json', vo
     )
   },
+  /**
+   * 获取统计页面顶部统计数据
+   * @return {*}
+   */
   getDailyStastics(vo){
-    return axios.post('/api/daily/getDailyStastics.json', vo
-  )
+    if(vo.searchStartEndDate && vo.searchStartEndDate.length==2){
+      // vo.queryStartDate = util.dateFormat(vo.searchStartEndDate[0], 'yyyy-MM-dd')
+      // vo.queryEndDate = util.dateFormat(vo.searchStartEndDate[1], 'yyyy-MM-dd')
+      vo.queryStartDate = new Date(vo.searchStartEndDate[0])
+      vo.queryEndDate = new Date(vo.searchStartEndDate[1])
+      delete vo.searchStartEndDate;
+    }
+    return axios.post('/api/daily/getDailyStastics.json', vo)
   },
 }

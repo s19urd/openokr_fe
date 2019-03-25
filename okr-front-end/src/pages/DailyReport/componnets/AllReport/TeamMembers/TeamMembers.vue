@@ -95,7 +95,7 @@
             <el-table-column
               prop="reportDay"
               label="报工日期"
-              width="100px"
+              width="150px"
               fixed
             >
               <template slot-scope="props">
@@ -107,21 +107,9 @@
               label="任务名称">
             </el-table-column>
             <el-table-column
-              prop="productName"
-              label="产品名称">
-            </el-table-column>
-            <el-table-column
-              prop="categoryName"
-              label="分摊类别"
-              width="150px">
-            </el-table-column>
-            <el-table-column
               prop="reportUserName"
-              label="填报人">
-            </el-table-column>
-            <el-table-column
-              prop="jobType"
-              label="人员岗位类型">
+              label="填报人"
+              width="150">
             </el-table-column>
             <el-table-column
               prop="teamName"
@@ -130,12 +118,12 @@
             <el-table-column
               prop="duration"
               label="耗费工时（h）"
-              width="120">
+              width="150">
             </el-table-column>
             <el-table-column
               prop="auditStatus"
               label="当前状态"
-              width="80"
+              width="150"
             >
               <template slot-scope="props">
                 <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
@@ -143,7 +131,7 @@
                 <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
               </template>
             </el-table-column>
-            <el-table-column width="100" label="操作" fixed="right">
+            <el-table-column width="150" label="操作" fixed="right">
               <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
                 <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
               </template>
@@ -246,12 +234,6 @@
       },
 
       afterFetchData(){
-        let searchVo={
-          queryStartDate:'',
-          queryEndDate:'',
-          taskId:'',
-          teamId:'',
-        }
         let vo = this.$refs.tableMain.getPageVo();
         this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
           this.totalData = res.data;
