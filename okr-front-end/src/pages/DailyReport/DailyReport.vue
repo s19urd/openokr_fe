@@ -193,6 +193,7 @@
   </d2-container>
 </template>
 <script>
+  import Vue from 'vue'
   import listMixin from "@/mixins/list.mixin";
   import Administrators from "./componnets/AllReport/Administrators";
   import TeamMembers from "./componnets/AllReport/TeamMembers";
@@ -226,10 +227,6 @@
         editWork:{},
         showSaveDialog:false,
         fullscreenLoading: false,
-        weakData:{// 获取周一周天的时间
-          mondayData : new Date(new Date().getTime() - (new Date().getDay()-1)*(24*60*60*1000)),
-          sundayData : new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000)),
-        },
         pickerOptions: { // 日期设置对象
           disabledDate: (time) => {
             return this.dealDisabledDate(time)
@@ -241,6 +238,18 @@
       teamId(){
         this.$route.params.teamId
       },
+      currentWeek () {// 获取周一周天的时间
+        let now = new Date()
+        let nowTime = now.getTime()
+        let nowDay = now.getDay()
+        let oneDayTime = 24 * 60 * 60 * 1000
+        let MondayTime = nowTime - (nowDay - 1) * oneDayTime
+        let SundayTime = nowTime + (7 - nowDay) * oneDayTime
+        let monday = new Date(MondayTime)
+        let sunday = new Date(SundayTime)
+        let arrWeek=[monday,sunday]
+        return arrWeek
+      },
       sumWorkingHour () {
         let sumTemp = 0
         this.tableData.forEach(item => {
@@ -248,27 +257,35 @@
         })
         return sumTemp
       },
+      tableDataDate () {
+        let addiDay='';
+        this.tableData.forEach(item => {
+          addiDay=this.date;
+        })
+        return Vue.filter('dateFormat')(addiDay)
+      },
+      sunTableMainHour () {
+        let sumTemp2 = 0;
+        this.tableMain.forEach(item => {
+          let mainTime= Vue.filter('dateFormat')(item.reportDay)
+          if(mainTime==this.tableDataDate){
+            sumTemp2 = sumTemp2+ Number(item.duration)
+          }
+        })
+        return sumTemp2
+      },
     },
     methods:{
       //历史报工
-      formatDate(date) {
-        let d = new Date(date),
-          month = '' + (d.getMonth() + 1),
-          day = '' + d.getDate(),
-          year = d.getFullYear();
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-        return [year, month, day].join('-');
-      },
       historyData(){
         // 获取周一周天的时间
-        console.log(this.formatDate(this.weakData.mondayData));
-        console.log(this.formatDate(this.weakData.sundayData));
+        console.log(Vue.filter('dateFormat')(this.currentWeek[0]));
+        console.log(Vue.filter('dateFormat')(this.currentWeek[1]));
         let historyList={
           currentPage:'',
           pageSize:'',
-          reportStartDayStr:this.formatDate(this.weakData.mondayData),
-          reportEndDayStr:this.formatDate(this.weakData.sundayData),
+          reportStartDayStr:Vue.filter('dateFormat')(this.currentWeek[0]),
+          reportEndDayStr:Vue.filter('dateFormat')(this.currentWeek[1]),
         }
         this.$api.okr.dailyWork.historyDailyWork(historyList).then(res => {
           this.tableMain = res.data.data;
@@ -297,13 +314,13 @@
               this.flag = false
               return
             }
-            if(item.duration === '') {
-              this.$message.warning('报工时长不能为空！')
-              this.dialogVisible = false
-              this.flag = false
-              return
-            }
           })
+          if(this.sumWorkingHour+this.sunTableMainHour>15){
+            this.$message.warning('每天的报工时长不能超过15小时！')
+            this.dialogVisible = false
+            this.flag = false
+            return
+          }
         }
         if (this.flag) {
           this.dialogVisible = true
@@ -517,7 +534,7 @@
     .el-table__empty-block{min-height:0;}
     .el-table__body-wrapper{
       tr+tr>td:first-child .cell{
-
+        display:none;
       }
     }
   }
