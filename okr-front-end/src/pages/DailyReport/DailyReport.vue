@@ -94,7 +94,7 @@
               width="150"
             >
               <template slot-scope="scope">
-                <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+                <el-input-number v-model="scope.row.duration" :precision="1" :min="0" :max="24"  placeholder="请输入"></el-input-number>
               </template>
             </el-table-column>
 
@@ -113,7 +113,7 @@
               width="10"
             >
               <template slot-scope="scope">
-                <el-input  class="hide" v-model="scope.row.duration" type="number" placeholder="请输入" @change="changeTime"></el-input>
+                <el-input  class="hide" v-model="scope.row.duration" type="number" placeholder="请输入"></el-input>
               </template>
             </el-table-column>
 
@@ -127,9 +127,9 @@
         </div>
         <div class="formFooter">
           <div class="sumWorkingHour">
-            <el-button type="default" icon="el-icon-circle-plus" @click="add">添加任务</el-button>
+            <el-button type="default" icon="el-icon-circle-plus" @click="add">添加报工</el-button>
           </div>
-          <el-button type="primary" @click="validate" >提交今日报工</el-button>
+          <el-button type="primary" @click="validate" >提交报工</el-button>
           <el-dialog
             title="提示"
             :visible.sync="dialogVisible"
@@ -173,7 +173,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="报工时长(h)">
-            <el-input-number v-model="editWork.duration" :precision="1" :min="0" :max="24"  placeholder="请输入" @change="changeTime"></el-input-number>
+            <el-input-number v-model="editWork.duration" :precision="1" :min="0" :max="24"  placeholder="请输入"></el-input-number>
           </el-form-item>
           <el-form-item label="状态" class="hide">
             <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
@@ -210,18 +210,16 @@
           id:'',
           reportDay: new Date(),
           taskId: '',
-          duration: '',
+          duration: '8',
           auditStatus: '00',
           remark: '',
         },
         projectList: [],
         firstDataList:[],
         multipleSelection: [],
-        sumWorkingHour: 0,
         maxLength: -1,
         dialogVisible: false,
         flag: '',
-        publicPath: process.env.BASE_URL,
         imageUrl: require('@/assets/okr/icon-happy.png'),
         tempMaxIndex: '',
         tempMinIndex: '',
@@ -242,7 +240,14 @@
     computed:{
       teamId(){
         this.$route.params.teamId
-      }
+      },
+      sumWorkingHour () {
+        let sumTemp = 0
+        this.tableData.forEach(item => {
+          sumTemp = sumTemp + Number(item.duration)
+        })
+        return sumTemp
+      },
     },
     methods:{
       //历史报工
@@ -275,13 +280,6 @@
         let taskItem = Object.assign({}, this.initItemData)
         taskItem.index= this.tableData.length;
         this.tableData.push(taskItem)
-      },
-      changeTime () {
-        let sumTemp = 0
-        this.tableData.forEach(item => {
-          sumTemp = sumTemp + Number(item.duration)
-        })
-        this.sumWorkingHour = sumTemp
       },
       //验证formData
       validate () {
@@ -402,7 +400,7 @@
       },
       // 设置本周时间可选范围
       dealDisabledDate (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
+        let time1=new Date(new Date().getTime() - (new Date().getDay()+7)*(24*60*60*1000));
         let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
         return  time2<time.getTime() || time.getTime() < time1
       }
@@ -413,9 +411,9 @@
         let roleTypeList=[];
         let roleTypeData=[];
         resData.map(item => {
-            if(roleTypeList.indexOf(item.roleType)==-1) {
-              roleTypeData.push(item.roleType)
-            }
+          if(roleTypeList.indexOf(item.roleType)==-1) {
+            roleTypeData.push(item.roleType)
+          }
         })
         roleTypeData.map(item => {
           let strData=item;
