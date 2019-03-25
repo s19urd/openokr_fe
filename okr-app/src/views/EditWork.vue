@@ -309,9 +309,11 @@ padding: 15px;
   padding-bottom: 2.875rem;
 }
 
-.van-cell__title {
-  flex-grow: .5;
-  text-align: left;
+.projectWorkingHour {
+  .van-cell__title {
+    flex-grow: .5;
+    text-align: left;
+  }
 }
 .van-cell__value {
   text-overflow: ellipsis;
