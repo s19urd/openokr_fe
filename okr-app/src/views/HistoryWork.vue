@@ -7,17 +7,17 @@
       :fixed="true"
       :z-index="1"
       left-arrow>
-      <icon name="search" slot="right" size="20px" @click="searchShow = !searchShow" />
+      <icon name="search" slot="right" size="20px" @click="search.show = !search.show" />
     </nav-bar>
 
     <div class="pageContent">
       <search
-        v-model="keyWord"
+        v-model="search.keyWord"
         placeholder="请输入搜索关键词"
         show-action
         @search="onSearch"
-        @cancel="searchShow = false"
-        v-show="searchShow"
+        @cancel="search.show = false"
+        v-show="search.show"
       />
 
       <tabs v-model="currentTab" color="#1989fa" animated sticky @change="tabChange">
@@ -50,10 +50,14 @@
 
         </tab>
         <tab title="历史报工">
-          <inlineCalendar @change="dayClick"/>
+          <notice-bar :scrollable="false" class="notice-bar">
+            {{ parseInt(search.month) + 1 }} 月份总工时 {{ countWork(this.currentMonthList) }} h
+          </notice-bar>
+          
+          <inlineCalendar @change="dayClick" ref="calendar" />
 
           <collapse v-model="activeCollapse2">
-            <collapse-item v-for="(work, key, index) in dailyList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + countWork(work) + 'h'">
+            <collapse-item v-for="(work, key, index) in searchList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + countWork(work) + 'h'">
               <swipe-cell :right-width="65" :on-close="onClose" v-for="(item, index) in work" :key="index" :id="item.id">
                 <cell-group>
                   <cell :value="item.duration + 'h'">
@@ -73,7 +77,8 @@
               </div>
             </collapse-item>
 
-            <collapse-item title="当日没有报工噢" disabled v-show="!Object.keys(dailyList).length"></collapse-item>
+            <collapse-item title="当日没有报工噢" disabled v-show="!Object.keys(searchList).length && !search.keyWord.length"></collapse-item>
+            <collapse-item title="搜索不到报工" disabled v-show="!Object.keys(searchList).length && search.keyWord.length"></collapse-item>
           </collapse>
         </tab>
       </tabs>
@@ -84,7 +89,7 @@
 
 <script>
 import Vue from 'vue'
-import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGroup, SwipeCell, Dialog, Tag, Toast, Search } from 'vant'
+import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGroup, SwipeCell, Dialog, Tag, Toast, Search, NoticeBar } from 'vant'
 
 export default {
   name: '',
@@ -93,11 +98,15 @@ export default {
       currentTab: 0,
       activeCollapse1: [],
       activeCollapse2: [],
-      dailyList: {},
+      searchList: {},
       currentWeekList: {},
-      currentMonthList: {},
-      searchShow: false,
-      keyWord: '',
+      currentMonthList: [],
+      search: {
+        show: false,
+        keyWord: '',
+        year: '',
+        month: '2',
+      },
     }
   },
   components: {
@@ -115,11 +124,10 @@ export default {
     Tag,
     Toast,
     Search,
+    NoticeBar,
   },
   mounted () {
-    this.getWeeklyWork(this.currentWeek)
-    // this.getMonthWork(['2019(-03-01', '2019-03-31'])
-    this.getDailyWork([new Date(), new Date()])
+    this.getWork('currentWeek', this.currentWeek)
   },
   computed: {
     currentWeek () {
@@ -134,19 +142,6 @@ export default {
       result.push(MondayTime, SundayTime)
       return result
     },
-    currentMonth () {
-      // 获取周一周天的时间
-      let result = []
-      let now = new Date()
-      let nowTime = now.getTime()
-      let nowDay = now.getDay()
-      let oneDayTime = 24 * 60 * 60 * 1000
-      let MondayTime = nowTime - (nowDay - 1) * oneDayTime
-      let SundayTime = nowTime + (7 - nowDay) * oneDayTime
-      result.push(MondayTime, SundayTime)
-
-      return result
-    },
   },
   methods: {
     back () {
@@ -154,18 +149,21 @@ export default {
     },
     tabChange (index) {
       // console.log(index)
+      index && this.getWork('search', [new Date(), new Date()])
+      index && this.getWork('currentMonth', ['2019-03-01', '2019-03-31'])
     },
     countWork (work) {
       return work.reduce((acc, el) => {
         return acc + el.duration
       }, 0)
     },
-    getDailyWork (date) {
+    getWork (type = '', date = ['', ''], searchKey) {
       let query = {
+        searchKey,
         currentPage: '',
         pageSize: '',
-        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd'),
-        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd'),
+        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd') || '',
+        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd') || '',
       }
 
       Vue.api.historyWork.getHistoryWork(query).then(res => {
@@ -173,37 +171,10 @@ export default {
         const arr = (res.data && res.data.data) || []
         // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
         // console.log(arr)
-        this.dailyList = this.dateToObj(arr)
-      })
-    },
-    getWeeklyWork (date) {
-      let query = {
-        currentPage: '',
-        pageSize: '',
-        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd'),
-        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd'),
-      }
-
-      Vue.api.historyWork.getHistoryWork(query).then(res => {
-        // console.log(res.data.data)
-        const arr = (res.data && res.data.data) || []
-        // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
-        this.currentWeekList = this.dateToObj(arr)
-      })
-    },
-    getMonthWork (date) {
-      let query = {
-        currentPage: '',
-        pageSize: '',
-        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd'),
-        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd'),
-      }
-
-      Vue.api.historyWork.getHistoryWork(query).then(res => {
-        // console.log(res.data.data)
-        const arr = (res.data && res.data.data) || []
-        // console.log(arr)
-        this.currentMonthList = this.dateToObj(arr)
+        this[`${type}List`] = type === 'currentMonth' ? arr : this.dateToObj(arr)
+        this.currentTab && setTimeout(() => {
+          arr.length ? !this.activeCollapse2.length && this.activeCollapse2.push(0) : this.activeCollapse2.shift()
+        }, 0)
       })
     },
     dateToObj (arr) {
@@ -249,7 +220,7 @@ export default {
             Vue.api.historyWork.deleteTask(instance.$attrs.id).then(res => {
               if (res.code === 0) {
                 Toast('删除成功')
-                this.getWeeklyWork(this.currentWeek)
+                this.getWork('currentWeek', this.currentWeek)
               } else {
                 Toast(`${res.message}`)
               }
@@ -265,9 +236,11 @@ export default {
     },
     onSearch (keyWord) {
       console.log(keyWord)
+      this.getWork('searchList', '', keyWord)
     },
     dayClick (date) {
-      this.getDailyWork([date.$d, date.$d])
+      // console.log(this.$refs.calendar.showDate.month)
+      this.getWork('search', [date.$d, date.$d])
     },
   },
 }
@@ -289,6 +262,12 @@ export default {
 }
 .custom-text {
   margin-right: 10px;
+}
+.notice-bar {
+  .van-notice-bar__content {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 .collapse-bd {
   padding: 10px 0 0;
