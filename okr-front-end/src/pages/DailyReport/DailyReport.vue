@@ -26,7 +26,7 @@
           ref="tableMain"
           class="fillTable"
           :data="tableMain">
-          <el-table-column prop="reportDay" width="180" label="报工日期">
+          <el-table-column prop="reportDay" width="150" label="报工日期">
             <template slot-scope="props">
               {{props.row.reportDay | dateFormat('yyyy-MM-dd') }}
             </template>
@@ -56,13 +56,13 @@
             :data="tableData">
             <el-table-column
               label="报工日期"
-              width="180">
+              width="150">
               <template slot-scope="scope">
                 <el-date-picker
                   v-model="date"
                   type="date"
                   :clearable="false"
-                  :picker-options="pickerOptions"
+                  :picker-options="pickerOptions1"
                 >
                 </el-date-picker>
               </template>
@@ -140,7 +140,7 @@
             <span slot="footer" class="dialog-footer">
             <div class="buttonWrap">
               <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="submit"  v-loading.fullscreen.lock="fullscreenLoading">确 定</el-button>
+              <el-button type="primary" @click="submit" >确 定</el-button>
             </div>
           </span>
           </el-dialog>
@@ -154,7 +154,7 @@
                              v-model="editWork.reportDay"
                              type="date"
                              format="yyyy-MM-dd"
-                             :picker-options="pickerOptions"
+                             :picker-options="pickerOptions2"
             >
             </el-date-picker>
           </el-form-item>
@@ -216,20 +216,20 @@
           remark: '',
         },
         projectList: [],
-        firstDataList:[],
         multipleSelection: [],
-        maxLength: -1,
         dialogVisible: false,
         flag: '',
         imageUrl: require('@/assets/okr/icon-happy.png'),
-        tempMaxIndex: '',
-        tempMinIndex: '',
         editWork:{},
         showSaveDialog:false,
-        fullscreenLoading: false,
-        pickerOptions: { // 日期设置对象
+        pickerOptions1: { // 日期设置对象
           disabledDate: (time) => {
-            return this.dealDisabledDate(time)
+            return this.dealDisabledDate1(time)
+          }
+        },
+        pickerOptions2: { // 日期设置对象
+          disabledDate: (time) => {
+            return this.dealDisabledDate2(time)
           }
         },
       }
@@ -241,13 +241,15 @@
       currentWeek () {// 获取周一周天的时间
         let now = new Date()
         let nowTime = now.getTime()
-        let nowDay = now.getDay()
+        let nowDay = now.getDay()||7
         let oneDayTime = 24 * 60 * 60 * 1000
         let MondayTime = nowTime - (nowDay - 1) * oneDayTime
         let SundayTime = nowTime + (7 - nowDay) * oneDayTime
+        let LastMondayTime = nowTime  - (nowDay +7) * oneDayTime
         let monday = new Date(MondayTime)
         let sunday = new Date(SundayTime)
-        let arrWeek=[monday,sunday]
+        let lastmonday = new Date(LastMondayTime)
+        let arrWeek=[monday,sunday,lastmonday]
         return arrWeek
       },
       sumWorkingHour () {
@@ -279,18 +281,17 @@
       //历史报工
       historyData(){
         // 获取周一周天的时间
-        console.log(Vue.filter('dateFormat')(this.currentWeek[0]));
-        console.log(Vue.filter('dateFormat')(this.currentWeek[1]));
-        let historyList={
+        console.log(Vue.filter('dateFormat')(this.currentWeek[0], 'yyyy-MM-dd'));
+        console.log(Vue.filter('dateFormat')(this.currentWeek[1], 'yyyy-MM-dd'));
+        let query={
           currentPage:'',
           pageSize:'',
-          reportStartDayStr:Vue.filter('dateFormat')(this.currentWeek[0]),
-          reportEndDayStr:Vue.filter('dateFormat')(this.currentWeek[1]),
+          reportStartDayStr:Vue.filter('dateFormat')(this.currentWeek[0], 'yyyy-MM-dd'),
+          reportEndDayStr:Vue.filter('dateFormat')(this.currentWeek[1], 'yyyy-MM-dd'),
         }
-        this.$api.okr.dailyWork.historyDailyWork(historyList).then(res => {
+        this.$api.okr.dailyWork.historyDailyWork(query).then(res => {
           this.tableMain = res.data.data;
         });
-
       },
       //添加任务
       add () {
@@ -300,6 +301,7 @@
       },
       //验证formData
       validate () {
+        console.log(this.mergeMainTime)
         this.flag = true
         if (this.tableData.length === 0) {
           this.$message.warning('请添加条数！')
@@ -307,20 +309,22 @@
           this.flag = false
           return
         } else {
-          this.tableData.forEach(item => {
-            if(item.taskId === "") {
-              this.$message.warning('项目类型不能为空！')
+          setTimeout(()=>{
+            this.tableData.forEach(item => {
+              if(item.taskId === "") {
+                this.$message.warning('项目类型不能为空！')
+                this.dialogVisible = false
+                this.flag = false
+                return
+              }
+            })
+          },0)
+            if(this.sumWorkingHour+this.sunTableMainHour>15){
+              this.$message.warning('每天的报工时长不能超过15小时！')
               this.dialogVisible = false
               this.flag = false
               return
             }
-          })
-          if(this.sumWorkingHour+this.sunTableMainHour>15){
-            this.$message.warning('每天的报工时长不能超过15小时！')
-            this.dialogVisible = false
-            this.flag = false
-            return
-          }
         }
         if (this.flag) {
           this.dialogVisible = true
@@ -416,11 +420,19 @@
         this.$refs.TeamMembers.open();
       },
       // 设置本周时间可选范围
-      dealDisabledDate (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay()+7)*(24*60*60*1000));
-        let time2=new Date(new Date().getTime()+ (7-new Date().getDay())*(24*60*60*1000));
+      dealDisabledDate1 (time) {
+        let time1=this.currentWeek[2];
+        let time2=this.currentWeek[1];
         return  time2<time.getTime() || time.getTime() < time1
-      }
+      },
+      // 设置本周时间可选范围
+      dealDisabledDate2 (time) {
+        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
+        let time2=this.currentWeek[1];
+        return  time2<time.getTime() || time.getTime() < time1
+      },
+      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+      },
     },
     mounted () {
       this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
@@ -524,7 +536,7 @@
     }
     .el-date-editor.el-input{
       &.el-input{
-        width:150px;
+        width:120px;
         input{
           padding-right: 10px
         }
