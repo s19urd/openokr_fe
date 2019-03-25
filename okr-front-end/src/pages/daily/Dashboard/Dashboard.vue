@@ -2,7 +2,10 @@
   <div class="dailyDashboard">
     <div class="tab-wrap text-center">
       <el-radio-group v-model="pageType" change="changePage">
-        <el-radio-button v-for="item in pageTypeOptions" v-if="item.show" :label="item.type">{{item.name}}</el-radio-button>
+        <el-radio-button
+          v-for="item in pageTypeOptions"
+          :label="item.type"
+          :key="item.type">{{item.name}}</el-radio-button>
       </el-radio-group>
     </div>
     <div class="tab-wrap">
@@ -10,7 +13,8 @@
         <el-radio-button
           class="radio-sty2"
           v-for="item in searchTypeOptions"
-          :label="item.type">
+          :label="item.type"
+          :key="item.type">
           {{item.name}}
         </el-radio-button>
       </el-radio-group>
@@ -51,8 +55,8 @@
         pageTypeOptions:[
           {name:'按人员所属', type:'1',show:true},
           {name:'按产品类别', type:'2',show:true},
-          {name:'按项目任务', type:'3',show:false},
-          {name:'按客户规模', type:'4',show:false}
+          // {name:'按项目任务', type:'3',show:false},
+          // {name:'按客户规模', type:'4',show:false}
         ],
         pageType:'1',
         searchTypeOptions:[
@@ -182,7 +186,7 @@
       //切换区间
       changeStartDate(val){
         this.reportStartDateStrOptions.map(item=>{
-          if(val ===item.value){
+          if(val === item.value){
             this.reportStartDateShow = item.label;
           }
         })
@@ -190,7 +194,7 @@
       //获取数据
       getData(){
         this.$nextTick(()=>{
-          this.tabLoading = true;
+          this.tabLoading = true; 
           let vo = this.getSearchParam();
           if(this.pageType==='1'){
             this.$refs.statisticByMember.getData(vo).then(res=>{
