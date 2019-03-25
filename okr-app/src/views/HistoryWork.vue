@@ -20,9 +20,9 @@
         v-show="searchShow"
       />
 
-      <tabs v-model="currentTab" color="#1989fa">
+      <tabs v-model="currentTab" color="#1989fa" animated sticky @change="tabChange">
         <tab title="本周报工">
-          <collapse v-model="activeCollapse">
+          <collapse v-model="activeCollapse1">
             <collapse-item v-for="(work, key, index) in currentWeekList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + countWork(work) + 'h'">
               <swipe-cell :right-width="65" :on-close="onClose" v-for="(item, index) in work" :key="index" :id="item.id">
                 <cell-group>
@@ -50,7 +50,31 @@
 
         </tab>
         <tab title="历史报工">
-          <inlineCalendar :dayClick="dayClick"/>
+          <inlineCalendar @change="dayClick"/>
+
+          <collapse v-model="activeCollapse2">
+            <collapse-item v-for="(work, key, index) in dailyList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + countWork(work) + 'h'">
+              <swipe-cell :right-width="65" :on-close="onClose" v-for="(item, index) in work" :key="index" :id="item.id">
+                <cell-group>
+                  <cell :value="item.duration + 'h'">
+                    <template slot="title">
+                      <span class="custom-text">{{ item.taskName }}</span>
+                      <Tag plain type="primary" v-if="item.auditStatus == '00'">{{ item.auditStatusStr }}</Tag>
+                      <Tag plain type="success" v-else-if="item.auditStatus == '01'">{{ item.auditStatusStr }}</Tag>
+                      <Tag plain type="danger" v-else>{{ item.auditStatusStr }}</Tag>
+                    </template>
+                  </cell>
+                </cell-group>
+                <span slot="right">删除</span>
+              </swipe-cell>
+              <div class="collapse-bd">
+                <span class="tip">滑动任务可删除</span>
+                <Button type="info" size="mini" @click="editWork(key)">编辑</Button>
+              </div>
+            </collapse-item>
+
+            <collapse-item title="当日没有报工噢" disabled v-show="!Object.keys(dailyList).length"></collapse-item>
+          </collapse>
         </tab>
       </tabs>
     </div>
@@ -67,8 +91,11 @@ export default {
   data () {
     return {
       currentTab: 0,
-      activeCollapse: [],
+      activeCollapse1: [],
+      activeCollapse2: [],
+      dailyList: {},
       currentWeekList: {},
+      currentMonthList: {},
       searchShow: false,
       keyWord: '',
     }
@@ -90,36 +117,71 @@ export default {
     Search,
   },
   mounted () {
-    this.currentWeek()
+    this.getWeeklyWork(this.currentWeek)
+    // this.getMonthWork(['2019(-03-01', '2019-03-31'])
+    this.getDailyWork([new Date(), new Date()])
   },
-  methods: {
-    back () {
-      this.$router.replace({ name: 'Login' })
-    },
-    countWork (work) {
-      return work.reduce((acc, el) => {
-        return acc + el.duration
-      }, 0)
-    },
+  computed: {
     currentWeek () {
       // 获取周一周天的时间
+      let result = []
+      let now = new Date()
+      let nowTime = now.getTime()
+      let nowDay = now.getDay() || 7
+      let oneDayTime = 24 * 60 * 60 * 1000
+      let MondayTime = nowTime - (nowDay - 1) * oneDayTime
+      let SundayTime = nowTime + (7 - nowDay) * oneDayTime
+      result.push(MondayTime, SundayTime)
+      return result
+    },
+    currentMonth () {
+      // 获取周一周天的时间
+      let result = []
       let now = new Date()
       let nowTime = now.getTime()
       let nowDay = now.getDay()
       let oneDayTime = 24 * 60 * 60 * 1000
       let MondayTime = nowTime - (nowDay - 1) * oneDayTime
       let SundayTime = nowTime + (7 - nowDay) * oneDayTime
-      let monday = new Date(MondayTime)
-      let sunday = new Date(SundayTime)
+      result.push(MondayTime, SundayTime)
 
-      // console.log(Vue.filter('dateFormat')(monday, 'yyyy-MM-dd'))
-      // console.log(Vue.filter('dateFormat')(sunday, 'yyyy-MM-dd'))
-
+      return result
+    },
+  },
+  methods: {
+    back () {
+      this.$router.replace({ name: 'Login' })
+    },
+    tabChange (index) {
+      // console.log(index)
+    },
+    countWork (work) {
+      return work.reduce((acc, el) => {
+        return acc + el.duration
+      }, 0)
+    },
+    getDailyWork (date) {
       let query = {
         currentPage: '',
         pageSize: '',
-        reportStartDayStr: Vue.filter('dateFormat')(monday, 'yyyy-MM-dd'),
-        reportEndDayStr: Vue.filter('dateFormat')(sunday, 'yyyy-MM-dd')
+        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd'),
+        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd'),
+      }
+
+      Vue.api.historyWork.getHistoryWork(query).then(res => {
+        // console.log(res.data.data)
+        const arr = (res.data && res.data.data) || []
+        // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
+        // console.log(arr)
+        this.dailyList = this.dateToObj(arr)
+      })
+    },
+    getWeeklyWork (date) {
+      let query = {
+        currentPage: '',
+        pageSize: '',
+        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd'),
+        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd'),
       }
 
       Vue.api.historyWork.getHistoryWork(query).then(res => {
@@ -127,6 +189,21 @@ export default {
         const arr = (res.data && res.data.data) || []
         // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
         this.currentWeekList = this.dateToObj(arr)
+      })
+    },
+    getMonthWork (date) {
+      let query = {
+        currentPage: '',
+        pageSize: '',
+        reportStartDayStr: Vue.filter('dateFormat')(date[0], 'yyyy-MM-dd'),
+        reportEndDayStr: Vue.filter('dateFormat')(date[1], 'yyyy-MM-dd'),
+      }
+
+      Vue.api.historyWork.getHistoryWork(query).then(res => {
+        // console.log(res.data.data)
+        const arr = (res.data && res.data.data) || []
+        // console.log(arr)
+        this.currentMonthList = this.dateToObj(arr)
       })
     },
     dateToObj (arr) {
@@ -138,7 +215,7 @@ export default {
         Array.isArray(result[reportDay]) || (result[reportDay] = [])
         result[reportDay].push(el)
       })
-      console.log(result)
+      // console.log(result)
       return result
     },
     // dateToArr (obj) {
@@ -172,7 +249,7 @@ export default {
             Vue.api.historyWork.deleteTask(instance.$attrs.id).then(res => {
               if (res.code === 0) {
                 Toast('删除成功')
-                this.currentWeek()
+                this.getWeeklyWork(this.currentWeek)
               } else {
                 Toast(`${res.message}`)
               }
@@ -190,7 +267,7 @@ export default {
       console.log(keyWord)
     },
     dayClick (date) {
-      console.log(date)
+      this.getDailyWork([date.$d, date.$d])
     },
   },
 }
@@ -199,6 +276,9 @@ export default {
 <style lang="scss">
 .inner {
   padding: 15px;
+}
+.mb10 {
+  margin-bottom: 10px;
 }
 .van-tab {
   font-size: 14px;

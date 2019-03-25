@@ -7,8 +7,8 @@
       </div>
 
       <cell-group class="LoginForm">
-        <Field v-model="userInfo.username"  label="账号/手机号" required></Field>
-        <Field v-model="userInfo.password"  label="请输入密码" required></Field>
+        <Field v-model="userInfo.username" label="账号/手机号" required></Field>
+        <Field v-model="userInfo.password" type="password" label="请输入密码" required></Field>
         <!-- <app-input :value="account" label="账号/手机号"/>
         <app-input :value="password" label="请输入密码"/> -->
         <Button type="info" class="submit" @click="submit">登陆</Button>
@@ -65,7 +65,10 @@ export default {
 </script>
 <style lang="scss">
   .Login {
+    height: 100%;
     padding: 56px 35px;
+    box-sizing: border-box;
+    overflow: hidden;
 
     .LoginHeader {
       margin-bottom: 80px;
