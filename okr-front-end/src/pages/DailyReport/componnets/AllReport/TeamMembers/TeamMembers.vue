@@ -34,7 +34,7 @@
           :search-model-base="tableMainSearchModelBase"
           :get-action="$api.okr.dailyWork.allDailyWork"
           :get-action-where="getActionWhere"
-          :auto-fetch="true"
+          :auto-fetch="false"
           :afterFetchData="afterFetchData"
 
         >
@@ -54,24 +54,6 @@
               >
               </el-date-picker>
             </div>
-
-            <div class="inline-block">
-              <span class="lab"> 产品名称：</span>
-              <el-select
-                filterable
-                clearable
-                v-model="scope.form.productId"
-                placeholder="请选择"
-                class="w70off"
-              >
-                <el-option
-                  v-for="item in productList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </div>
             <div class="inline-block">
               <span class="lab"> 任务名称：</span>
               <el-select
@@ -90,23 +72,6 @@
               </el-select>
             </div>
             <div class="inline-block">
-              <span class="lab">分摊类型：</span>
-              <el-select
-                filterable
-                clearable
-                v-model="scope.form.categoryId"
-                placeholder="请选择"
-                class="w70off"
-              >
-                <el-option
-                  v-for="item in categoryList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="inline-block">
               <span class="lab">团队：</span>
               <el-select
                 filterable
@@ -117,23 +82,6 @@
               >
                 <el-option
                   v-for="item in teamList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </div>
-            <div class="inline-block mr10">
-              <span class="lab">OKR：</span>
-              <el-select
-                filterable
-                clearable
-                v-model="scope.form.okrId"
-                placeholder="请选择"
-                class="w70off"
-              >
-                <el-option
-                  v-for="item in okrList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -188,12 +136,16 @@
               prop="auditStatus"
               label="当前状态"
               width="80"
-              fixed="right"
             >
               <template slot-scope="props">
                 <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
                 <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
                 <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column width="100" label="操作" fixed="right">
+              <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
+                <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
               </template>
             </el-table-column>
 
@@ -250,84 +202,83 @@
       open(vo) {
         this.isVisible = true;
         this.loading = false;
-        let searchVo={};
-        //任务名称-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.taskList=[]
-          let taskId=[]
-          resData.map(item => {
-            if(item.taskId!==null || item.taskName!==null){
-              if(taskId.indexOf(item.taskId)==-1){
-                taskId.push(item.taskId)
-                this.taskList.push({ value: item.taskId, label: item.taskName })
+        setTimeout(()=>{
+          this.$refs.tableMain.fetchData();
+          let searchVo={};
+          let allDaily={
+            reportStartDayStr:'',
+            reportEndDayStr:'',
+          }
+          this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
+            this.tableMain = res.data.data;
+          });
+          this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
+            //任务名称-下拉
+            let resData = res.data;
+            this.taskList=[]
+            let taskId=[]
+            resData.map(item => {
+              if(item.taskId!==null || item.taskName!==null){
+                if(taskId.indexOf(item.taskId)==-1){
+                  taskId.push(item.taskId)
+                  this.taskList.push({ value: item.taskId, label: item.taskName })
+                }
               }
-            }
-          })
-        })
-        //产品名称-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.productList=[]
-          let productId=[]
-          resData.map(item => {
-            if(item.productId!==null || item.productName!==null){
-              if(productId.indexOf(item.productId)==-1){
-                productId.push(item.productId)
-                this.productList.push({ value: item.productId, label: item.productName })
+              //团队-下拉
+              this.teamList=[]
+              let teamId=[]
+              if(item.teamId!==null || item.teamName!==null){
+                if(teamId.indexOf(item.teamId)==-1){
+                  teamId.push(item.teamId)
+                  this.teamList.push({ value: item.teamId, label: item.teamName })
+                }
               }
-            }
+            })
           })
-        })
-        //分摊类型-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.categoryList=[]
-          let categoryIds=[]
-          resData.map(item => {
-            if(item.categoryId!==null || item.categoryName!==null){
-              if(categoryIds.indexOf(item.categoryId)==-1){
-                categoryIds.push(item.categoryId)
-                this.categoryList.push({value: item.categoryId, label: item.categoryName})
-              }
-            }
-          })
-        })
-        //团队-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.teamList=[]
-          let teamId=[]
-          resData.map(item => {
-            if(item.teamId!==null || item.teamName!==null){
-              if(teamId.indexOf(item.teamId)==-1){
-                teamId.push(item.teamId)
-                this.teamList.push({ value: item.teamId, label: item.teamName })
-              }
-            }
-          })
-        })
-        //okr-下拉
-        this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-          let resData = res.data;
-          this.okrList=[]
-          let okrId=[]
-          resData.map(item => {
-            if(item.okrId!==null || item.okrName!==null){
-              if(okrId.indexOf(item.okrId)==-1){
-                okrId.push(item.okrId)
-                this.okrList.push({ value: item.okrId, label: item.okrName })
-              }
-            }
-          })
-        })
+        },0)
       },
       back() {
-        this.isVisible = false
-        this.$emit("ok");
+//        this.isVisible = false
+//        this.$emit("ok");
+        let NewPage = '_empty' + '?time=' + new Date().getTime()/500;
+        this.$router.push(NewPage);
+        this.$router.go(-1);
       },
 
       afterFetchData(){
+        let searchVo={
+          queryStartDate:'',
+          queryEndDate:'',
+          taskId:'',
+          teamId:'',
+        }
+        let vo = this.$refs.tableMain.getPageVo();
+        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
+          this.totalData = res.data;
+        });
+      },
+      //删除历史报工
+      removeItem(vo){
+        this.$msgbox({
+          title: '提示',
+          type: 'warning',
+          message: `确定要删除该数据？`,
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(action => {
+          if (action === 'confirm') {
+            this.$api.okr.dailyWork.deleteDailyList(vo).then(res => {
+              if (res.code === 0) {
+                this.$message.success(`删除数据成功`);
+                //刷新列表
+                this.$refs.tableMain.fetchData();
+              } else {
+                this.$message.error(res.message)
+              }
+            });
+          }
+        });
       },
     },
     mounted() {

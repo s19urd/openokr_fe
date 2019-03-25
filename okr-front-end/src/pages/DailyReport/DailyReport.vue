@@ -208,7 +208,7 @@
         date: new Date(),
         initItemData:{
           id:'',
-          reportDay: new Date(),
+          reportDay: '',
           taskId: '',
           duration: '8',
           auditStatus: '00',
@@ -515,9 +515,14 @@
     }
     .el-table__empty-text{display: none;}
     .el-table__empty-block{min-height:0;}
+    .el-table__body-wrapper{
+      tr+tr>td:first-child .cell{
+
+      }
+    }
   }
   .hanle-table-noth+.formFooter{border-top:none}
-  .hanle-table-noth .el-table__header-wrapper{display: none;}
+  .hanle-table-noth .el-table__header-wrapper{  display: none;  }
   .warning-popup{
     font-size:18px;
     .el-icon-warning{color: #e6a23c}
