@@ -85,8 +85,6 @@ export default {
    */
   getDailyStastics(vo){
     if(vo.searchStartEndDate && vo.searchStartEndDate.length==2){
-      // vo.queryStartDate = util.dateFormat(vo.searchStartEndDate[0], 'yyyy-MM-dd')
-      // vo.queryEndDate = util.dateFormat(vo.searchStartEndDate[1], 'yyyy-MM-dd')
       vo.queryStartDate = new Date(vo.searchStartEndDate[0])
       vo.queryEndDate = new Date(vo.searchStartEndDate[1])
       delete vo.searchStartEndDate;

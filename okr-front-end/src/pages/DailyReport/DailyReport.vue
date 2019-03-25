@@ -8,11 +8,11 @@
           </div>
           <div class="fr">
             <!--管理员-->
-            <template v-if="isManage===false">
+            <template v-if="isManage===0">
               <el-button type="default" @click="openTeamDialog">全部报工</el-button>
               <el-button type="default" @click="toMyTasks">我的任务</el-button>
             </template>
-            <template v-if="isManage===true">
+            <template v-if="isManage===1">
               <el-button type="default" @click="toMyTeam">我的团队</el-button>
               <el-button type="default" @click="toDataAggregation">数据汇总</el-button>
               <el-button type="default" @click="openAdminDialog">全部报工</el-button>
@@ -203,7 +203,7 @@
     components: {Administrators,TeamMembers},
     data () {
       return {
-        isManage:false,
+        isManage:0,
         tableMain: [],
         tableData: [],
         date: new Date(),
@@ -238,19 +238,21 @@
       teamId(){
         this.$route.params.teamId
       },
-      currentWeek () {// 获取周一周天的时间
+      pickableDays () {// 获取周一周天的时间
+        let result = []
         let now = new Date()
         let nowTime = now.getTime()
         let nowDay = now.getDay()||7
         let oneDayTime = 24 * 60 * 60 * 1000
-        let MondayTime = nowTime - (nowDay - 1) * oneDayTime
-        let SundayTime = nowTime + (7 - nowDay) * oneDayTime
-        let LastMondayTime = nowTime  - (nowDay +7) * oneDayTime
-        let monday = new Date(MondayTime)
-        let sunday = new Date(SundayTime)
-        let lastmonday = new Date(LastMondayTime)
-        let arrWeek=[monday,sunday,lastmonday]
-        return arrWeek
+//      //表格显示一周
+        let startMondayTime = nowTime - (nowDay - 1) * oneDayTime//周一
+        let endSundayTime = nowTime + (7 - nowDay) * oneDayTime//周日
+        //新增时间下拉禁用
+        let addStartTime = nowTime  - (nowDay +7) * oneDayTime
+        //删除时间下拉禁用
+        let editStartTime = nowTime  - (nowDay -0) * oneDayTime
+        result.push(startMondayTime, endSundayTime,addStartTime,editStartTime)
+        return result
       },
       sumWorkingHour () {
         let sumTemp = 0
@@ -281,13 +283,13 @@
       //历史报工
       historyData(){
         // 获取周一周天的时间
-        console.log(Vue.filter('dateFormat')(this.currentWeek[0], 'yyyy-MM-dd'));
-        console.log(Vue.filter('dateFormat')(this.currentWeek[1], 'yyyy-MM-dd'));
+        console.log(Vue.filter('dateFormat')(this.pickableDays[0], 'yyyy-MM-dd'));
+        console.log(Vue.filter('dateFormat')(this.pickableDays[1], 'yyyy-MM-dd'));
         let query={
           currentPage:'',
           pageSize:'',
-          reportStartDayStr:Vue.filter('dateFormat')(this.currentWeek[0], 'yyyy-MM-dd'),
-          reportEndDayStr:Vue.filter('dateFormat')(this.currentWeek[1], 'yyyy-MM-dd'),
+          reportStartDayStr:Vue.filter('dateFormat')(this.pickableDays[0], 'yyyy-MM-dd'),
+          reportEndDayStr:Vue.filter('dateFormat')(this.pickableDays[1], 'yyyy-MM-dd'),
         }
         this.$api.okr.dailyWork.historyDailyWork(query).then(res => {
           this.tableMain = res.data.data;
@@ -419,17 +421,19 @@
       openTeamDialog() {
         this.$refs.TeamMembers.open();
       },
-      // 设置本周时间可选范围
-      dealDisabledDate1 (time) {
-        let time1=this.currentWeek[2];
-        let time2=this.currentWeek[1];
-        return  time2<time.getTime() || time.getTime() < time1
+      // 新增-设置本周时间可选范围
+      dealDisabledDate1 (date) {
+        let pickDay = date.getTime()
+        let date1=new Date(this.pickableDays[2]);
+        let date2=new Date(this.pickableDays[1]);
+        return  date2 < pickDay|| pickDay < date1
       },
-      // 设置本周时间可选范围
-      dealDisabledDate2 (time) {
-        let time1=new Date(new Date().getTime() - (new Date().getDay())*(24*60*60*1000));
-        let time2=this.currentWeek[1];
-        return  time2<time.getTime() || time.getTime() < time1
+      // 修改-设置本周时间可选范围
+      dealDisabledDate2 (date) {
+        let pickDay = date.getTime()
+        let date1=new Date(this.pickableDays[3]);
+        let date2=new Date(this.pickableDays[1]);
+        return  date2 <= pickDay|| pickDay <= date1
       },
       objectSpanMethod({ row, column, rowIndex, columnIndex }) {
       },
@@ -447,7 +451,7 @@
         roleTypeData.map(item => {
           let strData=item;
           if (strData[0] == '0') {
-            this.isManage  = true;
+            this.isManage  = 1;
             console.log(this.isManage)
           }
         })

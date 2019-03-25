@@ -36,16 +36,16 @@
         <!---->
         <div class="mt20">
           <template>
-            <el-tabs v-model="activeTabName" >
+            <el-tabs v-model="activeTabName"  @tab-click="handleClick">
               <el-tab-pane label="我的报工" name="first">
                 <table-comb
                   name="管理者历史报工列表"
-                  ref="tableMain"
+                  ref="tableMain1"
                   :search-model-base="tableMainSearchModelBase"
                   :get-action="$api.okr.dailyWork.allDailyWork"
-                  :get-action-where="getActionWhere"
-                  :auto-fetch="true"
-                  :afterFetchData="afterFetchData"
+                  :get-action-where="getActionWhere1"
+                  :auto-fetch="false"
+                  :afterFetchData="afterFetchData1"
 
                 >
                   <!--基础查询-->
@@ -150,15 +150,15 @@
                 </table-comb>
                 <template slot="footer"></template>
               </el-tab-pane>
-              <el-tab-pane label="团队报工" name="second">
+              <el-tab-pane label="团队报工" name="second" >
                 <table-comb
                   name="团队报工列表"
-                  ref="tableMain"
+                  ref="tableMain2"
                   :search-model-base="tableMainSearchModelBase"
                   :get-action="$api.okr.dailyWork.allDailyWork"
-                  :get-action-where="getActionWhere"
-                  :auto-fetch="true"
-                  :afterFetchData="afterFetchData"
+                  :get-action-where="getActionWhere2"
+                  :auto-fetch="false"
+                  :afterFetchData="afterFetchData2"
 
                 >
                   <!--基础查询-->
@@ -286,6 +286,7 @@
     ],
     data() {
       return {
+        isManage:0,
         isVisible:false,
         totalData:{
           costTimeNum:0,
@@ -302,18 +303,19 @@
           okrId:''
         },
         taskList: [],
-        productList:[],
-        categoryList:[],
         teamList:[],
-        okrList:[],
         activeTabName: "first",
+        tabIndex:0
       };
     },
     computed: {
-      getActionWhere(){
+      getActionWhere1(){
         return {
-          reportStartDayStr:'',
-          reportEndDayStr:'',
+        }
+      },
+      getActionWhere2(){
+        return {
+          isAdmin:1
         }
       },
     },
@@ -324,14 +326,20 @@
         this. activeTabName= "first";
 
         setTimeout(()=>{
-          this.$refs.tableMain.fetchData();
+          if(this.tabIndex===0){
+            this.$refs.tableMain1.fetchData();
+          }
+          if(this.tabIndex===1){
+            this.$refs.tableMain2.fetchData();
+          }
           let searchVo={};
           let allDaily={
             reportStartDayStr:'',
             reportEndDayStr:'',
           }
           this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
-            this.tableMain = res.data.data;
+            this.tableMain1 = res.data.data;
+            this.tableMain2 = res.data.data;
           });
           this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
             //任务名称-下拉
@@ -356,7 +364,7 @@
               }
             })
           })
-        },0)
+        },0);
       },
       back() {
 //        this.isVisible = false
@@ -366,13 +374,22 @@
         this.$router.go(-1);
       },
 
-      afterFetchData(){
-        let vo = this.$refs.tableMain.getPageVo();
+      afterFetchData1(){
+        let vo = this.$refs.tableMain1.getPageVo();
         this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
           this.totalData = res.data;
         });
       },
-
+      afterFetchData2(){
+        let vo = this.$refs.tableMain2.getPageVo();
+        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
+          this.totalData = res.data;
+        });
+      },
+      handleClick(tab){
+        this.tabIndex=tab.index
+        console.log(tab.index);
+      },
       //确认
       openConfirm(item){
         const _this = this;
@@ -390,7 +407,8 @@
             this.$api.okr.dailyWork.allDailyWork(vo).then(res => {
               if (res.code === 0) {
                 this.$message.success(`确认成功！`)
-                this.$refs.tableMain.fetchData()
+                this.$refs.tableMain1.fetchData()
+                this.$refs.tableMain2.fetchData()
               } else {
                 this.$message.error(res.message);
               }
@@ -414,7 +432,8 @@
             this.$api.okr.dailyWork.allDailyWork(vo).then(res => {
               if (res.code === 0) {
                 this.$message.success(`驳回成功！`)
-                this.$refs.tableMain.fetchData()
+                this.$refs.tableMain1.fetchData()
+                this.$refs.tableMain2.fetchData()
               } else {
                 this.$message.error(res.message);
               }
@@ -424,7 +443,24 @@
       },
     },
     mounted() {
+      this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
+        let resData = res.data;
+        let roleTypeList=[];
+        let roleTypeData=[];
+        resData.map(item => {
+          if(roleTypeList.indexOf(item.roleType)==-1) {
+            roleTypeData.push(item.roleType)
+          }
+        })
+        roleTypeData.map(item => {
+          let strData=item;
+          if (strData[0] == '0') {
+            this.isManage  = 1;
+            console.log(this.isManage)
+          }
+        })
 
+      });
     }
   };
 </script>
