@@ -1,11 +1,10 @@
 <template>
   <div class="createTaskWapper positionAbsolute">
     <div class="header clearfix">
-      <p>
-        <a class="link">OKR管理系统</a>
-        <i class="el-icon-arrow-right gray"></i>
-        <a class="link">创建任务</a>
-      </p>
+      <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item>OKR管理系统</el-breadcrumb-item>
+        <el-breadcrumb-item>创建任务</el-breadcrumb-item>
+      </el-breadcrumb>
       <el-form class="searchForm">
           <el-form-item label="关键字:">
             <el-input placeholder="请输入" v-model="searchForm.searchKey"></el-input>
@@ -51,10 +50,10 @@
           <el-tag style="margin-left: 12px">该任务预计耗时：{{ item.estimateTime }}</el-tag>
           <div class="text">
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
-              <el-tag>{{ item.taskStartTime }}</el-tag> ~ <el-tag>{{ item.taskEndTime }}</el-tag>
+              <el-tag>{{ item.taskStartTime }} ~ {{ item.taskEndTime }}</el-tag>
             </div>
             <el-tag>jira编码:{{ item.jiraLabel }}</el-tag>由
-            <span class="person">{{ item.createUserName || 'XX' }} </span>创建
+            <span class="person">{{ item.createUserName || '由系统导入' }} </span>创建
           </div>
         </div>
         <div class="collapseHeader_right">
@@ -219,11 +218,27 @@ export default {
 
 <style lang="scss">
 .createTaskWapper {
-  padding: 8px 30px 30px;
+  padding: 8px 20px 30px;
+  font-size: 14px;
   
    .el-dialog {
      box-shadow: none;
    }
+
+   .el-button {
+     padding: 8px 14px;
+   }
+
+  .el-breadcrumb {
+    margin: 20px 0;
+    font-size: 12px;
+
+     &__inner {
+      &:hover {
+        color: rgb(76, 132, 255)
+      }
+     }
+  }
 
   .header {
     padding-right: 42px;
@@ -231,19 +246,6 @@ export default {
 }
 
 .header {
-  .link,
-  .arrow {
-    display: inline-block;
-    font-size: 12px;
-    color: #b7b8bd;
-    vertical-align: top;
-  }
-
-  .link {
-    &:hover {
-      color: rgb(76, 132, 255)
-    }
-  }
   .gray {
     font-size: 14px;
     color: #b7b8bd;
@@ -272,6 +274,10 @@ export default {
   padding: 20px;
   background: white;
 
+  .el-tag {
+    margin-right: 10px;
+  }
+
   .person {
     color: #4c84ff;
   }
@@ -298,7 +304,7 @@ export default {
 
 .taskItem {
   + .taskItem {
-    margin-top: 20px;
+    margin-top: 10px;
   }
 }
 
@@ -331,7 +337,7 @@ export default {
 
 .taskList {
   margin-left: -40px;
-  margin-right: 40px;
+  margin-top: 0;
 }
 
 .warning {
