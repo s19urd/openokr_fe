@@ -6,8 +6,8 @@ export const instance = axios.create({
   baseURL: '/',
   timeout: 15000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 // instance.interceptors.request.use(authInterceptor)
@@ -23,7 +23,7 @@ export const instance = axios.create({
 //   }
 // )
 
-export default function () {
+export default function() {
   let apiResources = {}
   Object.entries(resources).forEach(([key, factory]) => {
     apiResources[key] = factory(instance)

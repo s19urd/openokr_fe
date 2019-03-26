@@ -29,36 +29,33 @@ export default {
   components: {
     Field,
     CellGroup,
-    Button
+    Button,
   },
-
-  data () {
+  data() {
     return {
       imgUrl: require('assets/background.png'),
       userInfo: {
         username: '',
-        password: ''
-      }
+        password: '',
+      },
     }
   },
-
   methods: {
-    submit () {
+    submit() {
       Vue.api.login.signIn(this.userInfo).then(res => {
         if (res.success) {
           this.$router.replace({ name: 'HistoryWork' })
         }
       })
-    }
+    },
   },
-
-  mounted () {
+  mounted() {
     if (process.env.NODE_ENV === 'production') {
       if (!isMobile()) {
         window.location.href = '/login.htm'
       }
     }
-  }
+  },
 }
 </script>
 <style lang="scss">

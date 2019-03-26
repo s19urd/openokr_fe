@@ -1,1 +1,1 @@
-export function authInterceptor (config) {}
+export function authInterceptor(config) {}

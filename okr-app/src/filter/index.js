@@ -1,5 +1,5 @@
 export default {
-  install (Vue) {
+  install(Vue) {
     Vue.filter('dateFormat', (value, format) => {
       if (!value) return
       if (!(value instanceof Date)) {
@@ -12,7 +12,7 @@ export default {
         'm+': value.getMinutes(), // minute
         's+': value.getSeconds(), // second
         'q+': Math.floor((value.getMonth() + 3) / 3), // quarter
-        'S': value.getMilliseconds() // millisecond
+        'S': value.getMilliseconds(), // millisecond
       }
 
       if (!format || format === '') {
@@ -48,5 +48,5 @@ export default {
       i['s'] = Math.floor(t2 / 1000) - Math.floor(t / 1000)
       return i[interval]
     })
-  }
+  },
 }

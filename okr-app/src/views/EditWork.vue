@@ -95,7 +95,6 @@ import { NavBar, Popup, Cell, CellGroup, Picker, Field, Button, Toast } from 'va
 
 export default {
   name: 'report-working-hour',
-
   components: {
     NavBar,
     Popup,
@@ -103,10 +102,9 @@ export default {
     CellGroup,
     Picker,
     Field,
-    Button
+    Button,
   },
-
-  data () {
+  data() {
     return {
       show: false,
       showType: '',
@@ -119,19 +117,18 @@ export default {
       disabled: false,
     }
   },
-
   computed: {
-    sumWorkingHour () {
+    sumWorkingHour() {
       let sumTemp = 0
       this.totalProjectReport.forEach(item => {
         sumTemp = sumTemp + Number(item.duration)
       })
       return sumTemp
     },
-    queryDay () {
+    queryDay() {
       return this.$route.query.day
     },
-    pickableDays () {
+    pickableDays() {
       let result = []
       let now = new Date()
       let nowTime = now.getTime()
@@ -141,18 +138,18 @@ export default {
       let endSundayTime = nowTime + (7 - nowDay) * oneDayTime
       result.push(startMondayTime, endSundayTime)
       return result
-    }
+    },
   },
   methods: {
-    back () {
+    back() {
       this.$router.replace({ name: 'HistoryWork' })
     },
 
-    focus (event) {
+    focus(event) {
       event.target.select()
     },
 
-    dayClick (date) {
+    dayClick(date) {
       let pickDay = Vue.filter('dateFormat')(date.$d, 'yyyy-MM-dd')
       // console.log(pickDay)
       // console.log(Vue.filter('dateFormat')(this.pickableDays[0], 'yyyy-MM-dd'))
@@ -164,32 +161,32 @@ export default {
         Toast('只允许填报最近两周的报工噢')
       }
     },
-    showPopup (type, index) {
+    showPopup(type, index) {
       this.show = true
       this.showType = type
       this.popIndex = index
     },
-    hidePopup () {
+    hidePopup() {
       this.show = false
     },
-    cancel () {
+    cancel() {
       this.hidePopup()
     },
-    confirm (value, index) {
+    confirm(value, index) {
       if (this.showType === 'projectList') {
         this.totalProjectReport[this.popIndex].taskName = value.text
         this.totalProjectReport[this.popIndex].taskId = value.taskId
       }
       this.hidePopup()
     },
-    add () {
+    add() {
       let projectItem = Object.assign({}, this.initProjectReport)
       this.totalProjectReport.push(projectItem)
     },
-    removeProjectItem (index) {
+    removeProjectItem(index) {
       this.totalProjectReport.splice(index, 1)
     },
-    validate () {
+    validate() {
       this.totalProjectReport.forEach(item => {
         if (!item.duration) {
           Toast('报工时长不能为空')
@@ -209,7 +206,7 @@ export default {
         this.inValid = false
       })
     },
-    submit () {
+    submit() {
       this.totalProjectReport.forEach(item => {
         item.reportDay = this.selectedTime
       })
@@ -229,14 +226,14 @@ export default {
         }
       })
     },
-    loadQueryDay () {
+    loadQueryDay() {
       // 重置为查询日期
       this.selectedTime = new Date(this.queryDay)
       let query = {
         currentPage: '',
         pageSize: '',
         reportStartDayStr: this.queryDay,
-        reportEndDayStr: this.queryDay
+        reportEndDayStr: this.queryDay,
       }
       Vue.api.historyWork.getHistoryWork(query).then(res => {
         // console.log(res.data.data)
@@ -247,15 +244,14 @@ export default {
       })
     },
   },
-
-  mounted () {
+  mounted() {
     // 查询当前日期数据
     this.queryDay && this.loadQueryDay()
 
     const query = {
       isFilterTime: '1',
       currentPage: '',
-      pageSize: ''
+      pageSize: '',
     }
 
     Vue.api.editWork.getTaskListByCondition(query).then(res => {
@@ -268,12 +264,12 @@ export default {
         taskId: this.projectList[0].taskId,
         duration: 8.0,
         remark: '',
-        reportDay: ''
+        reportDay: '',
       }
       // 非查询日期模式时新增初始任务
       !this.queryDay && this.add()
     })
-  }
+  },
 }
 </script>
 <style lang="scss">

@@ -17,7 +17,7 @@ Vue.use(Filter)
 new Vue({
   router,
   store,
-  created () {
+  created() {
     setTimeout(() => {
       this.$api.login.loginCheck().then(res => {
         // console.log(res)
@@ -31,5 +31,5 @@ new Vue({
       })
     }, 0)
   },
-  render: h => h(App)
+  render: h => h(App),
 }).$mount('#app')

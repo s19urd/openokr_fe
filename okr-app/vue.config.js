@@ -1,3 +1,4 @@
+/* eslint-disable */
 const path = require('path')
 // const env = process.env.NODE_ENV
 
@@ -6,7 +7,7 @@ function resolve (dir) {
   return path.join(__dirname, dir)
 }
 
-const publicPath =  '/okrApp/'
+const publicPath = '/okrApp/'
 
 module.exports = {
   publicPath,
@@ -18,10 +19,10 @@ module.exports = {
         target: 'http://172.16.135.212:8892',
         changeOrigin: true,
         pathRewrite: {
-          '^/': '/'
-        }
-      }
-    }
+          '^/': '/',
+        },
+      },
+    },
   },
   // webpack.config
   configureWebpack: config => {
@@ -30,5 +31,5 @@ module.exports = {
     config.resolve.alias['sass'] = resolve('src/sass')
     config.resolve.alias['views'] = resolve('src/views')
     config.resolve.alias['utilities'] = resolve('src/utilities')
-  }
+  },
 }

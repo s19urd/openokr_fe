@@ -53,7 +53,7 @@
           <notice-bar :scrollable="false" class="notice-bar" v-show="calendarShow">
             {{ search.month }} 月份总工时为 {{ countWork(this.currentMonthList) }} h
           </notice-bar>
-         
+
           <inlineCalendar @change="dayClick" @switch="MonthYearSwitch" ref="calendar" v-show="calendarShow" />
 
           <collapse v-model="activeCollapse2">
@@ -93,7 +93,7 @@ import { NavBar, Icon, Tab, Tabs, Button, Collapse, CollapseItem, Cell, CellGrou
 
 export default {
   name: '',
-  data () {
+  data() {
     return {
       currentTab: 0,
       activeCollapse1: [],
@@ -128,11 +128,11 @@ export default {
     Search,
     NoticeBar,
   },
-  mounted () {
+  mounted() {
     this.getWork('currentWeek', this.currentWeek)
   },
   computed: {
-    currentWeek () {
+    currentWeek() {
       // 获取周一周天的时间
       let result = []
       let now = new Date()
@@ -146,10 +146,10 @@ export default {
     },
   },
   methods: {
-    back () {
+    back() {
       this.$router.replace({ name: 'Login' })
     },
-    tabChange (index) {
+    tabChange(index) {
       if (index && this.calendarShow === true) {
         this.getWork('search', [this.currentDate, this.currentDate])
         setTimeout(() => {
@@ -159,12 +159,12 @@ export default {
         }, 0)
       }
     },
-    countWork (work) {
+    countWork(work) {
       return work.reduce((acc, el) => {
         return acc + el.duration
       }, 0)
     },
-    getWork (type = '', date = ['', ''], searchKey) {
+    getWork(type = '', date = ['', ''], searchKey) {
       let query = {
         searchKey,
         currentPage: '',
@@ -184,7 +184,7 @@ export default {
         }, 0)
       })
     },
-    dateToObj (arr) {
+    dateToObj(arr) {
       // console.log(arr)
       const result = {}
       arr.map((el, index, arr) => {
@@ -211,7 +211,7 @@ export default {
     //   console.log(result)
     //   return result
     // },
-    onClose (clickPosition, instance) {
+    onClose(clickPosition, instance) {
       // console.log(clickPosition)
       // console.log(instance)
       switch (clickPosition) {
@@ -222,7 +222,7 @@ export default {
           break
         case 'right':
           Dialog.confirm({
-            message: '确定删除吗？'
+            message: '确定删除吗？',
           }).then(() => {
             Vue.api.historyWork.deleteTask(instance.$attrs.id).then(res => {
               if (res.code === 0) {
@@ -237,11 +237,11 @@ export default {
           break
       }
     },
-    editWork (day) {
+    editWork(day) {
       // console.log(day)
       this.$router.push({ name: 'EditWork', query: { day } })
     },
-    onSearch (keyWord) {
+    onSearch(keyWord) {
       if (keyWord.trim()) {
         this.currentTab = 1
         this.calendarShow = false
@@ -250,18 +250,18 @@ export default {
         Toast('请输入任务关键词')
       }
     },
-    cancelSearch () {
+    cancelSearch() {
       this.search.show = false
       this.search.keyWord = ''
       this.calendarShow = true
       this.getWork('search', [this.currentDate, this.currentDate])
     },
-    dayClick (date) {
+    dayClick(date) {
       // console.log(this.$refs.calendar.showDate.month)
       this.currentDate = date.$d
       this.getWork('search', [date.$d, date.$d])
     },
-    MonthYearSwitch (date) {
+    MonthYearSwitch(date) {
       this.search.year = date.year
       this.search.month = date.month
       this.getWork('currentMonth', [`${date.year}-${date.month}-01`, `${date.year}-${date.month}-31`])

@@ -39,7 +39,7 @@ const router = new Router({
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "ReportWorkingTime" */ './views/EditWork.vue')
     },
-  ]
+  ],
 })
 
 export default router

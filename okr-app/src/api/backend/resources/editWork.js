@@ -1,15 +1,14 @@
-export default function (instance) {
+export default function(instance) {
   return {
-    saveTask (taskArray) {
+    saveTask(taskArray) {
       return instance
         .post('/api/daily/saveDailyList.json', taskArray)
         .then(response => response.data)
     },
-
-    getTaskListByCondition (query) {
+    getTaskListByCondition(query) {
       return instance
         .post('/task/getTaskListByCondition.json', query)
         .then(response => response.data)
-    }
+    },
   }
 }

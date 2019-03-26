@@ -1,14 +1,14 @@
-export default function (instance) {
+export default function(instance) {
   return {
-    getHistoryWork (query) {
+    getHistoryWork(query) {
       return instance
         .post('/api/daily/getDailyPage.json', query)
         .then(response => response.data)
     },
-    deleteTask (id) {
+    deleteTask(id) {
       return instance
         .get('/api/daily/deleteDailyList.json', { params: { id } })
         .then(response => response.data)
-    }
+    },
   }
 }
