@@ -155,7 +155,8 @@ export default {
         setTimeout(() => {
           this.search.year = this.search.year || this.$refs.calendar.showDate.year
           this.search.month = this.search.month || this.$refs.calendar.showDate.month
-          this.getWork('currentMonth', [`${this.search.year}-${this.search.month}-01`, `${this.search.year}-${this.search.month}-31`])
+          let monthLastDay = new Date(this.search.year, this.search.month, 0).getDate()
+          this.getWork('currentMonth', [`${this.search.year}-${this.search.month}-01`, `${this.search.year}-${this.search.month}-${monthLastDay}`])
         }, 0)
       }
     },
@@ -264,7 +265,8 @@ export default {
     MonthYearSwitch(date) {
       this.search.year = date.year
       this.search.month = date.month
-      this.getWork('currentMonth', [`${date.year}-${date.month}-01`, `${date.year}-${date.month}-31`])
+      let monthLastDay = new Date(this.search.year, this.search.month, 0).getDate()
+      this.getWork('currentMonth', [`${date.year}-${date.month}-01`, `${date.year}-${date.month}-${monthLastDay}`])
     },
   },
 }
