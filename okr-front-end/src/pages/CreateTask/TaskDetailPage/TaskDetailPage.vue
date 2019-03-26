@@ -2,15 +2,15 @@
   <div class="taskDetailPage positionAbsolute">
     <div class="header">
       <div class="collapseHeader_intro">
-        <span class="taskName">{{ taskVO.taskName }}</span>
+        <div class="title">
+          <el-button class="el-icon-back" @click="back">返回</el-button>
+          <span class="taskName">{{ taskVO.taskName }}</span>
+        </div>
         <div class="basicInfo" v-if="taskVO.taskStartTime && taskVO.taskEndTime">
           <el-tag>任务周期：{{ taskVO.taskStartTime }} ~ {{ taskVO.taskEndTime }}</el-tag>
           <el-tag>jira编码:{{ taskVO.jiraLabel }}</el-tag>由
-          <span class="person">{{ taskVO.createUserName || '由系统导入' }} </span>创建
+          <span class="person">{{ taskVO.createUserName || '系统导入' }} </span><template v-if="taskVO.createUserName"> 创建</template>
         </div>
-      </div>
-      <div class="collapseHeader_button">
-        <el-button class="el-icon-back" @click="back">返回</el-button>
       </div>
     </div>
     <div class="okrKeys">
@@ -111,7 +111,7 @@ export default {
 </script>
 <style lang="scss">
 .taskDetailPage {
-  padding: 40px 20px;
+  padding: 20px;
   margin: 0 auto;
   font-size: 14px;
 
@@ -136,11 +136,21 @@ export default {
       &_intro {
         flex: 1;
 
+        .title {
+          margin-bottom: 10px;
+
+          .el-button {
+            padding: 8px 14px;
+          }
+        }
+
         .taskName {
           font-size: 18px;
           font-weight: bold;
           line-height: 32px;
-          color: rgb(33, 33, 33)
+          color: rgb(33, 33, 33);
+          display: inline-block;
+          margin-left: 10px;
         }
       }
     }
