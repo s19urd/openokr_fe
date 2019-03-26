@@ -134,15 +134,20 @@
             title="提示"
             :visible.sync="dialogVisible"
             width="40%">
-          <span class="warning-popup">
-            <i class="el-icon-warning"></i>您此次总工时为<em class="c-blue">{{ sumWorkingHour }}</em>小时，确认提交此次报告么？
-          </span>
-            <span slot="footer" class="dialog-footer">
+          <div class="warning-popup">
+            <i class="el-icon-warning"></i>
+            <div class="text">
+              您<span v-if="sumWorkingHour!=daySumWorkingHour">此次提交的总工时为 <em class="c-blue">{{ sumWorkingHour }}</em> 小时,</span>
+              <span><em class="c-blue"> {{submitWorkDate}} {{submitWorkWeek}} </em>这天的总工时为 <em class="c-blue">{{ daySumWorkingHour }}</em> 小时，</span>
+              确认提交此次报告吗？
+            </div>
+          </div>
+            <div slot="footer" class="dialog-footer">
             <div class="buttonWrap">
               <el-button @click="dialogVisible = false">取 消</el-button>
               <el-button type="primary" @click="submit" >确 定</el-button>
             </div>
-          </span>
+          </div>
           </el-dialog>
         </div>
       </el-form>
@@ -244,7 +249,7 @@
         let nowTime = now.getTime()
         let nowDay = now.getDay()||7
         let oneDayTime = 24 * 60 * 60 * 1000
-//      //表格显示一周
+      //表格显示一周
         let startMondayTime = nowTime - (nowDay - 1) * oneDayTime//周一
         let endSundayTime = nowTime + (7 - nowDay) * oneDayTime//周日
         //新增时间下拉禁用
@@ -261,22 +266,31 @@
         })
         return sumTemp
       },
-      tableDataDate () {
+      submitWorkDate () {//提交报工的日期
         let addiDay='';
         this.tableData.forEach(item => {
           addiDay=this.date;
         })
-        return Vue.filter('dateFormat')(addiDay)
+        return Vue.filter('dateFormat')(addiDay, 'yyyy-MM-dd')
+      },
+      submitWorkWeek () {//提交报工的日期换成星期几
+       let dateObject = new Date(this.submitWorkDate);
+       let submitweek = "星期"  + "日一二三四五六".charAt(dateObject.getDay());
+        return submitweek
       },
       sunTableMainHour () {
         let sumTemp2 = 0;
         this.tableMain.forEach(item => {
-          let mainTime= Vue.filter('dateFormat')(item.reportDay)
-          if(mainTime==this.tableDataDate){
+          let mainTime= Vue.filter('dateFormat')(item.reportDay, 'yyyy-MM-dd')
+          if(mainTime==this.submitWorkDate){
             sumTemp2 = sumTemp2+ Number(item.duration)
           }
         })
         return sumTemp2
+      },
+      daySumWorkingHour () {
+        let sumDayTime=this.sumWorkingHour+this.sunTableMainHour
+        return sumDayTime
       },
     },
     methods:{
@@ -303,7 +317,6 @@
       },
       //验证formData
       validate () {
-        console.log(this.mergeMainTime)
         this.flag = true
         if (this.tableData.length === 0) {
           this.$message.warning('请添加条数！')
@@ -311,7 +324,6 @@
           this.flag = false
           return
         } else {
-          setTimeout(()=>{
             this.tableData.forEach(item => {
               if(item.taskId === "") {
                 this.$message.warning('项目类型不能为空！')
@@ -319,14 +331,13 @@
                 this.flag = false
                 return
               }
+              if(this.daySumWorkingHour>15){
+                this.$message.warning('每天的报工时长不能超过15小时！')
+                this.dialogVisible = false
+                this.flag = false
+                return
+              }
             })
-          },0)
-            if(this.sumWorkingHour+this.sunTableMainHour>15){
-              this.$message.warning('每天的报工时长不能超过15小时！')
-              this.dialogVisible = false
-              this.flag = false
-              return
-            }
         }
         if (this.flag) {
           this.dialogVisible = true
@@ -558,7 +569,10 @@
   .hanle-table-noth .el-table__header-wrapper{  display: none;  }
   .warning-popup{
     font-size:18px;
-    .el-icon-warning{color: #e6a23c}
+    position: relative;padding-left:25px;
+    .el-icon-warning{position: absolute;left:0;top:5px;
+      color: #e6a23c
+    }
   }
   .el-tag--success {
     background-color: rgba(103,194,58,.1);
@@ -584,5 +598,8 @@
       background-color: #f9f9f9;
     }
   }
+</style>
+<style>
+  .daily-report .m-table-comb section.table-paging{padding:20px 20px 0 20px}
 </style>
 

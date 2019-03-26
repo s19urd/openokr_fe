@@ -7,7 +7,8 @@
         历史报工
       </template>
       <div class="numall-area admin-area">
-        <el-row>
+        <!--我的报工-->
+        <el-row v-if="tabIndex=='0'">
           <el-col :span="6">
             <div class="grid-content-top">
               <p class="key">耗费总工时</p>
@@ -30,6 +31,33 @@
             <div class="grid-content-top">
               <p class="key">人员总数</p>
               <p class="value">{{totalData.personnelNum||0}}<em>个</em></p>
+            </div>
+          </el-col>
+        </el-row>
+        <!--团队报工-->
+        <el-row v-if="tabIndex=='1'">
+          <el-col :span="6">
+            <div class="grid-content-top">
+              <p class="key">耗费总工时</p>
+              <p class="value">{{totalData2.costTimeNum||0}}<em>h</em></p>
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="grid-content-top">
+              <p class="key">任务总数</p>
+              <p class="value">{{totalData2.taskNum||0}}<em>个</em></p>
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="grid-content-top">
+              <p class="key">产品总数</p>
+              <p class="value">{{totalData2.productNum||0}}<em>项</em></p>
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="grid-content-top">
+              <p class="key">人员总数</p>
+              <p class="value">{{totalData2.personnelNum||0}}<em>个</em></p>
             </div>
           </el-col>
         </el-row>
@@ -286,9 +314,14 @@
     ],
     data() {
       return {
-        isManage:0,
         isVisible:false,
         totalData:{
+          costTimeNum:0,
+          taskNum:0,
+          productNum:0,
+          personnelNum:0
+        },
+        totalData2:{
           costTimeNum:0,
           taskNum:0,
           productNum:0,
@@ -302,7 +335,7 @@
         taskList: [],
         teamList:[],
         activeTabName: "first",
-        tabIndex:0
+        tabIndex:0,
       };
     },
     computed: {
@@ -314,13 +347,12 @@
           isAdmin:1
         }
       },
-
     },
     methods: {
       open(vo) {
         this.isVisible = true;
         this.loading = false;
-        this. activeTabName= "first";
+        this.activeTabName= "first";
         setTimeout(()=>{
           this.refreshTable()
           this.tableMainData()
@@ -333,6 +365,48 @@
         let NewPage = '_empty' + '?time=' + new Date().getTime()/500;
         this.$router.push(NewPage);
         this.$router.go(-1);
+      },
+
+      tableMainData(){
+        let dataVo={};
+//          let allDaily={
+//            reportStartDayStr:'',
+//            reportEndDayStr:'',
+//          }
+        this.$api.okr.dailyWork.allDailyWork(dataVo).then(res => {
+          if(this.tabIndex===0){
+            this.tableMain1 = res.data.data;
+          }
+          if(this.tabIndex===1){
+            this.tableMain2 = res.data.data;
+          }
+        });
+      },
+
+      handleClick(tab){
+        this.tabIndex=tab.index
+        console.log("tabIndex:"+this.tabIndex)
+
+      },
+      refreshTable(){
+        if(this.tabIndex===0){
+          this.$refs.tableMain1.fetchData();
+        }
+        if(this.tabIndex===1){
+          this.$refs.tableMain2.fetchData();
+        }
+      },
+      afterFetchData1(){
+        let vo = this.$refs.tableMain1.getPageVo();
+        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
+          this.totalData = res.data;
+        });
+      },
+      afterFetchData2(){
+        let vo = this.$refs.tableMain2.getPageVo();
+        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
+          this.totalData2 = res.data;
+        });
       },
       sarchCondition(){
         let dataVo={};
@@ -360,45 +434,6 @@
           })
         })
       },
-      tableMainData(){
-        let dataVo={};
-//          let allDaily={
-//            reportStartDayStr:'',
-//            reportEndDayStr:'',
-//          }
-        this.$api.okr.dailyWork.allDailyWork(dataVo).then(res => {
-          if(this.tabIndex===0){
-            this.tableMain1 = res.data.data;
-          }
-          if(this.tabIndex===1){
-            this.tableMain2 = res.data.data;
-          }
-        });
-      },
-      afterFetchData1(){
-        let vo = this.$refs.tableMain1.getPageVo();
-        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
-          this.totalData = res.data;
-        });
-      },
-      afterFetchData2(){
-        let vo = this.$refs.tableMain2.getPageVo();
-        this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
-          this.totalData = res.data;
-        });
-      },
-      handleClick(tab){
-        this.tabIndex=tab.index
-      },
-      refreshTable(){
-        if(this.tabIndex===0){
-          this.$refs.tableMain1.fetchData();
-        }
-        if(this.tabIndex===1){
-          this.$refs.tableMain2.fetchData();
-        }
-      },
-
       //确认
       openConfirm(item){
         const _this = this;
@@ -452,24 +487,7 @@
       },
     },
     mounted() {
-      this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
-        let resData = res.data;
-        let roleTypeList=[];
-        let roleTypeData=[];
-        resData.map(item => {
-          if(roleTypeList.indexOf(item.roleType)==-1) {
-            roleTypeData.push(item.roleType)
-          }
-        })
-        roleTypeData.map(item => {
-          let strData=item;
-          if (strData[0] == '0') {
-            this.isManage  = 1;
-            console.log(this.isManage)
-          }
-        })
 
-      });
     }
   };
 </script>
