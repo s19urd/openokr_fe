@@ -47,13 +47,13 @@
       <li class="taskItem" v-for="(item, index) in taskList" :key="index">
         <div class="collapseHeader_left">
           <span class="taskName" v-text="item.taskName"></span>
-          <el-tag style="margin-left: 12px">该任务预计耗时：{{ item.estimateTime }}</el-tag>
+          <span style="margin-left: 12px" v-if="item.estimateTime">该任务预计耗时：<span class="timeColor">{{ item.estimateTime }} h</span></span>
           <div class="text">
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
               <el-tag>{{ item.taskStartTime }} ~ {{ item.taskEndTime }}</el-tag>
             </div>
             <el-tag>jira编码:{{ item.jiraLabel }}</el-tag>由
-            <span class="person">{{ item.createUserName || '由系统导入' }} </span>创建
+            <span class="person">{{ item.createUserName || '系统导入' }} </span> <template v-if="item.createUserName"> 创建</template>
           </div>
         </div>
         <div class="collapseHeader_right">
@@ -299,6 +299,10 @@ export default {
 
   ul {
     margin-left: -40px;
+  }
+
+  .timeColor {
+    color: #ff0000;
   }
 }
 
