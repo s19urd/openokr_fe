@@ -50,10 +50,10 @@
 
         </tab>
         <tab title="历史报工">
-          <notice-bar :scrollable="false" class="notice-bar">
+          <notice-bar :scrollable="false" class="notice-bar" v-show="calendarShow">
             {{ search.month }} 月份总工时为 {{ countWork(this.currentMonthList) }} h
           </notice-bar>
-          
+         
           <inlineCalendar @change="dayClick" @switch="MonthYearSwitch" ref="calendar" v-show="calendarShow" />
 
           <collapse v-model="activeCollapse2">
@@ -150,13 +150,14 @@ export default {
       this.$router.replace({ name: 'Login' })
     },
     tabChange (index) {
-      // console.log(index)
-      index && this.getWork('search', [this.currentDate, this.currentDate])
-      index && setTimeout(() => {
-        this.search.year = this.search.year || this.$refs.calendar.showDate.year
-        this.search.month = this.search.month || this.$refs.calendar.showDate.month
-        this.getWork('currentMonth', [`${this.search.year}-${this.search.month}-01`, `${this.search.year}-${this.search.month}-31`])
-      }, 0)
+      if (index && this.calendarShow === true) {
+        this.getWork('search', [this.currentDate, this.currentDate])
+        setTimeout(() => {
+          this.search.year = this.search.year || this.$refs.calendar.showDate.year
+          this.search.month = this.search.month || this.$refs.calendar.showDate.month
+          this.getWork('currentMonth', [`${this.search.year}-${this.search.month}-01`, `${this.search.year}-${this.search.month}-31`])
+        }, 0)
+      }
     },
     countWork (work) {
       return work.reduce((acc, el) => {
