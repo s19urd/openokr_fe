@@ -7,16 +7,16 @@
       :fixed="true"
       :z-index="1"
       left-arrow>
-      <icon name="search" slot="right" size="20px" @click="search.show = !search.show" />
+      <icon name="search" slot="right" size="20px" @click="search.show = true" />
     </nav-bar>
 
     <div class="pageContent">
       <search
         v-model="search.keyWord"
-        placeholder="请输入搜索关键词"
+        placeholder="请输入任务关键词"
         show-action
         @search="onSearch"
-        @cancel="search.show = false"
+        @cancel="cancelSearch"
         v-show="search.show"
       />
 
@@ -51,10 +51,10 @@
         </tab>
         <tab title="历史报工">
           <notice-bar :scrollable="false" class="notice-bar">
-            {{ parseInt(search.month) + 1 }} 月份总工时 {{ countWork(this.currentMonthList) }} h
+            {{ search.month }} 月份总工时为 {{ countWork(this.currentMonthList) }} h
           </notice-bar>
           
-          <inlineCalendar @change="dayClick" ref="calendar" />
+          <inlineCalendar @change="dayClick" @switch="MonthYearSwitch" ref="calendar" v-show="calendarShow" />
 
           <collapse v-model="activeCollapse2">
             <collapse-item v-for="(work, key, index) in searchList" :key="index" :name="index" :title="key + ' ' + work[0].weekday" :value="'总工时：' + countWork(work) + 'h'">
@@ -105,8 +105,10 @@ export default {
         show: false,
         keyWord: '',
         year: '',
-        month: '2',
+        month: '',
       },
+      currentDate: new Date(),
+      calendarShow: true,
     }
   },
   components: {
@@ -149,8 +151,12 @@ export default {
     },
     tabChange (index) {
       // console.log(index)
-      index && this.getWork('search', [new Date(), new Date()])
-      index && this.getWork('currentMonth', ['2019-03-01', '2019-03-31'])
+      index && this.getWork('search', [this.currentDate, this.currentDate])
+      index && setTimeout(() => {
+        this.search.year = this.search.year || this.$refs.calendar.showDate.year
+        this.search.month = this.search.month || this.$refs.calendar.showDate.month
+        this.getWork('currentMonth', [`${this.search.year}-${this.search.month}-01`, `${this.search.year}-${this.search.month}-31`])
+      }, 0)
     },
     countWork (work) {
       return work.reduce((acc, el) => {
@@ -172,7 +178,7 @@ export default {
         // this.currentWeekList = this.dateToArr(this.dateToObj(arr))
         // console.log(arr)
         this[`${type}List`] = type === 'currentMonth' ? arr : this.dateToObj(arr)
-        this.currentTab && setTimeout(() => {
+        this.currentTab && type !== 'currentMonth' && setTimeout(() => {
           arr.length ? !this.activeCollapse2.length && this.activeCollapse2.push(0) : this.activeCollapse2.shift()
         }, 0)
       })
@@ -235,12 +241,29 @@ export default {
       this.$router.push({ name: 'EditWork', query: { day } })
     },
     onSearch (keyWord) {
-      console.log(keyWord)
-      this.getWork('searchList', '', keyWord)
+      if (keyWord.trim()) {
+        this.currentTab = 1
+        this.calendarShow = false
+        this.getWork('search', '', keyWord)
+      } else {
+        Toast('请输入任务关键词')
+      }
+    },
+    cancelSearch () {
+      this.search.show = false
+      this.search.keyWord = ''
+      this.calendarShow = true
+      this.getWork('search', [this.currentDate, this.currentDate])
     },
     dayClick (date) {
       // console.log(this.$refs.calendar.showDate.month)
+      this.currentDate = date.$d
       this.getWork('search', [date.$d, date.$d])
+    },
+    MonthYearSwitch (date) {
+      this.search.year = date.year
+      this.search.month = date.month
+      this.getWork('currentMonth', [`${date.year}-${date.month}-01`, `${date.year}-${date.month}-31`])
     },
   },
 }

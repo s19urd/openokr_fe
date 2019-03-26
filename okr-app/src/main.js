@@ -5,7 +5,7 @@ import router from './router'
 import store from './store'
 import './registerServiceWorker'
 import Api from './api'
-import Calendar from 'vue-mobile-calendar'
+import Calendar from 'vue-mobile-calendar-modified'
 import Filter from './filter'
 
 Vue.config.productionTip = false
