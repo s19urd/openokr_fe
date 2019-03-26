@@ -56,8 +56,6 @@
 <script>
   import Vue from 'vue'
   import util from '@/libs/util.js'
-  import echarts from 'echarts'
-  Vue.prototype.$echarts = echarts;
   export default {
     name: "statisticByMember",
 
@@ -66,11 +64,12 @@
 
     data() {
       return {
-        searchParam:{},
-        categoryId:'',
-        pageData:[],
-        myChart:null,
-        totalDuration:0,
+        searchParam: {},
+        categoryId: '',
+        pageData: [],
+        pieChart: '',
+        lineChart: '',
+        totalDuration: 0
       };
     },
     computed:{
@@ -111,7 +110,8 @@
             }
             if(this.searchParam.searchType==='1'){
               setTimeout(()=>{
-                this.drawPie();
+                // this.drawPie();
+                this.drawLine();
               },0)
             }
             if(this.searchParam.searchType==='2'){
@@ -123,16 +123,17 @@
         })
         return promise;
       },
-      //渲染表1
+      //渲染饼图
       drawPie(){
-        if(!this.myChart){
-          this.myChart = this.$echarts.init(document.getElementById('echart-pie'));
+        if(!this.pieChart){
+          this.pieChart = this.$echarts.init(document.getElementById('echart-pie'));
         }
         let names = [];
         let data = [];
         let colors = ['#409EFF','#67C23A','#E6A23C','#F56C6C','#909399','##FFEF40'];
         //如果有数据
         if(this.pageData.length>0){
+          console.log(this.pageData)
           data = this.pageData.map((item,index)=>{
             names.push(item.orgName);
             return {
@@ -149,7 +150,7 @@
           ]
         }
         // 绘制图表
-        this.myChart.setOption({
+        this.pieChart.setOption({
           title: { text: '按照人员所属部门统计 '+ this.searchParam.reportStartDateShow,textStyle:{fontWeight:400,fontSize:'14px'} },
           tooltip : {
             trigger: 'item',
@@ -158,11 +159,11 @@
           legend: {
             orient: 'vertical',
             left: '350px',
-            top:'middle',
-            data:names
+            top: 'middle',
+            data: names
           },
-          color:colors,
-          series : [
+          color: colors,
+          series: [
             {
               x: 'center',
               name: '工时',
@@ -170,12 +171,62 @@
               label: {
                 show:false
               },
-              radius : [80, 100],
+              radius: [80, 100],
               center: ['150px', '160px'],
-              data:data,
+              data: data
             }
           ]
         });
+      },
+      //渲染折线图
+      drawLine () {
+        if (!this.lineChart) {
+          this.lineChart = this.$echarts.init(document.getElementById("echart-line"))
+        }
+        let names = []
+        let colors = ['#409EFF','#67C23A','#E6A23C','#F56C6C','#909399','##FFEF40']
+        
+        this.lineChart.setOption({
+          title: { text: '按照人员所属部门统计 '+ this.searchParam.reportStartDateShow,textStyle:{fontWeight:400,fontSize:'14px'} },
+          tooltip : {
+            trigger: 'item',
+            formatter: "1111 2222"
+          },
+          xAxis: {
+            type: 'category',
+            name: 'x',
+            data: [ `${this.searchParam.reportStartDateShow}月份第一周`, `${this.searchParam.reportStartDateShow}月份第二周`, `${this.searchParam.reportStartDateShow}月份第三周`, `${this.searchParam.reportStartDateShow}月份第四周`]
+          },
+          yAxis: {
+            type: 'log',
+            name: 'y'
+          },
+          legend: {
+            orient: 'vertical',
+            left: '350px',
+            top: 'middle',
+            data: names
+          },
+          color: colors,
+          series: [
+            {
+              name: '3的指数',
+              type: 'line',
+              data: [1, 741, 2223, 6669]
+            },
+            {
+              name: '3的指数',
+              type: 'line',
+              data: [3, 9, 247, 741]
+            },
+            {
+              name: '3的指数',
+              type: 'line',
+              data: [81, 247, 2223, 4669]
+            }
+          ]
+        })
+        
       },
       //表格统计
       getSummaries(param) {

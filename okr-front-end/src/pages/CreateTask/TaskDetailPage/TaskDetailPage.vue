@@ -1,20 +1,16 @@
 <template>
   <div class="taskDetailPage positionAbsolute">
     <div class="header">
-      <div class="collapseHeader_button">
-        <el-button class="el-icon-back" @click="back">返回列表页面</el-button>
-      </div>
-      <div class="collapseHeader_intro alginRight">
-        <div>
-          <span class="taskName">{{ taskVO.taskName }}</span>
-          <div class="text">
-            <div class="timeRange" v-if="taskVO.taskStartTime && taskVO.taskEndTime">
-              <el-tag>{{ taskVO.taskStartTime }}</el-tag> ~ <el-tag>{{ taskVO.taskEndTime }}</el-tag>
-            </div>
-            <el-tag>jira编码:{{ taskVO.jiraLabel }}</el-tag>由
-            <span class="person">{{ taskVO.createUserName || 'XX' }} </span>创建
-          </div>
+      <div class="collapseHeader_intro">
+        <span class="taskName">{{ taskVO.taskName }}</span>
+        <div class="basicInfo" v-if="taskVO.taskStartTime && taskVO.taskEndTime">
+          <el-tag>任务周期：{{ taskVO.taskStartTime }} ~ {{ taskVO.taskEndTime }}</el-tag>
+          <el-tag>jira编码:{{ taskVO.jiraLabel }}</el-tag>由
+          <span class="person">{{ taskVO.createUserName || '由系统导入' }} </span>创建
         </div>
+      </div>
+      <div class="collapseHeader_button">
+        <el-button class="el-icon-back" @click="back">返回</el-button>
       </div>
     </div>
     <div class="okrKeys">
@@ -115,9 +111,13 @@ export default {
 </script>
 <style lang="scss">
 .taskDetailPage {
-  padding: 40px 30px;
-  max-width: 960px;
+  padding: 40px 20px;
   margin: 0 auto;
+  font-size: 14px;
+
+  .el-tag {
+    margin-right: 10px;
+  }
 
   .okrKeys {
     li {
@@ -129,7 +129,7 @@ export default {
 
   .header {
     display: flex;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 
     .collapseHeader {
 
@@ -152,14 +152,14 @@ export default {
     .text {
       margin-top: 20px;
 
-      .timeRange {
+      .basicInfo {
         margin-bottom: 20px;
       }
     }
   }
 
   .apportionTable {
-    margin-top: 50px;
+    margin-top: 30px;
     background-color: rgb(245, 245, 245);
     padding: 4px;
     border-radius: 4px;

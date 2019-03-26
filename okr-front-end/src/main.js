@@ -7,6 +7,7 @@ import '@/assets/svg-icons'
 import '@/components'
 import '@/plugin/axios'
 import '@/mock/register'
+import echarts from 'echarts'
 import api from '@/api'
 import util from '@/libs/util.js'
 import store from '@/store/index'
@@ -23,6 +24,7 @@ import { frameInRoutes } from './routerConfig'
 Vue.use(ElementUI)
 Vue.use(vueFilter)
 Vue.use(pluginOpen)
+Vue.use(echarts)
 
 Vue.config.productionTip = false
 
