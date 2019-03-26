@@ -91,4 +91,12 @@ export default {
     }
     return axios.post('/api/daily/getDailyStastics.json', vo)
   },
+  /**
+   * 管理员历史报工-审核日报
+   * @return {*}
+   */
+  auditDaily (vo) {
+    return axios.post('/api/daily/auditDaily.json', vo
+    )
+  },
 }

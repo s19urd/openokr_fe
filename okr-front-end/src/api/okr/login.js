@@ -7,6 +7,6 @@ export default {
   * @return {*}
   */
  isLogin () {
-    return axios.post('/sys/user/checkUserLogin.json')
-  }
+    return axios.get('/checkLoginStatus.json')
+ },
 }

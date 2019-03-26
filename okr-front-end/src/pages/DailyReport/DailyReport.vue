@@ -458,7 +458,7 @@
 
       });
       this.$api.okr.login.isLogin().then(res => {
-        if (!res.success) {
+        if (!res.data) {
           this.$router.replace({
             name: 'Unauthorized'
           })

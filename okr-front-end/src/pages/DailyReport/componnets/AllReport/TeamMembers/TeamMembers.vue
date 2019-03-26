@@ -166,16 +166,10 @@
         tableMainSearchModelBase:{
           searchStartEndDate: [],
           taskId:'',
-          productId:'',
-          categoryId:'',
           teamId:'',
-          okrId:''
         },
         taskList: [],
-        productList:[],
-        categoryList:[],
         teamList:[],
-        okrList:[],
       };
     },
     computed: {

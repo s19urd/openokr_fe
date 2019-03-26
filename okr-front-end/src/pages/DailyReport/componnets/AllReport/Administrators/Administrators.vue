@@ -297,10 +297,7 @@
         tableMainSearchModelBase:{
           searchStartEndDate: [],
           taskId:'',
-          productId:'',
-          categoryId:'',
           teamId:'',
-          okrId:''
         },
         taskList: [],
         teamList:[],
@@ -310,70 +307,74 @@
     },
     computed: {
       getActionWhere1(){
-        return {
-        }
+        return {}
       },
       getActionWhere2(){
         return {
           isAdmin:1
         }
       },
+
     },
     methods: {
       open(vo) {
         this.isVisible = true;
         this.loading = false;
         this. activeTabName= "first";
-
         setTimeout(()=>{
-          if(this.tabIndex===0){
-            this.$refs.tableMain1.fetchData();
-          }
-          if(this.tabIndex===1){
-            this.$refs.tableMain2.fetchData();
-          }
-          let searchVo={};
-          let allDaily={
-            reportStartDayStr:'',
-            reportEndDayStr:'',
-          }
-          this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
-            this.tableMain1 = res.data.data;
-            this.tableMain2 = res.data.data;
-          });
-          this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
-            //任务名称-下拉
-            let resData = res.data;
-            this.taskList=[]
-            let taskId=[]
-            resData.map(item => {
-              if(item.taskId!==null || item.taskName!==null){
-                if(taskId.indexOf(item.taskId)==-1){
-                  taskId.push(item.taskId)
-                  this.taskList.push({ value: item.taskId, label: item.taskName })
-                }
-              }
-              //团队-下拉
-              this.teamList=[]
-              let teamId=[]
-              if(item.teamId!==null || item.teamName!==null){
-                if(teamId.indexOf(item.teamId)==-1){
-                  teamId.push(item.teamId)
-                  this.teamList.push({ value: item.teamId, label: item.teamName })
-                }
-              }
-            })
-          })
+          this.refreshTable()
+          this.tableMainData()
+          this.sarchCondition()
         },0);
       },
       back() {
-//        this.isVisible = false
-//        this.$emit("ok");
+        //this.isVisible = false
+        //this.$emit("ok");
         let NewPage = '_empty' + '?time=' + new Date().getTime()/500;
         this.$router.push(NewPage);
         this.$router.go(-1);
       },
-
+      sarchCondition(){
+        let dataVo={};
+        this.$api.okr.dailyWork.getSearchConditionList(dataVo).then(res => {
+          //任务名称-下拉
+          let resData = res.data;
+          this.taskList=[]
+          let taskId=[]
+          resData.map(item => {
+            if(item.taskId!==null || item.taskName!==null){
+              if(taskId.indexOf(item.taskId)==-1){
+                taskId.push(item.taskId)
+                this.taskList.push({ value: item.taskId, label: item.taskName })
+              }
+            }
+            //团队-下拉
+            this.teamList=[]
+            let teamId=[]
+            if(item.teamId!==null || item.teamName!==null){
+              if(teamId.indexOf(item.teamId)==-1){
+                teamId.push(item.teamId)
+                this.teamList.push({ value: item.teamId, label: item.teamName })
+              }
+            }
+          })
+        })
+      },
+      tableMainData(){
+        let dataVo={};
+//          let allDaily={
+//            reportStartDayStr:'',
+//            reportEndDayStr:'',
+//          }
+        this.$api.okr.dailyWork.allDailyWork(dataVo).then(res => {
+          if(this.tabIndex===0){
+            this.tableMain1 = res.data.data;
+          }
+          if(this.tabIndex===1){
+            this.tableMain2 = res.data.data;
+          }
+        });
+      },
       afterFetchData1(){
         let vo = this.$refs.tableMain1.getPageVo();
         this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
@@ -388,8 +389,16 @@
       },
       handleClick(tab){
         this.tabIndex=tab.index
-        console.log(tab.index);
       },
+      refreshTable(){
+        if(this.tabIndex===0){
+          this.$refs.tableMain1.fetchData();
+        }
+        if(this.tabIndex===1){
+          this.$refs.tableMain2.fetchData();
+        }
+      },
+
       //确认
       openConfirm(item){
         const _this = this;
@@ -402,13 +411,13 @@
         }).then(action => {
           if (action === 'confirm') {
             let vo={
+              id:item.id,
               auditStatus:item.auditStatus='01'
             }
-            this.$api.okr.dailyWork.allDailyWork(vo).then(res => {
+            this.$api.okr.dailyWork.auditDaily(vo).then(res => {
               if (res.code === 0) {
                 this.$message.success(`确认成功！`)
-                this.$refs.tableMain1.fetchData()
-                this.$refs.tableMain2.fetchData()
+                this.refreshTable()
               } else {
                 this.$message.error(res.message);
               }
@@ -427,13 +436,13 @@
         }).then(action => {
           if (action === 'confirm') {
             let vo={
+              id:item.id,
               auditStatus:item.auditStatus='02'
             }
-            this.$api.okr.dailyWork.allDailyWork(vo).then(res => {
+            this.$api.okr.dailyWork.auditDaily(vo).then(res => {
               if (res.code === 0) {
                 this.$message.success(`驳回成功！`)
-                this.$refs.tableMain1.fetchData()
-                this.$refs.tableMain2.fetchData()
+                this.refreshTable()
               } else {
                 this.$message.error(res.message);
               }
