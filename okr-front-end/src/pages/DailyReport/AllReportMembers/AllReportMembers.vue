@@ -222,7 +222,7 @@ export default {
       });
       this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
         //任务名称-下拉
-        let resData = res.data;
+        let resData = res.data|| [];
         this.taskList=[]
         let taskId=[]
         resData.map(item => {
@@ -268,7 +268,7 @@ export default {
   }
   .el-col+.el-col .grid-content-top{border-left: 1px solid #e5e5e5;}
   .inline-block{
-    display:inline-block;width: 370px;margin:5px 0;
+    display:inline-block;width: 350px;margin:5px 0;
     .lab{
       display: inline-block;text-align: right;min-width: 58px;
     }

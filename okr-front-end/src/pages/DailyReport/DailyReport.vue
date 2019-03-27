@@ -419,7 +419,7 @@
         window.open(routeData.href, '_blank');
       },
       toMyTasks(){
-        let routeData = this.$router.resolve({ path: 'CreateTask.vhtml' });
+        let routeData = this.$router.resolve({ path: '/CreateTask.vhtml' });
         window.open(routeData.href, '_blank');
       },
       // 全部报工-管理者
@@ -447,7 +447,7 @@
     },
     mounted () {
       this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
-        let resData = res.data;
+        let resData = res.data || [];
         let roleTypeList=[];
         let roleTypeData=[];
         resData.map(item => {

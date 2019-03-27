@@ -41,13 +41,13 @@ export default {
     )
   },
   /**
-   * POST /task/getTaskListByPage.json
+   * POST /task/getTaskListByUser.json
    * 寻找项目列表
    * @return {*}
    */
 
   queryTaskListByPage (vo) {
-     return axios.post('/task/getTaskListByCondition.json', vo
+     return axios.post('/task/getTaskListByUser.json', vo
      )
   },
 
