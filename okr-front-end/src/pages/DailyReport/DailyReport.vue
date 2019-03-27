@@ -1,6 +1,6 @@
 <template>
   <d2-container>
-    <div class="daily-report">
+    <div class="daily-report" >
       <el-form class="">
         <div class="tip flex">
           <div class="flex1">
@@ -134,20 +134,20 @@
             title="提示"
             :visible.sync="dialogVisible"
             width="40%">
-          <div class="warning-popup">
-            <i class="el-icon-warning"></i>
-            <div class="text">
-              您<span v-if="sumWorkingHour!=daySumWorkingHour">此次提交的总工时为 <em class="c-blue">{{ sumWorkingHour }}</em> 小时,</span>
-              <span><em class="c-blue"> {{submitWorkDate}} {{submitWorkWeek}} </em>这天的总工时为 <em class="c-blue">{{ daySumWorkingHour }}</em> 小时，</span>
-              确认提交此次报告吗？
+            <div class="warning-popup">
+              <i class="el-icon-warning"></i>
+              <div class="text">
+                您<span v-if="sumWorkingHour!=daySumWorkingHour">此次提交的总工时为 <em class="c-blue">{{ sumWorkingHour }}</em> 小时,</span>
+                <span><em class="c-blue"> {{submitWorkDate}} {{submitWorkWeek}} </em>这天的总工时为 <em class="c-blue">{{ daySumWorkingHour }}</em> 小时，</span>
+                确认提交此次报告吗？
+              </div>
             </div>
-          </div>
             <div slot="footer" class="dialog-footer">
-            <div class="buttonWrap">
-              <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="submit" >确 定</el-button>
+              <div class="buttonWrap">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submit" >确 定</el-button>
+              </div>
             </div>
-          </div>
           </el-dialog>
         </div>
       </el-form>
@@ -249,7 +249,7 @@
         let nowTime = now.getTime()
         let nowDay = now.getDay()||7
         let oneDayTime = 24 * 60 * 60 * 1000
-      //表格显示一周
+        //表格显示一周
         let startMondayTime = nowTime - (nowDay - 1) * oneDayTime//周一
         let endSundayTime = nowTime + (7 - nowDay) * oneDayTime//周日
         //新增时间下拉禁用
@@ -274,8 +274,8 @@
         return Vue.filter('dateFormat')(addiDay, 'yyyy-MM-dd')
       },
       submitWorkWeek () {//提交报工的日期换成星期几
-       let dateObject = new Date(this.submitWorkDate);
-       let submitweek = "星期"  + "日一二三四五六".charAt(dateObject.getDay());
+        let dateObject = new Date(this.submitWorkDate);
+        let submitweek = "星期"  + "日一二三四五六".charAt(dateObject.getDay());
         return submitweek
       },
       sunTableMainHour () {
@@ -324,20 +324,20 @@
           this.flag = false
           return
         } else {
-            this.tableData.forEach(item => {
-              if(item.taskId === "") {
-                this.$message.warning('项目类型不能为空！')
-                this.dialogVisible = false
-                this.flag = false
-                return
-              }
-              if(this.daySumWorkingHour>15){
-                this.$message.warning('每天的报工时长不能超过15小时！')
-                this.dialogVisible = false
-                this.flag = false
-                return
-              }
-            })
+          this.tableData.forEach(item => {
+            if(item.taskId === "") {
+              this.$message.warning('项目类型不能为空！')
+              this.dialogVisible = false
+              this.flag = false
+              return
+            }
+            if(this.daySumWorkingHour>15){
+              this.$message.warning('每天的报工时长不能超过15小时！')
+              this.dialogVisible = false
+              this.flag = false
+              return
+            }
+          })
         }
         if (this.flag) {
           this.dialogVisible = true
@@ -416,13 +416,17 @@
       },
       // 跳转页面
       toMyTeam(){
-        this.$router.push({path: '/TeamOKR'})
+        let routeData = this.$router.resolve({ path: '/TeamOKR' });
+        window.open(routeData.href, '_blank');
       },
       toDataAggregation(){
-        this.$router.push({path: '/daily/dashboard/'+this.teamId})
+        let routeData = this.$router.resolve({ path: '/daily/dashboard/'+this.teamId });
+        window.open(routeData.href, '_blank');
+//      this.$router.push({path: '/daily/dashboard/'+this.teamId})
       },
       toMyTasks(){
-        this.$router.push({path: '/CreateTask.vhtml'})
+        let routeData = this.$router.resolve({ path: 'CreateTask.vhtml' });
+        window.open(routeData.href, '_blank');
       },
       // 全部报工-管理者
       openAdminDialog() {
@@ -445,8 +449,6 @@
         let date1=new Date(this.pickableDays[3]);
         let date2=new Date(this.pickableDays[1]);
         return  date2 <= pickDay|| pickDay <= date1
-      },
-      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
       },
     },
     mounted () {
@@ -475,7 +477,7 @@
           })
         }
       });
-      this.historyData()
+
       //任务名称
       let projectVo={
         isFilterTime:'1',
@@ -499,7 +501,7 @@
   .flex>.flex3{-webkit-box-flex:3;-webkit-flex:3;-ms-flex:3;flex:3;display:block;-webkit-flex-grow:3;-webkit-flex-shrink:3;-webkit-flex-basis:0;}
   .tip {
     align-items: center;
-    padding: 22px 0px;
+    padding: 15px 0 20px 0;
     border-bottom: 1px solid rgb(243, 243, 243);
     font-size: 14px;
     font-weight: bold;

@@ -54,14 +54,14 @@
               >
               </el-date-picker>
             </div>
-            <div class="inline-block">
+            <div class="inline-block ml20">
               <span class="lab"> 任务名称：</span>
               <el-select
                 filterable
                 clearable
                 v-model="scope.form.taskId"
                 placeholder="请选择"
-                class="w70off"
+                class="w80off"
               >
                 <el-option
                   v-for="item in taskList"
@@ -71,14 +71,14 @@
                 </el-option>
               </el-select>
             </div>
-            <div class="inline-block">
+            <div class="inline-block ml20">
               <span class="lab">团队：</span>
               <el-select
                 filterable
                 clearable
                 v-model="scope.form.teamId"
                 placeholder="请选择"
-                class="w70off"
+                class="w80off"
               >
                 <el-option
                   v-for="item in teamList"
@@ -149,6 +149,7 @@
 <script>
   import listMixin from "@/mixins/list.mixin";
   export default {
+    inject:['reload'],
     // 如果需要缓存页面
     // name 字段需要设置为和本页路由 name 字段一致
     name: "TeamMembers",
@@ -222,17 +223,27 @@
       back() {
 //        this.isVisible = false
 //        this.$emit("ok");
-        let NewPage = '_empty' + '?time=' + new Date().getTime()/500;
-        this.$router.push(NewPage);
-        this.$router.go(-1);
-      },
 
-      afterFetchData(){
+//        let NewPage = '_empty' + '?time=' + new Date().getTime()/500;
+//        this.$router.push(NewPage);
+//        this.$router.go(-1);
+
+//        this.$router.replace({
+//          path: '/dailyReport.vhtml',
+//          name:'DailyReport'
+//        });
+        this.reload()
+      },
+      searchCondition(){
         let vo = this.$refs.tableMain.getPageVo();
         this.$api.okr.dailyWork.getDailyStastics(vo).then(res => {
           this.totalData = res.data;
         });
       },
+      afterFetchData(){
+        this.searchCondition()
+      },
+
       //删除历史报工
       removeItem(vo){
         this.$msgbox({
@@ -249,6 +260,7 @@
                 this.$message.success(`删除数据成功`);
                 //刷新列表
                 this.$refs.tableMain.fetchData();
+                this.searchCondition()
               } else {
                 this.$message.error(res.message)
               }
@@ -288,13 +300,18 @@
   .inline-block{
     display:inline-block;width: 370px;margin:5px 0;
     .lab{
-      display: inline-block;min-width: 100px;text-align: right;
+      display: inline-block;text-align: right;min-width: 58px;
     }
     .w70off{
       width: 70%;
       box-sizing: border-box;
     }
+    .w80off{
+      width: 80%;
+      box-sizing: border-box;
+    }
   }
+  .ml20{margin-left:20px}
 </style>
 
 <style>
