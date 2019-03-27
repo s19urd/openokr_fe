@@ -11,6 +11,8 @@ import Error404 from './pages/Error404';
 
 // report working hour
 import DailyReport from './pages/DailyReport'
+import AllReportController from './pages/DailyReport/AllReportController/AllReportController'
+import AllReportMembers from './pages/DailyReport/AllReportMembers/AllReportMembers'
 import CreateTask from './pages/CreateTask'
 import TaskDetailPage from './pages/CreateTask/TaskDetailPage/TaskDetailPage'
 import dailyDashboard from './pages/daily/Dashboard'
@@ -62,6 +64,24 @@ const routerConfig = [
      component: DailyReport,
     meta: {
       title: '今日报工',
+    }
+  },
+  {
+    path: '/AllReportMembers.vhtml',
+    name: 'AllReportMembers',
+    layout: Blank,
+    component: AllReportMembers,
+    meta: {
+      title: '普通用户历史报工',
+    }
+  },
+  {
+    path: '/AllReportController.vhtml',
+    name: 'AllReportController',
+    layout: Blank,
+    component: AllReportController,
+    meta: {
+      title: '管理者历史报工',
     }
   },
   {

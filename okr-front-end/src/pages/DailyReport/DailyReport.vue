@@ -192,20 +192,15 @@
           <el-button type="primary"  @click="saveEditWork">确 定</el-button>
         </div>
       </el-dialog>
-      <administrators ref="Administrators"></administrators>
-      <team-members ref="TeamMembers"></team-members>
     </div>
   </d2-container>
 </template>
 <script>
   import Vue from 'vue'
   import listMixin from "@/mixins/list.mixin";
-  import Administrators from "./componnets/AllReport/Administrators";
-  import TeamMembers from "./componnets/AllReport/TeamMembers";
-  import { difference, findIndex, max, min } from 'lodash'
   export default {
     name: 'DailyReport',
-    components: {Administrators,TeamMembers},
+    components: {},
     data () {
       return {
         isManage:0,
@@ -422,7 +417,6 @@
       toDataAggregation(){
         let routeData = this.$router.resolve({ path: '/daily/dashboard/'+this.teamId });
         window.open(routeData.href, '_blank');
-//      this.$router.push({path: '/daily/dashboard/'+this.teamId})
       },
       toMyTasks(){
         let routeData = this.$router.resolve({ path: 'CreateTask.vhtml' });
@@ -430,11 +424,11 @@
       },
       // 全部报工-管理者
       openAdminDialog() {
-        this.$refs.Administrators.open();
+        this.$router.push({ name : 'AllReportController' })
       },
       // 全部报工-团队成员
       openTeamDialog() {
-        this.$refs.TeamMembers.open();
+        this.$router.push({ name : 'AllReportMembers' })
       },
       // 新增-设置本周时间可选范围
       dealDisabledDate1 (date) {
