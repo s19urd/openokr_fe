@@ -71,7 +71,7 @@
                 :search-model-base="tableMainSearchModelBase"
                 :get-action="$api.okr.dailyWork.allDailyWork"
                 :get-action-where="getActionWhere1"
-                :auto-fetch="false"
+                :auto-fetch="true"
                 :afterFetchData="afterFetchData1"
 
               >
@@ -471,7 +471,7 @@
       },
     },
     mounted () {
-      this.refreshTable()
+
       this.tableMainData()
       this.sarchCondition()
     }
