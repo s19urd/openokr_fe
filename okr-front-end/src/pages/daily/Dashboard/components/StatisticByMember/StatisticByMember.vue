@@ -75,9 +75,6 @@ export default {
     //获取数据
     getData(vo) {
       this.searchParam = Object.assign({}, vo)
-
-      console.log('searchParam')
-      console.log(this.searchParam.searchType)
       let promise = {};
 
       if (this.searchParam.searchType === "0") {
@@ -103,7 +100,6 @@ export default {
         promise.then(res => {
           if (res.code === 0) {
             this.chartData = res.data;
-            console.log(this.chartData);
             //渲染统计图表
             setTimeout(() => {
               this.drawLine();
@@ -159,8 +155,8 @@ export default {
         },
         legend: {
           orient: "vertical",
-          left: "350px",
-          top: "middle",
+          left: "300px",
+          top: "top",
           data: names
         },
         color: colors,
@@ -201,14 +197,16 @@ export default {
 
       //如果有数据
       if (this.chartData) {
-        console.log('12121212')
-        console.log(this.chartData.lineSeriesData)
-        _xAxisData = this.chartData.xaxisData
-        // this.chartData.xaxisData.map((item, index) => {
-        //   _xAxisData.push(`${this.searchParam.reportStartDateStr}第${index}周`)
-        // })
+        let xaxisDataLen = this.chartData.xaxisData.length
+        for ( let i=1; i< xaxisDataLen; i++ ) {
+          if (this.searchParam.searchType === '1') {
+            _xAxisData.push(`${this.searchParam.reportStartDateShow}第${i}周`)
+          }
+          if (this.searchParam.searchType === '2') {
+            _xAxisData.push(`${this.searchParam.reportStartDateShow}第${i}月`)
+          }
+        }
         this.chartData.lineSeriesData.map(item => {
-          console.log(item.data)
           _series.push({
             name: item.name,
             type: "line",
@@ -227,7 +225,7 @@ export default {
       setTimeout(()=> {
         this.lineChart.setOption({
         title: {
-          text: "按照人员所属部门统计 " + this.searchParam.reportStartDateShow,
+          text: "按照人员所属部门统计：" + this.searchParam.reportStartDateShow,
           textStyle: { fontWeight: 400, fontSize: "14px" }
         },
         tooltip: {
@@ -239,7 +237,6 @@ export default {
           borderWidth: 1,
           borderColor: '#ccc',
           padding: 10,
-          position: [10, 10],
           textStyle: {
             color: '#000'
           }
@@ -251,9 +248,7 @@ export default {
         },
         yAxis: {
           type: "value",
-          name: "工时/h",
-          min: 'dataMin',
-          max: 'dataMax'
+          name: "工时/h"
         },
         legend: {
           orient: "vertical",
