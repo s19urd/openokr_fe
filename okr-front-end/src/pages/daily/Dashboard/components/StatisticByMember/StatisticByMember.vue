@@ -16,15 +16,15 @@
             <el-table-column prop="percentage" label="工时占比"></el-table-column>
           </el-table>
         </el-col>
-        <el-col :span="12" style="position: relative;" v-if="searchParam.searchType==='0'">
+
+        <el-col :span="12" style="position: relative;" v-show="searchParam.searchType==='0'">
           <div class="echart-pie-total">
             <span class="s-title">总工时</span>
             <span class="title">{{totalDuration}}h</span>
           </div>
           <div class="echart-sty1" id="echart-pie"></div>
         </el-col>
-
-        <el-col :span="12" style="position: relative;" v-else>
+        <el-col :span="12" style="position: relative;"  v-show="searchParam.searchType==='1' ||searchParam.searchType==='2' ">
           <div class="echart-sty1" id="echart-line"></div>
         </el-col>
       </el-row>
@@ -34,6 +34,7 @@
 <script>
 import Vue from "vue";
 import util from "@/libs/util.js";
+import { setTimeout } from 'timers';
 export default {
   name: "statisticByMember",
 
@@ -74,6 +75,7 @@ export default {
     //获取数据
     getData(vo) {
       this.searchParam = Object.assign({}, vo)
+
       console.log('searchParam')
       console.log(this.searchParam.searchType)
       let promise = {};
@@ -184,9 +186,10 @@ export default {
           document.getElementById("echart-line")
         );
       }
-      let names = [];
-      let data = [];
-      let _series = [];
+      let names = []
+      let data = []
+      let _series = []
+      let _xAxisData = []
       let colors = [
         "#409EFF",
         "#67C23A",
@@ -200,9 +203,12 @@ export default {
       if (this.chartData) {
         console.log('12121212')
         console.log(this.chartData.lineSeriesData)
-
+        _xAxisData = this.chartData.xaxisData
+        // this.chartData.xaxisData.map((item, index) => {
+        //   _xAxisData.push(`${this.searchParam.reportStartDateStr}第${index}周`)
+        // })
         this.chartData.lineSeriesData.map(item => {
-          console.log(item)
+          console.log(item.data)
           _series.push({
             name: item.name,
             type: "line",
@@ -215,29 +221,39 @@ export default {
             value: 0,
             name: "无数据"
           }
-        ];
-      }
-      console.log("2222");
-      console.log(_series);
+        ]
+      } 
 
-      this.lineChart.setOption({
+      setTimeout(()=> {
+        this.lineChart.setOption({
         title: {
           text: "按照人员所属部门统计 " + this.searchParam.reportStartDateShow,
           textStyle: { fontWeight: 400, fontSize: "14px" }
         },
         tooltip: {
-          trigger: "axis"
+          trigger: "axis",
+          axisPointer: {
+            type: 'cross'
+          },
+          backgroundColor: 'rgba(245, 245, 245, 0.8)',
+          borderWidth: 1,
+          borderColor: '#ccc',
+          padding: 10,
+          position: [10, 10],
+          textStyle: {
+            color: '#000'
+          }
         },
         xAxis: {
           type: "category",
           name: "时间",
-          data: this.pageData.xaxisData
+          data: _xAxisData
         },
         yAxis: {
-          type: "log",
+          type: "value",
           name: "工时/h",
-          // min: "dataMin",
-          // max: "dataMax"
+          min: 'dataMin',
+          max: 'dataMax'
         },
         legend: {
           orient: "vertical",
@@ -247,7 +263,8 @@ export default {
         },
         color: colors,
         series: _series
-      });
+      })
+      }, 0)
     },
     //表格统计
     getSummaries(param) {

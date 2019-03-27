@@ -20,7 +20,10 @@ module.exports = {
     // 代理设置
     proxy: {
       '/.*\.(json|htm)': {
-        target: 'http://172.16.150.188:8892',
+        //小郑
+        // target: 'http://172.16.150.188:8892',
+        //啊二
+        target: 'http://172.16.135.169:8892',
         changeOrigin: true,
         pathRewrite: {
           '^/': '/'
