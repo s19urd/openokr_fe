@@ -32,7 +32,7 @@
     </div>
     <div class="tab-content-wrap" v-loading="tabLoading"  element-loading-text="加载中">
       <statistic-by-member ref="statisticByMember" v-show="pageType==='1'"></statistic-by-member>
-      <statistic-by-product ref="statisticByProduct" v-show="pageType==='2'"></statistic-by-product>
+      <statistic-by-product ref="statisticByProduct" v-show="pageType==='2'" :search-keys="searchKeys"></statistic-by-product>
     </div>
   </div>
 </template>
@@ -69,7 +69,7 @@
         reportStartDateShow:'',
         weekSearchType:'1',
         tabLoading:false,
-
+        searchKeys: {}
       };
     },
     computed:{
@@ -151,11 +151,11 @@
       }
     },
     watch:{
-      pageType(){
-
+      pageType (){
+        this.getData()
       },
       reportStartDateStr(){
-        this.getData();
+        this.getData()
       }
     },
     methods: {
@@ -176,6 +176,12 @@
         }
       },
       getSearchParam(){
+        this.searchKeys = {
+          teamId:this.teamId||this.$route.params.teamId,
+          searchType:this.searchType,
+          reportStartDateStr:this.reportStartDateStr,
+          reportStartDateShow:this.reportStartDateShow
+        }
         return {
           teamId:this.teamId||this.$route.params.teamId,
           searchType:this.searchType,
