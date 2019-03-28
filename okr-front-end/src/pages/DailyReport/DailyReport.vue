@@ -418,7 +418,7 @@
         window.open(routeData.href, '_blank');
       },
       toDataAggregation(){
-        let routeData = this.$router.resolve({ path: '/daily/dashboard/'+this.teamId });
+        let routeData = this.$router.resolve({ path: '/daily/dashboard.vhtml' });
         window.open(routeData.href, '_blank');
       },
       toMyTasks(){
