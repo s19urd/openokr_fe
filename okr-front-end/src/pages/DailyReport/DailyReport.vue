@@ -446,6 +446,7 @@
       },
     },
     mounted () {
+      this.historyData();
       this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
         let resData = res.data || [];
         let roleTypeList=[];
@@ -566,9 +567,10 @@
   .warning-popup{
     font-size:18px;
     position: relative;padding-left:25px;
-    .el-icon-warning{position: absolute;left:0;top:5px;
-      color: #e6a23c
+    .el-icon-warning{position: absolute;left:0;top:6px;
+      color: #e6a23c;
     }
+    .text{line-height: 33px}
   }
   .el-tag--success {
     background-color: rgba(103,194,58,.1);
