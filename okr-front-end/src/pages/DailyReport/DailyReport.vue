@@ -471,13 +471,13 @@
           }
         })
       });
-//      this.$api.okr.login.isLogin().then(res => {
-//        if (!res.data) {
-//          this.$router.replace({
-//            name: 'Unauthorized'
-//          })
-//        }
-//      });
+      this.$api.okr.login.isLogin().then(res => {
+        if (!res.data) {
+          this.$router.replace({
+            name: 'Unauthorized'
+          })
+        }
+      });
       //任务名称
       let projectVo={
         isFilterTime:'1',
