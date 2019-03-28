@@ -489,7 +489,7 @@
 
   }
 </script>
-<style lang="scss">
+<style type="text/scss" lang="scss">
   .flex{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
   .flex>.flex1{-webkit-box-flex:1;-ms-flex:1;flex:1;display:block;-webkit-flex-grow:1;-webkit-flex-shrink:1;-webkit-flex-basis:0;}
   .flex>.flex2{-webkit-box-flex:2;-webkit-flex:2;-ms-flex:2;flex:2;display:block;-webkit-flex-grow:2;-webkit-flex-shrink:2;-webkit-flex-basis:0;}

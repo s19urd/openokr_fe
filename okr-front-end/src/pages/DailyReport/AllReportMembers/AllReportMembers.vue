@@ -222,9 +222,12 @@ export default {
       });
       this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
         //任务名称-下拉
-        let resData = res.data|| [];
+        let resData = res.data;
         this.taskList=[]
         let taskId=[]
+        //团队-下拉
+        this.teamList=[]
+        let teamId=[]
         resData.map(item => {
           if(item.taskId!==null || item.taskName!==null){
             if(taskId.indexOf(item.taskId)==-1){
@@ -232,9 +235,6 @@ export default {
               this.taskList.push({ value: item.taskId, label: item.taskName })
             }
           }
-          //团队-下拉
-          this.teamList=[]
-          let teamId=[]
           if(item.teamId!==null || item.teamName!==null){
             if(teamId.indexOf(item.teamId)==-1){
               teamId.push(item.teamId)
@@ -246,7 +246,7 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   .grid-content-top{
     text-align: center;
     margin-bottom: 20px;
@@ -282,15 +282,19 @@ export default {
     }
   }
   .ml20{margin-left:20px}
-  .numall-area .table-filter .fl{line-height: 40px}
-  .numall-area .table-filter .fwb{font-weight: bold}
-  .numall-area .el-row{  background-color: #f2f9ff;
-    border-radius: 3px;
-    padding: 20px 0 0 0;}
-  .numall-area .m-table-comb{padding:20px 0 0 0}
-  .numall-area .el-table th {
-    color: #333;
-    background-color: #f9f9f9;
+  .numall-area {
+    .table-filter{
+      .fl{line-height: 40px}
+      .fwb{font-weight: bold}
+    }
+    .el-row{  background-color: #f2f9ff;
+      border-radius: 3px;
+      padding: 20px 0 0 0;}
+    .m-table-comb{padding:20px 0 0 0}
+    .el-table th {
+      color: #333;
+      background-color: #f9f9f9;
+    }
   }
 </style>
 
