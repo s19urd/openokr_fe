@@ -214,6 +214,7 @@ export default {
   },
   mounted () {
     setTimeout(()=>{
+      //获取全部报工
       let allDaily={
         reportStartDayStr:'',
         reportEndDayStr:'',
@@ -247,7 +248,6 @@ export default {
         })
       })
     },0)
-
   }
 }
 </script>

@@ -530,8 +530,11 @@
       },
     },
     mounted () {
+      setTimeout(()=>{
+        //获取全部报工
       this.tableMainData()
       this.sarchCondition()
+      },0)
     }
   }
 </script>
