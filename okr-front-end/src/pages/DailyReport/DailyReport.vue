@@ -199,6 +199,7 @@
   import Vue from 'vue'
   import listMixin from "@/mixins/list.mixin";
   export default {
+    inject:['reload'],
     name: 'DailyReport',
     components: {},
     data () {
@@ -348,6 +349,8 @@
           this.dialogVisible = false
           if (res.code === 0) {
             this.$message.success('您的报工已提交成功，耐心等待审核结果～')
+          }else {
+            this.$message.error(res.message);
           }
           this.historyData();
           this.tableData=[]
@@ -425,10 +428,12 @@
       // 全部报工-管理者
       openAdminDialog() {
         this.$router.push({ name : 'AllReportController' })
+        this.reload()
       },
       // 全部报工-团队成员
       openTeamDialog() {
         this.$router.push({ name : 'AllReportMembers' })
+        this.reload()
       },
       // 新增-设置本周时间可选范围
       dealDisabledDate1 (date) {
@@ -446,7 +451,9 @@
       },
     },
     mounted () {
-      this.historyData();
+      setTimeout(()=>{
+        this.historyData();
+      },0)
       this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
         let resData = res.data || [];
         let roleTypeList=[];
@@ -460,19 +467,17 @@
           let strData=item;
           if (strData[0] == '0') {
             this.isManage  = 1;
-            console.log(this.isManage)
+            console.log("isManage:"+this.isManage)
           }
         })
-
       });
-      this.$api.okr.login.isLogin().then(res => {
-        if (!res.data) {
-          this.$router.replace({
-            name: 'Unauthorized'
-          })
-        }
-      });
-
+//      this.$api.okr.login.isLogin().then(res => {
+//        if (!res.data) {
+//          this.$router.replace({
+//            name: 'Unauthorized'
+//          })
+//        }
+//      });
       //任务名称
       let projectVo={
         isFilterTime:'1',

@@ -176,6 +176,7 @@ export default {
   methods: {
     back () {
       this.$router.push({ name: 'DailyReport' })
+      this.reload()
     },
     searchCondition(){
       let vo = this.$refs.tableMain.getPageVo();
@@ -212,14 +213,16 @@ export default {
     },
   },
   mounted () {
-      let searchVo={};
+    setTimeout(()=>{
       let allDaily={
         reportStartDayStr:'',
         reportEndDayStr:'',
       }
       this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
         this.tableMain = res.data.data;
+        this.$refs.tableMain.fetchData();
       });
+      let searchVo={};
       this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
         //任务名称-下拉
         let resData = res.data;
@@ -243,6 +246,8 @@ export default {
           }
         })
       })
+    },0)
+
   }
 }
 </script>

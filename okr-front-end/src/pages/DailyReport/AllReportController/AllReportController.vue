@@ -171,6 +171,9 @@
                     <template slot-scope="props">
                       <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
                       <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                      <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
+                        <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
+                      </template>
                     </template>
                   </el-table-column>
                 </template>
@@ -359,6 +362,7 @@
       },
       back () {
         this.$router.push({ name: 'DailyReport' })
+        this.reload()
       },
       tableMainData(){
         let dataVo={};
@@ -497,6 +501,30 @@
             });
           }
         })
+      },
+      //删除历史报工
+      removeItem(vo){
+        this.$msgbox({
+          title: '提示',
+          type: 'warning',
+          message: `确定要删除该数据？`,
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(action => {
+          if (action === 'confirm') {
+            this.$api.okr.dailyWork.deleteDailyList(vo).then(res => {
+              if (res.code === 0) {
+                this.$message.success(`删除数据成功`);
+                //刷新列表
+                this.$refs.tableMain.fetchData();
+                this.searchCondition()
+              } else {
+                this.$message.error(res.message)
+              }
+            });
+          }
+        });
       },
     },
     mounted () {
