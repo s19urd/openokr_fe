@@ -236,9 +236,6 @@
       }
     },
     computed:{
-      teamId(){
-        this.$route.params.teamId
-      },
       pickableDays () {// 获取周一周天的时间
         let result = []
         let now = new Date()
