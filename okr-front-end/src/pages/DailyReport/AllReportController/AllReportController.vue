@@ -167,13 +167,13 @@
                       <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column width="150" label="操作" fixed="right">
+                  <el-table-column width="200" label="操作" fixed="right">
                     <template slot-scope="props">
-                      <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
-                      <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
-                      <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
-                        <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
-                      </template>
+                      <el-button-group>
+                        <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' " @click="removeItem(props.row)"> 删除</el-button>
+                        <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                        <el-button type="primary" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
+                      </el-button-group>
                     </template>
                   </el-table-column>
                 </template>
@@ -287,10 +287,12 @@
                       <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column width="150" label="操作" fixed="right">
+                  <el-table-column width="140" label="操作" fixed="right">
                     <template slot-scope="props">
-                      <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
-                      <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                      <el-button-group>
+                        <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                        <el-button type="primary" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
+                      </el-button-group>
                     </template>
                   </el-table-column>
                 </template>
@@ -517,7 +519,7 @@
               if (res.code === 0) {
                 this.$message.success(`删除数据成功`);
                 //刷新列表
-                this.$refs.tableMain.fetchData();
+                this.$refs.tableMain1.fetchData();
                 this.searchCondition()
               } else {
                 this.$message.error(res.message)
