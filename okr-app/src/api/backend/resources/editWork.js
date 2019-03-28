@@ -7,7 +7,7 @@ export default function(instance) {
     },
     getTaskListByCondition(query) {
       return instance
-        .post('/task/getTaskListByCondition.json', query)
+        .post('/task/getTaskListByUser.json', query)
         .then(response => response.data)
     },
   }
