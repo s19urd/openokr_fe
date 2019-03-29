@@ -230,7 +230,7 @@
         },
         pickerOptions2: { // 日期设置对象
           disabledDate: (time) => {
-            return this.dealDisabledDate2(time)
+            return this.dealDisabledDate1(time)
           }
         },
       }
