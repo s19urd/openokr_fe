@@ -131,7 +131,7 @@
                   <el-table-column
                     prop="reportDay"
                     label="报工日期"
-                    width="150px"
+                    width="100px"
                     fixed
                   >
                     <template slot-scope="props">
@@ -140,34 +140,44 @@
                   </el-table-column>
                   <el-table-column
                     prop="taskName"
-                    label="任务名称">
+                    label="任务名称"
+                    width="300">
                   </el-table-column>
                   <el-table-column
                     prop="reportUserName"
                     label="填报人"
-                    width="150">
+                    width="100">
                   </el-table-column>
                   <el-table-column
                     prop="teamName"
-                    label="所属团队">
+                    label="所属团队"
+                    width="200">
                   </el-table-column>
                   <el-table-column
                     prop="duration"
-                    label="耗费工时（h）"
-                    width="150">
+                    label="耗费工时(h)"
+                    width="100"
+                    align="center"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="remark"
+                    label="备注信息"
+                    min-width="300"
+                  >
                   </el-table-column>
                   <el-table-column
                     prop="auditStatus"
                     label="当前状态"
                     width="80"
-                  >
+                    fixed="right">
                     <template slot-scope="props">
                       <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
                       <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
                       <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column width="200" label="操作" fixed="right">
+                  <el-table-column width="190" label="操作" fixed="right">
                     <template slot-scope="props">
                       <el-button-group>
                         <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' " @click="removeItem(props.row)"> 删除</el-button>
@@ -249,7 +259,7 @@
                   <el-table-column
                     prop="reportDay"
                     label="报工日期"
-                    width="150px"
+                    width="100px"
                     fixed
                   >
                     <template slot-scope="props">
@@ -258,27 +268,37 @@
                   </el-table-column>
                   <el-table-column
                     prop="taskName"
-                    label="任务名称">
+                    label="任务名称"
+                    width="350">
                   </el-table-column>
 
                   <el-table-column
                     prop="reportUserName"
                     label="填报人"
-                    width="150">
+                    width="100">
                   </el-table-column>
                   <el-table-column
                     prop="teamName"
-                    label="所属团队">
+                    label="所属团队"
+                    width="200">
                   </el-table-column>
                   <el-table-column
                     prop="duration"
-                    label="耗费工时（h）"
-                    width="150">
+                    label="耗费工时(h)"
+                    width="100"
+                    align="center"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="remark"
+                    label="备注信息"
+                    min-width="300"
+                  >
                   </el-table-column>
                   <el-table-column
                     prop="auditStatus"
                     label="当前状态"
-                    width="150"
+                    width="80"
                     fixed="right"
                   >
                     <template slot-scope="props">
@@ -532,7 +552,7 @@
     mounted () {
       setTimeout(()=>{
         //获取全部报工
-      this.tableMainData()
+//      this.tableMainData()
       this.sarchCondition()
       },0)
     }

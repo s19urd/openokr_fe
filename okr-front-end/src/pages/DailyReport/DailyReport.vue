@@ -160,13 +160,13 @@
                              type="date"
                              format="yyyy-MM-dd"
                              :picker-options="pickerOptions2"
+                             :clearable="false"
             >
             </el-date-picker>
           </el-form-item>
           <el-form-item label="任务名称">
             <el-select class="w430"
                        filterable
-                       clearable
                        v-model="editWork.taskId"
                        placeholder="请选择">
               <el-option
