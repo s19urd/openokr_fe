@@ -162,7 +162,7 @@
                   </el-table-column>
                   <el-table-column
                     prop="remark"
-                    label="备注信息"
+                    label="工作内容"
                     min-width="300"
                   >
                   </el-table-column>
@@ -291,7 +291,7 @@
                   </el-table-column>
                   <el-table-column
                     prop="remark"
-                    label="备注信息"
+                    label="工作内容"
                     min-width="300"
                   >
                   </el-table-column>

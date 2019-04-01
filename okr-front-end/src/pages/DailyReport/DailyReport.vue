@@ -4,7 +4,7 @@
       <el-form class="">
         <div class="tip flex">
           <div class="flex1">
-            <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～
+            <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在工作内容里唠叨唠叨今天的收获呢！明天也要加油哦～
           </div>
           <div class="fr">
             <!--管理员-->
@@ -100,7 +100,7 @@
 
             <el-table-column
               prop="name"
-              label="备注信息"
+              label="工作内容"
             >
               <template slot-scope="scope">
                 <el-input v-model="scope.row.remark" maxlength="200" placeholder="请输入"></el-input>
