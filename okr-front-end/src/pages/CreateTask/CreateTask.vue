@@ -85,8 +85,8 @@
       @size-change="handleSizeChange"
       :page-size="searchForm.pageSize"
       :page-sizes="[3, 5, 7, 10]"
-      layout="sizes, prev, pager, next"
-      :total="totalPage"
+      layout="total, sizes, prev, pager, next"
+      :total="totalRecord"
       @current-change="fetchData"
       class="alginCenter">  
     </el-pagination>
@@ -125,7 +125,7 @@ export default {
 
       teamList: [],
 
-      totalPage: 0,
+      totalRecord: 0,
       taskList: [],
 
       isShow: false,
@@ -178,7 +178,7 @@ export default {
     search (searchForm) {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data && res.data.data
-        this.totalPage = res.data && res.data.totalPage
+        this.totalRecord = res.data && res.data.totalRecord
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime)
           item.taskEndTime = timestampsToDate(item.taskEndTime) 
