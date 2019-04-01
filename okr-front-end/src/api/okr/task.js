@@ -60,6 +60,6 @@ export default {
    * @return {*}
    */
   queryTeamList () {
-    return axios.get('/manage/okrTeam/getTaskListByUser.json')
+    return axios.get('/manage/okrTeam/getTeamListByUser.json')
   }
 }

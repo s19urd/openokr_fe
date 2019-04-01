@@ -160,13 +160,13 @@
                              type="date"
                              format="yyyy-MM-dd"
                              :picker-options="pickerOptions2"
+                             :clearable="false"
             >
             </el-date-picker>
           </el-form-item>
           <el-form-item label="任务名称">
             <el-select class="w430"
                        filterable
-                       clearable
                        v-model="editWork.taskId"
                        placeholder="请选择">
               <el-option
@@ -199,6 +199,7 @@
   import Vue from 'vue'
   import listMixin from "@/mixins/list.mixin";
   export default {
+    inject:['reload'],
     name: 'DailyReport',
     components: {},
     data () {
@@ -229,15 +230,12 @@
         },
         pickerOptions2: { // 日期设置对象
           disabledDate: (time) => {
-            return this.dealDisabledDate2(time)
+            return this.dealDisabledDate1(time)
           }
         },
       }
     },
     computed:{
-      teamId(){
-        this.$route.params.teamId
-      },
       pickableDays () {// 获取周一周天的时间
         let result = []
         let now = new Date()
@@ -348,6 +346,8 @@
           this.dialogVisible = false
           if (res.code === 0) {
             this.$message.success('您的报工已提交成功，耐心等待审核结果～')
+          }else {
+            this.$message.error(res.message);
           }
           this.historyData();
           this.tableData=[]
@@ -415,20 +415,22 @@
         window.open(routeData.href, '_blank');
       },
       toDataAggregation(){
-        let routeData = this.$router.resolve({ path: '/daily/dashboard/'+this.teamId });
+        let routeData = this.$router.resolve({ path: '/daily/dashboard.vhtml' });
         window.open(routeData.href, '_blank');
       },
       toMyTasks(){
-        let routeData = this.$router.resolve({ path: 'CreateTask.vhtml' });
+        let routeData = this.$router.resolve({ path: '/CreateTask.vhtml' });
         window.open(routeData.href, '_blank');
       },
       // 全部报工-管理者
       openAdminDialog() {
         this.$router.push({ name : 'AllReportController' })
+        this.reload()
       },
       // 全部报工-团队成员
       openTeamDialog() {
         this.$router.push({ name : 'AllReportMembers' })
+        this.reload()
       },
       // 新增-设置本周时间可选范围
       dealDisabledDate1 (date) {
@@ -446,8 +448,11 @@
       },
     },
     mounted () {
+      setTimeout(()=>{
+        this.historyData();
+      },0)
       this.$api.okr.dailyWork.getCurrentUserRole().then(res => {
-        let resData = res.data;
+        let resData = res.data || [];
         let roleTypeList=[];
         let roleTypeData=[];
         resData.map(item => {
@@ -459,10 +464,9 @@
           let strData=item;
           if (strData[0] == '0') {
             this.isManage  = 1;
-            console.log(this.isManage)
+            console.log("isManage:"+this.isManage)
           }
         })
-
       });
       this.$api.okr.login.isLogin().then(res => {
         if (!res.data) {
@@ -471,7 +475,6 @@
           })
         }
       });
-
       //任务名称
       let projectVo={
         isFilterTime:'1',
@@ -488,7 +491,7 @@
 
   }
 </script>
-<style lang="scss">
+<style type="text/scss" lang="scss">
   .flex{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
   .flex>.flex1{-webkit-box-flex:1;-ms-flex:1;flex:1;display:block;-webkit-flex-grow:1;-webkit-flex-shrink:1;-webkit-flex-basis:0;}
   .flex>.flex2{-webkit-box-flex:2;-webkit-flex:2;-ms-flex:2;flex:2;display:block;-webkit-flex-grow:2;-webkit-flex-shrink:2;-webkit-flex-basis:0;}
@@ -566,9 +569,10 @@
   .warning-popup{
     font-size:18px;
     position: relative;padding-left:25px;
-    .el-icon-warning{position: absolute;left:0;top:5px;
-      color: #e6a23c
+    .el-icon-warning{position: absolute;left:0;top:6px;
+      color: #e6a23c;
     }
+    .text{line-height: 33px}
   }
   .el-tag--success {
     background-color: rgba(103,194,58,.1);

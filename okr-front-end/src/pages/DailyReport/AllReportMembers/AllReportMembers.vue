@@ -94,7 +94,7 @@
           <el-table-column
             prop="reportDay"
             label="报工日期"
-            width="150px"
+            width="100px"
             fixed
           >
             <template slot-scope="props">
@@ -103,26 +103,30 @@
           </el-table-column>
           <el-table-column
             prop="taskName"
-            label="任务名称">
+            label="任务名称"
+            width="350">
           </el-table-column>
           <el-table-column
             prop="reportUserName"
             label="填报人"
-            width="150">
+            width="100">
           </el-table-column>
           <el-table-column
             prop="teamName"
-            label="所属团队">
+            label="所属团队"
+            width="200">
           </el-table-column>
           <el-table-column
             prop="duration"
             label="耗费工时（h）"
-            width="150">
+            width="150"
+            width="100"
+            align="center"
           </el-table-column>
           <el-table-column
             prop="auditStatus"
             label="当前状态"
-            width="150"
+            width="80"
           >
             <template slot-scope="props">
               <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
@@ -130,7 +134,13 @@
               <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
             </template>
           </el-table-column>
-          <el-table-column width="150" label="操作" fixed="right">
+          <el-table-column
+            prop="remark"
+            label="备注信息"
+            min-width="300"
+          >
+          </el-table-column>
+          <el-table-column width="100" label="操作" fixed="right">
             <template slot-scope="props" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' ">
               <el-button type="danger" size="mini" @click="removeItem(props.row)"> 删除</el-button>
             </template>
@@ -176,6 +186,7 @@ export default {
   methods: {
     back () {
       this.$router.push({ name: 'DailyReport' })
+      this.reload()
     },
     searchCondition(){
       let vo = this.$refs.tableMain.getPageVo();
@@ -212,19 +223,25 @@ export default {
     },
   },
   mounted () {
+    setTimeout(()=>{
+      //获取全部报工
+//      let allDaily={
+//        reportStartDayStr:'',
+//        reportEndDayStr:'',
+//      }
+//      this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
+//        this.tableMain = res.data.data;
+//        this.$refs.tableMain.fetchData();
+//      });
       let searchVo={};
-      let allDaily={
-        reportStartDayStr:'',
-        reportEndDayStr:'',
-      }
-      this.$api.okr.dailyWork.allDailyWork(allDaily).then(res => {
-        this.tableMain = res.data.data;
-      });
       this.$api.okr.dailyWork.getSearchConditionList(searchVo).then(res => {
         //任务名称-下拉
         let resData = res.data;
         this.taskList=[]
         let taskId=[]
+        //团队-下拉
+        this.teamList=[]
+        let teamId=[]
         resData.map(item => {
           if(item.taskId!==null || item.taskName!==null){
             if(taskId.indexOf(item.taskId)==-1){
@@ -232,9 +249,6 @@ export default {
               this.taskList.push({ value: item.taskId, label: item.taskName })
             }
           }
-          //团队-下拉
-          this.teamList=[]
-          let teamId=[]
           if(item.teamId!==null || item.teamName!==null){
             if(teamId.indexOf(item.teamId)==-1){
               teamId.push(item.teamId)
@@ -243,10 +257,11 @@ export default {
           }
         })
       })
+    },0)
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   .grid-content-top{
     text-align: center;
     margin-bottom: 20px;
@@ -268,7 +283,7 @@ export default {
   }
   .el-col+.el-col .grid-content-top{border-left: 1px solid #e5e5e5;}
   .inline-block{
-    display:inline-block;width: 370px;margin:5px 0;
+    display:inline-block;width: 350px;margin:5px 0;
     .lab{
       display: inline-block;text-align: right;min-width: 58px;
     }
@@ -282,15 +297,19 @@ export default {
     }
   }
   .ml20{margin-left:20px}
-  .numall-area .table-filter .fl{line-height: 40px}
-  .numall-area .table-filter .fwb{font-weight: bold}
-  .numall-area .el-row{  background-color: #f2f9ff;
-    border-radius: 3px;
-    padding: 20px 0 0 0;}
-  .numall-area .m-table-comb{padding:20px 0 0 0}
-  .numall-area .el-table th {
-    color: #333;
-    background-color: #f9f9f9;
+  .numall-area {
+    .table-filter{
+      .fl{line-height: 40px}
+      .fwb{font-weight: bold}
+    }
+    .el-row{  background-color: #f2f9ff;
+      border-radius: 3px;
+      padding: 20px 0 0 0;}
+    .m-table-comb{padding:20px 0 0 0}
+    .el-table th {
+      color: #333;
+      background-color: #f9f9f9;
+    }
   }
 </style>
 

@@ -131,7 +131,7 @@
                   <el-table-column
                     prop="reportDay"
                     label="报工日期"
-                    width="150px"
+                    width="100px"
                     fixed
                   >
                     <template slot-scope="props">
@@ -140,37 +140,50 @@
                   </el-table-column>
                   <el-table-column
                     prop="taskName"
-                    label="任务名称">
+                    label="任务名称"
+                    width="300">
                   </el-table-column>
                   <el-table-column
                     prop="reportUserName"
                     label="填报人"
-                    width="150">
+                    width="100">
                   </el-table-column>
                   <el-table-column
                     prop="teamName"
-                    label="所属团队">
+                    label="所属团队"
+                    width="200">
                   </el-table-column>
                   <el-table-column
                     prop="duration"
-                    label="耗费工时（h）"
-                    width="150">
+                    label="耗费工时(h)"
+                    width="100"
+                    align="center"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="remark"
+                    label="备注信息"
+                    min-width="300"
+                  >
                   </el-table-column>
                   <el-table-column
                     prop="auditStatus"
                     label="当前状态"
                     width="80"
-                  >
+                    fixed="right">
                     <template slot-scope="props">
                       <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
                       <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
                       <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column width="150" label="操作" fixed="right">
+                  <el-table-column width="190" label="操作" fixed="right">
                     <template slot-scope="props">
-                      <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
-                      <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                      <el-button-group>
+                        <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' " @click="removeItem(props.row)"> 删除</el-button>
+                        <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                        <el-button type="primary" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
+                      </el-button-group>
                     </template>
                   </el-table-column>
                 </template>
@@ -205,14 +218,14 @@
                     </el-date-picker>
                   </div>
 
-                  <div class="inline-block">
+                  <div class="inline-block ml20">
                     <span class="lab"> 任务名称：</span>
                     <el-select
                       filterable
                       clearable
                       v-model="scope.form.taskId"
                       placeholder="请选择"
-                      class="w70off"
+                      class="w80off"
                     >
                       <el-option
                         v-for="item in taskList"
@@ -222,14 +235,14 @@
                       </el-option>
                     </el-select>
                   </div>
-                  <div class="inline-block">
+                  <div class="inline-block ml20">
                     <span class="lab">团队：</span>
                     <el-select
                       filterable
                       clearable
                       v-model="scope.form.teamId"
                       placeholder="请选择"
-                      class="w70off"
+                      class="w80off"
                     >
                       <el-option
                         v-for="item in teamList"
@@ -246,7 +259,7 @@
                   <el-table-column
                     prop="reportDay"
                     label="报工日期"
-                    width="150px"
+                    width="100px"
                     fixed
                   >
                     <template slot-scope="props">
@@ -255,27 +268,37 @@
                   </el-table-column>
                   <el-table-column
                     prop="taskName"
-                    label="任务名称">
+                    label="任务名称"
+                    width="350">
                   </el-table-column>
 
                   <el-table-column
                     prop="reportUserName"
                     label="填报人"
-                    width="150">
+                    width="100">
                   </el-table-column>
                   <el-table-column
                     prop="teamName"
-                    label="所属团队">
+                    label="所属团队"
+                    width="200">
                   </el-table-column>
                   <el-table-column
                     prop="duration"
-                    label="耗费工时（h）"
-                    width="150">
+                    label="耗费工时(h)"
+                    width="100"
+                    align="center"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="remark"
+                    label="备注信息"
+                    min-width="300"
+                  >
                   </el-table-column>
                   <el-table-column
                     prop="auditStatus"
                     label="当前状态"
-                    width="150"
+                    width="80"
                     fixed="right"
                   >
                     <template slot-scope="props">
@@ -284,10 +307,12 @@
                       <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column width="150" label="操作" fixed="right">
+                  <el-table-column width="140" label="操作" fixed="right">
                     <template slot-scope="props">
-                      <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
-                      <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                      <el-button-group>
+                        <el-button size="mini" v-if="props.row.auditStatus==='00'" @click="openReject(props.row)"> 驳回</el-button>
+                        <el-button type="primary" size="mini" v-if="props.row.auditStatus==='00'" @click="openConfirm(props.row)"> 确认</el-button>
+                      </el-button-group>
                     </template>
                   </el-table-column>
                 </template>
@@ -343,36 +368,34 @@
       },
     },
     methods: {
-      back () {
-        this.$router.push({ name: 'DailyReport' })
-      },
-      tableMainData(){
-        let dataVo={};
-//          let allDaily={
-//            reportStartDayStr:'',
-//            reportEndDayStr:'',
-//          }
-        this.$api.okr.dailyWork.allDailyWork(dataVo).then(res => {
-          if(this.tabIndex===0){
-            this.tableMain1 = res.data.data;
-          }
-          if(this.tabIndex===1){
-            this.tableMain2 = res.data.data;
-          }
-        });
-      },
       handleClick(tab){
         this.tabIndex=tab.index
         console.log("tabIndex:"+this.tabIndex)
-
+        this.refreshTable()
+        this.sarchCondition()
       },
       refreshTable(){
-        if(this.tabIndex===0){
+        if(this.tabIndex==='0' || this.tabIndex===0){
           this.$refs.tableMain1.fetchData();
         }
-        if(this.tabIndex===1){
+        if(this.tabIndex==='1' || this.tabIndex===1){
           this.$refs.tableMain2.fetchData();
         }
+      },
+      back () {
+        this.$router.push({ name: 'DailyReport' })
+        this.reload()
+      },
+      tableMainData(){
+        let dataVo={};
+        this.$api.okr.dailyWork.allDailyWork(dataVo).then(res => {
+          if(this.tabIndex==='0' || this.tabIndex===0){
+            this.tableMain1 = res.data.data;
+          }
+          if(this.tabIndex==='1' || this.tabIndex===1){
+            this.tableMain2 = res.data.data;
+          }
+        });
       },
       getSearchCondition1(){
         let vo = this.$refs.tableMain1.getPageVo();
@@ -393,30 +416,62 @@
         this.getSearchCondition2()
       },
       sarchCondition(){
-        let dataVo={};
-        this.$api.okr.dailyWork.getSearchConditionList(dataVo).then(res => {
-          //任务名称-下拉
-          let resData = res.data;
-          this.taskList=[]
-          let taskId=[]
-          resData.map(item => {
-            if(item.taskId!==null || item.taskName!==null){
-              if(taskId.indexOf(item.taskId)==-1){
-                taskId.push(item.taskId)
-                this.taskList.push({ value: item.taskId, label: item.taskName })
-              }
-            }
+        let dataVo1={
+        };
+        let dataVo2={
+          isAdmin:1
+        };
+        if(this.tabIndex==='0' || this.tabIndex===0){
+          this.$api.okr.dailyWork.getSearchConditionList(dataVo1).then(res => {
+            //任务名称-下拉
+            let resData = res.data || [];
+            this.taskList=[]
+            let taskId=[]
             //团队-下拉
             this.teamList=[]
             let teamId=[]
-            if(item.teamId!==null || item.teamName!==null){
-              if(teamId.indexOf(item.teamId)==-1){
-                teamId.push(item.teamId)
-                this.teamList.push({ value: item.teamId, label: item.teamName })
+            resData.map(item => {
+              if(item.taskId!==null || item.taskName!==null){
+                if(taskId.indexOf(item.taskId)==-1){
+                  taskId.push(item.taskId)
+                  this.taskList.push({ value: item.taskId, label: item.taskName })
+                }
               }
-            }
+              if(item.teamId!==null || item.teamName!==null){
+                if(teamId.indexOf(item.teamId)==-1){
+                  teamId.push(item.teamId)
+                  this.teamList.push({ value: item.teamId, label: item.teamName })
+                }
+              }
+            })
           })
-        })
+        }
+        if(this.tabIndex==='1' || this.tabIndex===1){
+          this.$api.okr.dailyWork.getSearchConditionList(dataVo2).then(res => {
+            //任务名称-下拉
+            let resData = res.data || [];
+            this.taskList=[]
+            let taskId=[]
+            //团队-下拉
+            this.teamList=[]
+            let teamId=[]
+            resData.map(item => {
+              if(item.taskId!==null || item.taskName!==null){
+                if(taskId.indexOf(item.taskId)==-1){
+                  taskId.push(item.taskId)
+                  this.taskList.push({ value: item.taskId, label: item.taskName })
+                }
+              }
+              if(item.teamId!==null || item.teamName!==null){
+                if(teamId.indexOf(item.teamId)==-1){
+                  teamId.push(item.teamId)
+                  this.teamList.push({ value: item.teamId, label: item.teamName })
+                }
+              }
+            })
+          })
+        }
+
       },
       //确认
       openConfirm(item){
@@ -469,15 +524,41 @@
           }
         })
       },
+      //删除历史报工
+      removeItem(vo){
+        this.$msgbox({
+          title: '提示',
+          type: 'warning',
+          message: `确定要删除该数据？`,
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(action => {
+          if (action === 'confirm') {
+            this.$api.okr.dailyWork.deleteDailyList(vo).then(res => {
+              if (res.code === 0) {
+                this.$message.success(`删除数据成功`);
+                //刷新列表
+                this.$refs.tableMain1.fetchData();
+                this.searchCondition()
+              } else {
+                this.$message.error(res.message)
+              }
+            });
+          }
+        });
+      },
     },
     mounted () {
-
-      this.tableMainData()
+      setTimeout(()=>{
+        //获取全部报工
+//      this.tableMainData()
       this.sarchCondition()
+      },0)
     }
   }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   .grid-content-top{
     text-align: center;
     margin-bottom: 20px;
@@ -499,7 +580,7 @@
   }
   .el-col+.el-col .grid-content-top{border-left: 1px solid #e5e5e5;}
   .inline-block{
-    display:inline-block;width: 370px;margin:5px 0;
+    display:inline-block;width: 350px;margin:5px 0;
     .lab{
       display: inline-block;text-align: right;min-width: 58px;
     }
@@ -513,15 +594,23 @@
     }
   }
   .ml20{margin-left:20px}
-  .numall-area .table-filter .fl{line-height: 40px}
-  .numall-area .table-filter .fwb{font-weight: bold}
-  .numall-area .el-row{  background-color: #f2f9ff;
-    border-radius: 3px;
-    padding: 20px 0 0 0;}
-  .numall-area .m-table-comb{padding:20px 0 0 0}
-  .numall-area .el-table th {
-    color: #333;
-    background-color: #f9f9f9;
+  .numall-area {
+    .table-filter{
+      .fl{line-height: 40px}
+      .fwb{font-weight: bold}
+    }
+    .el-row{  background-color: #f2f9ff;
+      border-radius: 3px;
+      padding: 20px 0 0 0;}
+
+    .el-table th {
+      color: #333;
+      background-color: #f9f9f9;
+    }
+    &.admin-area{
+      .m-table-comb{padding:10px 0 0 0}
+    }
   }
+
 </style>
 
