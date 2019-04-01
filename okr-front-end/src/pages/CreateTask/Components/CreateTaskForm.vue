@@ -223,7 +223,6 @@
       },
 
       changeReleatedProjectList (item) {
-        console.log('33333333333333333333333')
         this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
           // item.projectReleatedList = []
           item.projectReleatedList = res.data
@@ -301,7 +300,7 @@
             this.$emit('update:dialogVisible', false)
             if (res.code === 0) {
               this.$message.success('保存成功！')
-              this.$router.go(0)
+              // this.$router.go(0)
             } else {
               this.$message.success(res.message)
             }

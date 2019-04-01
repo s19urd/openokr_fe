@@ -84,38 +84,41 @@ export default {
     getData(vo) {
       this.searchParam =Object.assign({},  vo ? vo : this.searchKeys) 
       let promise = {};
+      let promiseArray = [],
+          promiseTable,
+          promiseLine
 
-      if (this.searchParam.searchType === "0") {
-        promise = this.$api.daily.weekly.getStatisticByOrg(this.searchParam);
-        promise.then(res => {
-          if (res.code === 0) {
-            this.pageData = res.data;
-            //渲染统计图表
-            setTimeout(() => {
-              this.drawPie();
-            }, 100);
-          }
-        });
-        return promise;
-      }
-      if (
-        this.searchParam.searchType === "1" ||
-        this.searchParam.searchType === "2"
-      ) {
-        promise = this.$api.daily.weekly.getStatisticChartByOrg(
+      promiseTable = this.$api.daily.weekly.getStatisticByOrg(this.searchParam);
+      promiseArray.push(promiseTable)
+      if ( this.searchParam.searchType === "1" || this.searchParam.searchType === "2") {
+        promiseLine = this.$api.daily.weekly.getStatisticChartByOrg(
           this.searchParam
         )
-        promise.then(res => {
+        promiseArray.push(promiseLine)
+      }
+      let promiseAll = Promise.all(promiseArray)
+      promiseAll.then((resultArray)=> {
+        console.log(resultArray)
+        let res = resultArray[0]
+        if (res.code === 0) {
+          this.pageData = res.data
+          //渲染统计图表
+          setTimeout(() => {
+            this.drawPie()
+          }, 100)
+        }
+        if (this.searchParam.searchType === "1" || this.searchParam.searchType === "2") {
+          res = resultArray[1]
           if (res.code === 0) {
-            this.chartData = res.data;
+            this.chartData = res.data
             //渲染统计图表
             setTimeout(() => {
-              this.drawLine();
-            }, 100);
+              this.drawLine()
+            }, 100)
           }
-        });
-        return promise;
-      }
+        }
+      })
+      return promiseAll
     },
 
     //渲染饼图

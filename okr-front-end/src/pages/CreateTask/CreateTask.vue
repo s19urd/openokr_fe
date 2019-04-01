@@ -176,8 +176,8 @@ export default {
 
     serach (searchForm) {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
-        this.taskList = res.data.data
-        this.totalPage = res.data.totalPage
+        this.taskList = res.data && res.data.data
+        this.totalPage = res.data && res.data.totalPage
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime) 
           item.taskEndTime = timestampsToDate(item.taskEndTime) 

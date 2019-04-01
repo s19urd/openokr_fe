@@ -22,7 +22,7 @@ new Vue({
       this.$api.login.loginCheck().then(res => {
         // console.log(res)
         if (res && res.data) {
-          // console.log(this.$router)
+          console.log(this.$router)
           // console.log(this.$router.history.current.name)
           this.$router.history.current.name === 'Login' && this.$router.replace({ name: 'HistoryWork' })
         } else {
@@ -31,5 +31,5 @@ new Vue({
       })
     }, 0)
   },
-  render: h => h(App),
+  render: h => h(App), 
 }).$mount('#app')

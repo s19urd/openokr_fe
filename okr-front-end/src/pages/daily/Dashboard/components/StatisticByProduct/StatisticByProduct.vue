@@ -78,6 +78,7 @@
           totalDuration += item.duration
         })
         this.totalDuration = totalDuration
+        totalDuration = totalDuration || 1 
         return this.pageData.map(item => {
           return {
             ...item,
@@ -100,9 +101,7 @@
             on: {
               click:() => {
                 this.weekSearchType= this.weekSearchType === '01' ? '00':'01';
-                console.log('222')
                 this.getData()
-                console.log('444')
               }
             }
           })
@@ -138,43 +137,44 @@
       },
       //获取数据
       getData (vo){
-        this.searchParam = Object.assign({}, vo)
+        this.searchParam = vo ? Object.assign({}, vo) : this.searchParam
         this.searchParam.categoryId = this.weekSearchType
         console.log(this.searchParam)
-        let promise = {}
-        if (this.searchParam.searchType === "0") {
-          promise = this.$api.daily.weekly.getStatisticByTask(this.searchParam)
-          promise.then(res => {
-            if (res.code === 0) {
-              this.pageData = res.data
-              //渲染统计图表
-              setTimeout(() => {
-                this.drawPie()
-              }, 100)
-            }
-          })
-          return promise
-        }
+        let promiseArray = [],
+            promiseTable,
+            promiseLine
+        promiseTable = this.$api.daily.weekly.getStatisticByTask(this.searchParam)
+        promiseArray.push(promiseTable)
 
-        if (
-          this.searchParam.searchType === "1" ||
-          this.searchParam.searchType === "2"
-        ) {
-          promise = this.$api.daily.weekly.getStatisticChartByTask(
+        if (this.searchParam.searchType === "1" || this.searchParam.searchType === "2") {
+          promiseLine = this.$api.daily.weekly.getStatisticChartByTask(
             this.searchParam
           )
-          promise.then(res => {
+          promiseArray.push(promiseLine)
+        }
+        let promiseAll = Promise.all(promiseArray)
+        promiseAll.then((resultArray)=> {
+          console.log(resultArray)
+          let res = resultArray[0]
+          if (res.code === 0) {
+            this.pageData = res.data
+            //渲染统计图表
+            setTimeout(() => {
+              this.drawPie()
+            }, 100)
+          }
+          if (this.searchParam.searchType === "1" || this.searchParam.searchType === "2") {
+            res = resultArray[1]
             if (res.code === 0) {
-              this.chartData = res.data;
+              this.chartData = res.data
               //渲染统计图表
               setTimeout(() => {
-                this.drawLine();
-              }, 100);
+                this.drawLine()
+              }, 100)
             }
-          });
-          return promise;
-        }
-       
+          }
+        })
+        return promiseAll
       },
 
       //渲染饼图
@@ -262,7 +262,8 @@
           "#E6A23C",
           "#F56C6C",
           "#909399",
-          "##FFEF40"
+          "#FFEF40",
+          "#E6223C"
         ]
 
         //如果有数据
@@ -349,10 +350,11 @@
 </script>
 
 <style lang="scss">
-  .el-table {
-    &.tableData
-    &::before {
-      height: 0;
+  .el-table { 
+    &.tableData {
+      &::before {
+        height: 0;
+      }
     }
   }
 </style>
