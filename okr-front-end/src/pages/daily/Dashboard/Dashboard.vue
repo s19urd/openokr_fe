@@ -9,6 +9,19 @@
       </el-radio-group>
     </div>
     <div class="tab-wrap">
+      <div class="releatedTeam">
+        <span>关联团队：</span>
+        <el-select v-model="selectedTeamId">
+          <el-option
+            v-for="item in teamList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+      </div>
+    
       <el-radio-group v-model="searchType" size="small">
         <el-radio-button
           class="radio-sty2"
@@ -18,6 +31,7 @@
           {{item.name}}
         </el-radio-button>
       </el-radio-group>
+
       <span class="d2-ml-20">
          当前统计周期：
         <el-select v-model="reportStartDateStr" @change="changeStartDate">
@@ -69,7 +83,9 @@
         reportStartDateShow:'',
         weekSearchType:'1',
         tabLoading:false,
-        searchKeys: {}
+        searchKeys: {},
+        selectedTeamId: '',
+        teamList: [{ id: '4ef00cb7ad60418ba02a5ddc16abb74b', name: 'test team'}]
       };
     },
     computed:{
@@ -145,9 +161,6 @@
         }
 
         return _options;
-      },
-      teamId(){
-        this.$route.params.teamId
       }
     },
     watch:{
@@ -177,13 +190,13 @@
       },
       getSearchParam(){
         this.searchKeys = {
-          teamId:this.teamId||this.$route.params.teamId,
-          searchType:this.searchType,
-          reportStartDateStr:this.reportStartDateStr,
-          reportStartDateShow:this.reportStartDateShow
+          teamId: this.selectedTeamId,
+          searchType: this.searchType,
+          reportStartDateStr: this.reportStartDateStr,
+          reportStartDateShow: this.reportStartDateShow
         }
         return {
-          teamId:this.teamId||this.$route.params.teamId,
+          teamId: this.selectedTeamId,
           searchType:this.searchType,
           reportStartDateStr:this.reportStartDateStr,
           reportStartDateShow:this.reportStartDateShow
@@ -221,7 +234,7 @@
       },
     },
     mounted () {
-
+      this.selectedTeamId = this.teamList[0].id
     }
   };
 </script>
@@ -235,6 +248,11 @@
   .tab-wrap{
     padding: 20px 0;
     font-size: 14px;
+
+    .el-radio-button__inner {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
   }
   .text-center{
     text-align: center;
@@ -265,6 +283,10 @@
   .echart-sty1{
     border: #ccc solid 1px;
     padding: 20px;
+    margin-right: 20px;
+  }
+  .releatedTeam {
+    display: inline-block;
     margin-right: 20px;
   }
 

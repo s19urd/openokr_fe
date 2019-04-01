@@ -105,7 +105,18 @@
           show-checkbox
           node-key="id"
           :default-checked-keys="taskForm.userIds"
+          @check="handleChange"
           ref="userTree"></el-tree>
+          <div class="selectedUser" v-if="selectedUserList.length > 0">
+            <span class="text">相关参与人员：</span>
+            <el-tag
+             v-for="item in selectedUserList"
+             :key="item.name"
+            >
+            {{ item.name }}
+            </el-tag>
+          </div>
+
       </el-form-item >
 
       <el-form-item label="关联KR: ">
@@ -169,7 +180,8 @@
         userTree: [],
         KRTrees: [],
         teamList: [],
-        flag: true
+        flag: true,
+        selectedUserList: []
       } 
     },
 
@@ -284,6 +296,17 @@
         }
       },
 
+      handleChange () {        
+        let nodeList = this.$refs.userTree.getCheckedNodes()
+        let selectedUserList = []
+        if (nodeList.length > 0) {
+          nodeList.forEach(item => {
+            !item.children && selectedUserList.push({ name: item.label })
+          })
+        }
+        this.selectedUserList = selectedUserList
+      },
+
       confirm () {
         if(this.$refs.KRTrees) {
           this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
@@ -336,6 +359,11 @@
 
       this.$api.okr.task.queryUsers().then(res => {
         this.userTree = res
+        if (this.userTree.length > 0) {
+          this.$nextTick(() => {
+            this.handleChange()
+          })
+        }
       })
 
       this.$api.okr.task.queryOKRTreeData().then(res => {
@@ -361,6 +389,8 @@
           })
         }
       }
+
+      // this.handleChange()
     }
   }
 </script>
@@ -408,6 +438,16 @@
       &.add {
         margin-top: -3px;
         margin-left: -15px;
+      }
+    }
+
+    .selectedUser {
+      float: right;
+      width: 40%;
+
+      .text {
+        display: inline-block;
+        width: 100%;
       }
     }
 
