@@ -5,9 +5,9 @@ export default function(instance) {
         .post('/api/daily/saveDailyList.json', taskArray)
         .then(response => response.data)
     },
-    getTaskListByCondition(query) {
+    getTaskList(query) {
       return instance
-        .post('/task/getTaskListByCondition.json', query)
+        .post('/task/getTaskListByUser.json', query)
         .then(response => response.data)
     },
   }
