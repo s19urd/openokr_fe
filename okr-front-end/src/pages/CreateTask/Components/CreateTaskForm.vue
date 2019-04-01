@@ -226,11 +226,9 @@
         this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
           // item.projectReleatedList = []
           item.projectReleatedList = res.data
-          console.log(res.data[0]);
           
           item.apportionNameId = res.data.length ? res.data[0].id : ''
           item.apportionName = res.data.length ? res.data[0].name : ''
-          console.log(item.projectReleatedList)
         })
       },
 
@@ -300,7 +298,7 @@
             this.$emit('update:dialogVisible', false)
             if (res.code === 0) {
               this.$message.success('保存成功！')
-              // this.$router.go(0)
+              this.$emit('update')
             } else {
               this.$message.success(res.message)
             }
@@ -359,8 +357,6 @@
           this.taskForm.apportionVOS.map((item, index) => {
             this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
               item.projectReleatedList = res.data
-              console.log("888888888888888888888")
-              console.log(item.projectReleatedList)
             })
           })
         }

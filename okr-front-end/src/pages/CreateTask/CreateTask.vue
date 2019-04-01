@@ -34,7 +34,7 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" @click="serach(searchForm)">搜索</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="search(searchForm)">搜索</el-button>
           </el-form-item>
     
           <el-form-item>
@@ -94,7 +94,8 @@
     <template v-if ="isShow">
       <create-task-form
         :dialog-visible.sync="isShow"
-        :task-form-edit.sync="itemFormInfo"></create-task-form>
+        :task-form-edit.sync="itemFormInfo"
+        @update="search(searchForm)"></create-task-form>
     </template>
   </div>
 </template>
@@ -169,17 +170,17 @@ export default {
       this.$api.okr.task.deleteTask(item.id).then(res => {
         if(res.code === 0) {
           this.$message.success('删除成功')
-          this.serach(this.searchForm)
+          this.search(this.searchForm)
         }
       })
     },
 
-    serach (searchForm) {
+    search (searchForm) {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
         this.taskList = res.data && res.data.data
         this.totalPage = res.data && res.data.totalPage
         this.taskList.forEach((item, index) => {
-          item.taskStartTime = timestampsToDate(item.taskStartTime) 
+          item.taskStartTime = timestampsToDate(item.taskStartTime)
           item.taskEndTime = timestampsToDate(item.taskEndTime) 
         })
 
@@ -193,7 +194,7 @@ export default {
     
     fetchData (pageIndex) {
       this.searchForm.currentPage = pageIndex || this.searchForm.currentPage || 1
-      this.serach(this.searchForm)
+      this.search(this.searchForm)
     }
   },
 
@@ -211,7 +212,7 @@ export default {
       this.teamList = res.data
     })
 
-    this.serach(this.searchForm)
+    this.search(this.searchForm)
   }
 };
 </script>
