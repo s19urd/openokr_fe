@@ -47,7 +47,8 @@
       <li class="taskItem" v-for="(item, index) in taskList" :key="index">
         <div class="collapseHeader_left">
           <span class="taskName" v-text="item.taskName"></span>
-          <span style="margin-left: 12px" v-if="item.estimateTime">该任务预计耗时：<span class="timeColor">{{ item.estimateTime }} h</span></span>
+          <span style="margin-left: 16px" v-if="item.estimateTime">该任务预计耗时：<span class="timeColor">{{ item.estimateTime }} h</span></span>
+          <span style="margin-left: 20px" v-if="item.totalWorkingHours">该任务目前累计耗时：<span class="timeColor">{{ item.totalWorkingHours }} h</span></span>
           <div class="text">
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
               <el-tag>{{ item.taskStartTime }} ~ {{ item.taskEndTime }}</el-tag>
