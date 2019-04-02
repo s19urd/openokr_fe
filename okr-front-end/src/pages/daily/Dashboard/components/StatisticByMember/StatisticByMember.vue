@@ -34,7 +34,6 @@
 <script>
 import Vue from "vue";
 import util from "@/libs/util.js";
-import { setTimeout } from 'timers';
 export default {
   name: "statisticByMember",
 
@@ -102,6 +101,7 @@ export default {
         let res = resultArray[0]
         if (res.code === 0) {
           this.pageData = res.data
+          console.log(this.pageData)
           //渲染统计图表
           setTimeout(() => {
             this.drawPie()
@@ -169,7 +169,14 @@ export default {
           orient: "vertical",
           left: "300px",
           top: "top",
-          data: names
+          data: names,
+          formatter: function() {
+            let showData = []
+            this.pageData.forEach((item, index) => {
+              showData.push(item.name + item.duration)
+            })
+            return showData
+          }
         },
         color: colors,
         series: [
