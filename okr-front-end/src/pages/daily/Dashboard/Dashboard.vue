@@ -169,6 +169,9 @@
       },
       reportStartDateStr(){
         this.getData()
+      },
+      selectedTeamId () {
+        this.getData()
       }
     },
     methods: {
@@ -234,7 +237,11 @@
       },
     },
     mounted () {
-      this.selectedTeamId = this.teamList[0].id
+      this.$api.okr.task.queryTeamList().then(res => {
+        this.teamList = res.data
+        this.selectedTeamId = this.teamList[0].id
+        this.getData()
+      })
     }
   };
 </script>

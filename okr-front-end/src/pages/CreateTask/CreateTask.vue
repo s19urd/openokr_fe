@@ -372,6 +372,11 @@ export default {
     }
   }
 
+  .el-select,
+  .el-input {
+    width: auto
+  }
+
   .el-input__inner {
     padding-top: 20px;
     padding-bottom: 20px;

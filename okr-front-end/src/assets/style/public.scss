@@ -26,6 +26,7 @@ $prefix: d2;
   align-items: center;
   flex-direction: row;
 }
+
 %flex-center-col {
   display: flex;
   justify-content: center;
@@ -44,6 +45,7 @@ $prefix: d2;
 }
 
 .clearfix {
+
   &::before,
   &::after {
     content: "";
@@ -73,4 +75,12 @@ ul {
   right: 0;
   left: 0;
   bottom: 0;
+}
+
+//饿了么组件
+.el-date-editor--daterange.el-input,
+.el-date-editor--daterange.el-input__inner,
+.el-date-editor--timerange.el-input,
+.el-date-editor--timerange.el-input__inner {
+  max-width: 100%;
 }
