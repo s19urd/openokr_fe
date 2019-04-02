@@ -33,7 +33,7 @@
           </el-table-column>
           <el-table-column prop="taskName" width="300" label="任务名称"></el-table-column>
           <el-table-column prop="duration" width="150" label="报工时长(h)"></el-table-column>
-          <el-table-column prop="remark" label="备注"></el-table-column>
+          <el-table-column prop="remark" label="工作内容"></el-table-column>
           <el-table-column prop="auditStatus" width="150" label="状态">
             <template slot-scope="props">
               <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
@@ -183,7 +183,7 @@
           <el-form-item label="状态" class="hide">
             <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="工作内容">
             <el-input class="w430" v-model="editWork.remark" type="textarea" :rows="3" placeholder="请输入"></el-input>
           </el-form-item>
         </el-form>
