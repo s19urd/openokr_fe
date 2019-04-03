@@ -53,7 +53,7 @@
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
               <el-tag>{{ item.taskStartTime }} ~ {{ item.taskEndTime }}</el-tag>
             </div>
-            <el-tag>jira编码:{{ item.jiraLabel }}</el-tag>由
+            <el-tag>Jira编码:<a class="link" v-if="item.jiraLabel" :href="item.jiraLabel">{{ item.jiraLabel }}</a></el-tag>由
             <span class="person">{{ item.createUserName || '系统导入' }} </span> <template v-if="item.createUserName"> 创建</template>
           </div>
         </div>
@@ -178,7 +178,7 @@ export default {
 
     search (searchForm) {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
-        this.taskList = res.data && res.data.data
+        this.taskList = res.data && res.data.data || []
         this.totalRecord = res.data && res.data.totalRecord
         this.taskList.forEach((item, index) => {
           item.taskStartTime = timestampsToDate(item.taskStartTime)
@@ -296,6 +296,11 @@ export default {
       margin-right: 58px;
       color: #4c84ff;
       font-size: 14px;
+    }
+
+    .link {
+      text-decoration: underline !important;
+      margin-left: 4px;
     }
   }
 

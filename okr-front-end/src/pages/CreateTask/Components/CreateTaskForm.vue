@@ -95,8 +95,8 @@
           </el-col>  
       </el-row>
 
-      <el-form-item label="jira标签: " label-width="72px">
-        <el-input class="jiraInputWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
+      <el-form-item label="Jira标签: " label-width="72px">
+        <el-input class="jiraInputWidth" placeholder="请填写Jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
       <el-input
