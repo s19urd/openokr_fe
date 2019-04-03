@@ -433,6 +433,12 @@
       }
     }
 
+    .el-select,
+    .el-input {
+      width: 188px;
+      max-width: 100%;
+    }
+
     .el-form-item__label {
       text-align: left;
       width: 82px !important;
@@ -553,12 +559,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-  }
-
-  .el-select,
-  .el-input {
-    width: 188px;
-    max-width: 100%;
   }
 
   .sharProjectItem {

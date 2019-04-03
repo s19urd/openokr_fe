@@ -97,11 +97,9 @@ export default {
       }
       let promiseAll = Promise.all(promiseArray)
       promiseAll.then((resultArray)=> {
-        console.log(resultArray)
         let res = resultArray[0]
         if (res.code === 0) {
           this.pageData = res.data
-          console.log(this.pageData)
           //渲染统计图表
           setTimeout(() => {
             this.drawPie()
@@ -137,16 +135,16 @@ export default {
         "#F56C6C",
         "#909399",
         "##FFEF40"
-      ];
+      ]
       //如果有数据
-      if (this.pageData.length > 0) {
-        data = this.pageData.map((item, index) => {
-          names.push(item.orgName);
-          return {
+      if (this.tableData.length > 0) {
+        data = this.tableData.map((item, index) => {
+          names.push({name: `${item.orgName}  |   ${item.duration}h      ${item.percentage}`, icon: 'circle'})
+          return { 
             value: item.duration,
-            name: item.orgName
-          };
-        });
+            name:   `${item.orgName}  |   ${item.duration}h      ${item.percentage}`
+          }
+        })
       } else {
         data = [
           {
@@ -155,28 +153,24 @@ export default {
           }
         ];
       }
+      let reportStartDateShow = this.searchParam.reportStartDateShow
       // 绘制图表
       this.pieChart.setOption({
         title: {
           text: "按照人员所属部门统计 " + this.searchParam.reportStartDateShow,
           textStyle: { fontWeight: 400, fontSize: "14px" }
         },
-        tooltip: {
+        tooltip: {  
           trigger: "item",
-          formatter: "{a} <br/>{b} : {c} ({d}%)"
+          formatter: function (params, ticket, callback) {
+           return `${reportStartDateShow}<br>${params.data.name}`
+          }
         },
         legend: {
           orient: "vertical",
           left: "300px",
           top: "top",
-          data: names,
-          formatter: function() {
-            let showData = []
-            this.pageData.forEach((item, index) => {
-              showData.push(item.name + item.duration)
-            })
-            return showData
-          }
+          data: names
         },
         color: colors,
         series: [

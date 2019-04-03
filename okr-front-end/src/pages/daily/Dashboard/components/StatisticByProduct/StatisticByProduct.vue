@@ -109,7 +109,6 @@
       },
       //表格统计
       getSummaries (param) {
-        console.log(param)
         const { columns, data } = param
         const sums = []
         columns.forEach((column, index) => {
@@ -139,7 +138,6 @@
       getData (vo){
         this.searchParam = vo ? Object.assign({}, vo) : this.searchParam
         this.searchParam.categoryId = this.weekSearchType
-        console.log(this.searchParam)
         let promiseArray = [],
             promiseTable,
             promiseLine
@@ -154,7 +152,6 @@
         }
         let promiseAll = Promise.all(promiseArray)
         promiseAll.then((resultArray)=> {
-          console.log(resultArray)
           let res = resultArray[0]
           if (res.code === 0) {
             this.pageData = res.data
@@ -196,12 +193,12 @@
           "#F5FC6C",
         ]
         //如果有数据
-        if (this.pageData.length > 0) {
-          data = this.pageData.map((item, index) => {
-            names.push(item.taskName)
+        if (this.tableData.length > 0) {
+          data = this.tableData.map((item, index) => {
+            names.push({name: `${item.taskName}  |   ${item.duration}h      ${item.percentage}`, icon: 'circle'})
             return {
               value: item.duration,
-              name: item.taskName
+              name: `${item.taskName}  |   ${item.duration}h      ${item.percentage}`
             }
           })
         } else {
@@ -212,6 +209,8 @@
             }
           ]
         }
+
+        let reportStartDateShow = this.searchParam.reportStartDateShow
         //绘制图表
         this.pieChart.setOption({
           title: {
@@ -220,10 +219,12 @@
           },
           tooltip: {
             trigger: "item",
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
+            formatter: function (params, ticket, callback) {
+              return `${reportStartDateShow}<br>${params.data.name}`
+            }
           },
           legend: {
-          orient: "vertical",
+            orient: "vertical",
             left: "300px",
             top: "top",
             data: names
