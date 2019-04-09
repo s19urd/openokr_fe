@@ -239,7 +239,7 @@
     mounted () {
       this.$api.okr.task.queryTeamList().then(res => {
         this.teamList = res.data
-        this.selectedTeamId = this.teamList[0].id
+        this.selectedTeamId = this.teamList && this.teamList.length && this.teamList[0].id
         this.getData()
       })
     }
