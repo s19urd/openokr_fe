@@ -235,23 +235,41 @@
                       </el-option>
                     </el-select>
                   </div>
+                    <div class="inline-block ml20">
+                      <span class="lab">团队：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.teamId"
+                        placeholder="请选择"
+                        class="w80off"
+                      >
+                        <el-option
+                          v-for="item in teamList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                  </div>
                   <div class="inline-block ml20">
-                    <span class="lab">团队：</span>
+                    <span class="lab">填报人：</span>
                     <el-select
                       filterable
                       clearable
-                      v-model="scope.form.teamId"
+                      v-model="scope.form.reportUserIdList"
                       placeholder="请选择"
                       class="w80off"
                     >
                       <el-option
-                        v-for="item in teamList"
+                        v-for="item in realList"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value">
                       </el-option>
                     </el-select>
                   </div>
+
 
                 </template>
                 <!--表格-->
@@ -350,9 +368,11 @@
           searchStartEndDate: [],
           taskId:'',
           teamId:'',
+          reportUserIdList:''
         },
         taskList: [],
         teamList:[],
+        realList:[],
         activeTabName: "first",
         tabIndex:0,
       };
@@ -466,6 +486,18 @@
                 if(teamId.indexOf(item.teamId)==-1){
                   teamId.push(item.teamId)
                   this.teamList.push({ value: item.teamId, label: item.teamName })
+                }
+              }
+            })
+
+            //填报人-下拉
+            this.realList=[]
+            let id=[]
+            resData[0].userVOList.map(item => {
+              if(item.id!==null || item.realName!==null){
+                if(id.indexOf(item.id)==-1){
+                  id.push(item.id)
+                  this.realList.push({ value: item.id, label: item.realName })
                 }
               }
             })

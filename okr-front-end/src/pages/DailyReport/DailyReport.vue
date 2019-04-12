@@ -330,6 +330,13 @@
               this.flag = false
               return
             }
+
+            if(item.remark === "") {
+              this.$message.warning('工作内容不能为空！')
+              this.dialogVisible = false
+              this.flag = false
+              return
+            }
           })
         }
         if (this.flag) {
