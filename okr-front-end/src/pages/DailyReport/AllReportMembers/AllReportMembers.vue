@@ -122,6 +122,7 @@
             width="150"
             width="100"
             align="center"
+          >
           </el-table-column>
           <el-table-column
             prop="auditStatus"
