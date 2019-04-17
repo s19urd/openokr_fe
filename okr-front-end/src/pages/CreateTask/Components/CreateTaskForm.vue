@@ -6,11 +6,21 @@
     @close="close">
     <el-form :model="taskForm" ref="taskForm">
       <el-form-item label="任务名称：" prop="taskName" class="isRequired">
-        <el-input style="width: 60%" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
+        <el-input style="width: 350px; max-width: 100%" placeholder="请输入任务名称" v-model="taskForm.taskVO.taskName"></el-input>
+      </el-form-item>
+
+      <el-form-item label="起止时间:" class="dateItem isRequired">
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="到"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间">
+        </el-date-picker>
       </el-form-item>
 
       <el-form-item label="预计耗时:" prop="estimateTime" label-width="80px" class="estimateTime">
-        <el-input type="number" :min="0" style="width: 30%" placeholder="请输入预计耗时" v-model="taskForm.taskVO.estimateTime">
+        <el-input type="number" :min="0" placeholder="请输入预计耗时" v-model="taskForm.taskVO.estimateTime">
           <template slot="append">h</template>
         </el-input >
       </el-form-item>
@@ -28,6 +38,8 @@
    
       <el-row
         :gutter="12"
+        type="flex"
+        align="middle"
         class="sharProjectItem"
         v-for="(item, index) in taskForm.apportionVOS"
         :key="index"
@@ -70,42 +82,52 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="1" class="alignCenter  remove">
+          <el-col :span="1" class="remove">
             <button class="button" @click="deleteShareTaskItem(item, index)"  v-if="taskForm.apportionVOS.length !== 1">
               <i class="el-icon-remove"></i>
             </button>
           </el-col>
+
+          <el-col :span="1" class="plusIcon" v-if="taskForm.apportionVOS.length-1 === index">
+            <button class="button add" @click="addShareTaskItem">
+              <i class="el-icon-circle-plus"></i>
+            </button>
+          </el-col>  
       </el-row>
-      
-      <el-col :span="1" class="plusIcon">
-        <button class="button add" @click="addShareTaskItem">
-          <i class="el-icon-circle-plus"></i>
-        </button>
-      </el-col>
 
-  
-      <el-form-item label="起止时间:" class="dateItem isRequired">
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator="到"
-          start-placeholder="开始时间"
-          end-placeholder="结束时间">
-        </el-date-picker>
-      </el-form-item>
-  
-
-      <el-form-item label="jira标签: " label-width="72px">
-        <el-input class="maxWidth" placeholder="请填写jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
+      <el-form-item label="Jira标签: " label-width="72px">
+        <el-input class="jiraInputWidth" placeholder="请填写Jira标签" v-model="taskForm.taskVO.jiraLabel"></el-input>
       </el-form-item >
 
-      <el-form-item label="参与人员: ">
+      <el-input
+        class="treeSearch"
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+
+      <el-form-item label="参与人员: " class="userTreeItem">
         <el-tree
+          class="userTree"
           :data="userTree"
           show-checkbox
           node-key="id"
+          :default-expanded-keys="taskForm.userIds"
           :default-checked-keys="taskForm.userIds"
+          @check="handleChange"
+          :filter-node-method="filterNode"
           ref="userTree"></el-tree>
+          <div class="selectedUser" v-if="selectedUserList.length > 0">
+            <span class="text">选中参与人员：</span>
+            <el-tag
+             closable
+             @close="handleClose(index, item.id)"
+             v-for="(item, index) in selectedUserList"
+             :key="item.id"
+            >
+            {{ item.name }}
+            </el-tag>
+          </div>
+
       </el-form-item >
 
       <el-form-item label="关联KR: ">
@@ -169,7 +191,9 @@
         userTree: [],
         KRTrees: [],
         teamList: [],
-        flag: true
+        flag: true,
+        selectedUserList: [],
+        filterText: ''
       } 
     },
 
@@ -223,15 +247,12 @@
       },
 
       changeReleatedProjectList (item) {
-        console.log('33333333333333333333333')
         this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
           // item.projectReleatedList = []
           item.projectReleatedList = res.data
-          console.log(res.data[0]);
           
           item.apportionNameId = res.data.length ? res.data[0].id : ''
           item.apportionName = res.data.length ? res.data[0].name : ''
-          console.log(item.projectReleatedList)
         })
       },
 
@@ -287,6 +308,28 @@
         }
       },
 
+      handleChange () {        
+        let nodeList = this.$refs.userTree.getCheckedNodes()
+        let selectedUserList = []
+        if (nodeList.length > 0) {
+          nodeList.forEach(item => {
+            !item.children && selectedUserList.push({ name: item.label, id: item.id })
+          })
+        }
+        this.selectedUserList = selectedUserList
+      },
+      
+      handleClose (index, tag) {
+        this.selectedUserList.splice(index, 1)
+        this.taskForm['userIds'].splice(this.taskForm['userIds'].indexOf(tag), 1)
+        this.$refs.userTree.setCheckedKeys(this.taskForm['userIds'])
+      },
+
+      filterNode(value, data) {
+        if (!value) return true;
+        return data.label.indexOf(value) !== -1;
+      },
+
       confirm () {
         if(this.$refs.KRTrees) {
           this.taskForm['krIds'] = this.$refs.KRTrees.getCheckedKeys()
@@ -301,7 +344,7 @@
             this.$emit('update:dialogVisible', false)
             if (res.code === 0) {
               this.$message.success('保存成功！')
-              this.$router.go(0)
+              this.$emit('update')
             } else {
               this.$message.success(res.message)
             }
@@ -322,6 +365,10 @@
           this.taskForm.taskVO['taskStartTime'] = this.dateRange[0]
           this.taskForm.taskVO['taskEndTime'] = this.dateRange[1]
         }
+      },
+
+      filterText(val) {
+        this.$refs.userTree.filter(val)
       }
     },
 
@@ -339,6 +386,11 @@
 
       this.$api.okr.task.queryUsers().then(res => {
         this.userTree = res
+        if (this.userTree.length > 0) {
+          this.$nextTick(() => {
+            this.handleChange()
+          })
+        }
       })
 
       this.$api.okr.task.queryOKRTreeData().then(res => {
@@ -360,8 +412,6 @@
           this.taskForm.apportionVOS.map((item, index) => {
             this.$api.okr.task.getApportionSelectList(item.categoryId).then(res=> {
               item.projectReleatedList = res.data
-              console.log("888888888888888888888")
-              console.log(item.projectReleatedList)
             })
           })
         }
@@ -379,9 +429,14 @@
 
     .el-col {
       &.remove {
-        transform: translateY(55%);
-        margin-left: -8px;
+        transform: translateY(-50%);
       }
+    }
+
+    .el-select,
+    .el-input {
+      width: 188px;
+      max-width: 100%;
     }
 
     .el-form-item__label {
@@ -416,6 +471,28 @@
       }
     }
 
+    .selectedUser {
+      float: left;
+      width: 40%;
+      padding-top: 28px;
+      padding-left: 82px;
+
+      .text {
+        display: inline-block;
+        width: 100%;
+      }
+    }
+
+    .userTreeItem {
+      .el-form-item__label {
+        margin-top: -40px;
+      }
+    }
+
+    .treeSearch {
+      margin-left: 82px;
+    }
+
     .el-icon-remove {
       color: #ff000099;
     }
@@ -429,9 +506,9 @@
     }
 
     .plusIcon {
-      float: right;
-      margin-top: -50px;
       text-align: right;
+      padding-right: 3px!important;
+      transform: translateY(-50%);
     }
 
     .dateItem {
@@ -447,12 +524,6 @@
       }
     }
 
-    .el-input {
-      &.maxWidth {
-        width: 140px;
-      }
-    }
-
     .dialog-footer {
       display: flex;
       justify-content: space-between;
@@ -460,7 +531,12 @@
 
     .el-tree {
       float: left;
-      padding-top: 10px;
+
+      &.userTree {
+        padding-top: 28px;
+        padding-left: 82px;
+        padding-right: 82px;
+      }
 
       .el-tree__empty-text {
         position: relative;
@@ -486,13 +562,11 @@
   }
 
   .sharProjectItem {
-    .el-select {
-      width: 188px;
-    }
 
     .apportionRate {
       &.el-input-group {
         width: 55%;
+        min-width: 90px;
 
         .el-input-group__append {
           padding-left: 8px;
@@ -501,10 +575,4 @@
       }
     }
   }
-
-  .alignCenter {
-    text-align: center;
-  }
 </style>
-
-

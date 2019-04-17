@@ -34,7 +34,7 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" @click="serach(searchForm)">搜索</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="search(searchForm)">搜索</el-button>
           </el-form-item>
     
           <el-form-item>
@@ -47,12 +47,13 @@
       <li class="taskItem" v-for="(item, index) in taskList" :key="index">
         <div class="collapseHeader_left">
           <span class="taskName" v-text="item.taskName"></span>
-          <span style="margin-left: 12px" v-if="item.estimateTime">该任务预计耗时：<span class="timeColor">{{ item.estimateTime }} h</span></span>
+          <span style="margin-left: 16px" v-if="item.estimateTime">该任务预计耗时：<span class="timeColor">{{ (item.estimateTime/8).toFixed(2) }} 天</span></span>
+          <span style="margin-left: 20px" v-if="item.totalWorkingHours">该任务目前累计耗时：<span class="timeColor">{{ (item.totalWorkingHours/8).toFixed(2) }} 天</span></span>
           <div class="text">
             <div class="timeRange" v-if="item.taskStartTime && item.taskEndTime">
               <el-tag>{{ item.taskStartTime }} ~ {{ item.taskEndTime }}</el-tag>
             </div>
-            <el-tag>jira编码:{{ item.jiraLabel }}</el-tag>由
+            <el-tag>Jira编码:<a class="link" v-if="item.jiraLabel" :href="item.jiraLabel">{{ item.jiraLabel }}</a></el-tag>由
             <span class="person">{{ item.createUserName || '系统导入' }} </span> <template v-if="item.createUserName"> 创建</template>
           </div>
         </div>
@@ -85,8 +86,8 @@
       @size-change="handleSizeChange"
       :page-size="searchForm.pageSize"
       :page-sizes="[3, 5, 7, 10]"
-      layout="sizes, prev, pager, next"
-      :total="totalPage"
+      layout="total, sizes, prev, pager, next"
+      :total="totalRecord"
       @current-change="fetchData"
       class="alginCenter">  
     </el-pagination>
@@ -94,7 +95,8 @@
     <template v-if ="isShow">
       <create-task-form
         :dialog-visible.sync="isShow"
-        :task-form-edit.sync="itemFormInfo"></create-task-form>
+        :task-form-edit.sync="itemFormInfo"
+        @update="search(searchForm)"></create-task-form>
     </template>
   </div>
 </template>
@@ -124,7 +126,7 @@ export default {
 
       teamList: [],
 
-      totalPage: 0,
+      totalRecord: 0,
       taskList: [],
 
       isShow: false,
@@ -169,17 +171,17 @@ export default {
       this.$api.okr.task.deleteTask(item.id).then(res => {
         if(res.code === 0) {
           this.$message.success('删除成功')
-          this.serach(this.searchForm)
+          this.search(this.searchForm)
         }
       })
     },
 
-    serach (searchForm) {
+    search (searchForm) {
       this.$api.okr.task.getTaskListByPage(searchForm).then(res =>{
-        this.taskList = res.data.data
-        this.totalPage = res.data.totalPage
+        this.taskList = res.data && res.data.data || []
+        this.totalRecord = res.data && res.data.totalRecord
         this.taskList.forEach((item, index) => {
-          item.taskStartTime = timestampsToDate(item.taskStartTime) 
+          item.taskStartTime = timestampsToDate(item.taskStartTime)
           item.taskEndTime = timestampsToDate(item.taskEndTime) 
         })
 
@@ -193,7 +195,7 @@ export default {
     
     fetchData (pageIndex) {
       this.searchForm.currentPage = pageIndex || this.searchForm.currentPage || 1
-      this.serach(this.searchForm)
+      this.search(this.searchForm)
     }
   },
 
@@ -211,7 +213,7 @@ export default {
       this.teamList = res.data
     })
 
-    this.serach(this.searchForm)
+    this.search(this.searchForm)
   }
 };
 </script>
@@ -295,6 +297,11 @@ export default {
       color: #4c84ff;
       font-size: 14px;
     }
+
+    .link {
+      text-decoration: underline !important;
+      margin-left: 4px;
+    }
   }
 
   ul {
@@ -368,6 +375,11 @@ export default {
       height: 42px;
       line-height: 42px;
     }
+  }
+
+  .el-select,
+  .el-input {
+    width: auto
   }
 
   .el-input__inner {

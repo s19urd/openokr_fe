@@ -131,7 +131,7 @@
                   <el-table-column
                     prop="reportDay"
                     label="报工日期"
-                    width="150px"
+                    width="100px"
                     fixed
                   >
                     <template slot-scope="props">
@@ -140,34 +140,44 @@
                   </el-table-column>
                   <el-table-column
                     prop="taskName"
-                    label="任务名称">
+                    label="任务名称"
+                    width="300">
                   </el-table-column>
                   <el-table-column
                     prop="reportUserName"
                     label="填报人"
-                    width="150">
+                    width="100">
                   </el-table-column>
                   <el-table-column
                     prop="teamName"
-                    label="所属团队">
+                    label="所属团队"
+                    width="200">
                   </el-table-column>
                   <el-table-column
                     prop="duration"
-                    label="耗费工时（h）"
-                    width="150">
+                    label="耗费工时(h)"
+                    width="100"
+                    align="center"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="remark"
+                    label="工作内容"
+                    min-width="300"
+                  >
                   </el-table-column>
                   <el-table-column
                     prop="auditStatus"
                     label="当前状态"
                     width="80"
-                  >
+                    fixed="right">
                     <template slot-scope="props">
                       <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
                       <el-tag size="mini" type="success" v-if="props.row.auditStatus==='01'">已确认</el-tag>
                       <el-tag size="mini" type="danger" v-if="props.row.auditStatus==='02'">已驳回</el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column width="200" label="操作" fixed="right">
+                  <el-table-column width="190" label="操作" fixed="right">
                     <template slot-scope="props">
                       <el-button-group>
                         <el-button type="danger" size="mini" v-if="props.row.auditStatus==='00' || props.row.auditStatus==='02' " @click="removeItem(props.row)"> 删除</el-button>
@@ -225,17 +235,34 @@
                       </el-option>
                     </el-select>
                   </div>
+                    <div class="inline-block ml20">
+                      <span class="lab">团队：</span>
+                      <el-select
+                        filterable
+                        clearable
+                        v-model="scope.form.teamId"
+                        placeholder="请选择"
+                        class="w80off"
+                      >
+                        <el-option
+                          v-for="item in teamList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                  </div>
                   <div class="inline-block ml20">
-                    <span class="lab">团队：</span>
+                    <span class="lab">填报人：</span>
                     <el-select
                       filterable
                       clearable
-                      v-model="scope.form.teamId"
+                      v-model="scope.form.reportUserIdList"
                       placeholder="请选择"
                       class="w80off"
                     >
                       <el-option
-                        v-for="item in teamList"
+                        v-for="item in realList"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value">
@@ -243,13 +270,14 @@
                     </el-select>
                   </div>
 
+
                 </template>
                 <!--表格-->
                 <template slot="tableColumns">
                   <el-table-column
                     prop="reportDay"
                     label="报工日期"
-                    width="150px"
+                    width="100px"
                     fixed
                   >
                     <template slot-scope="props">
@@ -258,27 +286,37 @@
                   </el-table-column>
                   <el-table-column
                     prop="taskName"
-                    label="任务名称">
+                    label="任务名称"
+                    width="350">
                   </el-table-column>
 
                   <el-table-column
                     prop="reportUserName"
                     label="填报人"
-                    width="150">
+                    width="100">
                   </el-table-column>
                   <el-table-column
                     prop="teamName"
-                    label="所属团队">
+                    label="所属团队"
+                    width="200">
                   </el-table-column>
                   <el-table-column
                     prop="duration"
-                    label="耗费工时（h）"
-                    width="150">
+                    label="耗费工时(h)"
+                    width="100"
+                    align="center"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="remark"
+                    label="工作内容"
+                    min-width="300"
+                  >
                   </el-table-column>
                   <el-table-column
                     prop="auditStatus"
                     label="当前状态"
-                    width="150"
+                    width="80"
                     fixed="right"
                   >
                     <template slot-scope="props">
@@ -330,9 +368,11 @@
           searchStartEndDate: [],
           taskId:'',
           teamId:'',
+          reportUserIdList:''
         },
         taskList: [],
         teamList:[],
+        realList:[],
         activeTabName: "first",
         tabIndex:0,
       };
@@ -449,6 +489,18 @@
                 }
               }
             })
+
+            //填报人-下拉
+            this.realList=[]
+            let id=[]
+            resData[0].userVOList.map(item => {
+              if(item.id!==null || item.realName!==null){
+                if(id.indexOf(item.id)==-1){
+                  id.push(item.id)
+                  this.realList.push({ value: item.id, label: item.realName })
+                }
+              }
+            })
           })
         }
 
@@ -532,7 +584,7 @@
     mounted () {
       setTimeout(()=>{
         //获取全部报工
-      this.tableMainData()
+//      this.tableMainData()
       this.sarchCondition()
       },0)
     }

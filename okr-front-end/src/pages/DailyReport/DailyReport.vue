@@ -4,7 +4,7 @@
       <el-form class="">
         <div class="tip flex">
           <div class="flex1">
-            <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在备注信息里唠叨唠叨今天的收获呢！明天也要加油哦～
+            <img class="fl" :src="imageUrl"/>今天又完成工作了鸭！可以在工作内容里唠叨唠叨今天的收获呢！明天也要加油哦～
           </div>
           <div class="fr">
             <!--管理员-->
@@ -33,7 +33,7 @@
           </el-table-column>
           <el-table-column prop="taskName" width="300" label="任务名称"></el-table-column>
           <el-table-column prop="duration" width="150" label="报工时长(h)"></el-table-column>
-          <el-table-column prop="remark" label="备注"></el-table-column>
+          <el-table-column prop="remark" label="工作内容"></el-table-column>
           <el-table-column prop="auditStatus" width="150" label="状态">
             <template slot-scope="props">
               <el-tag size="mini" v-if="props.row.auditStatus==='00'">待审核</el-tag>
@@ -100,7 +100,7 @@
 
             <el-table-column
               prop="name"
-              label="备注信息"
+              label="工作内容"
             >
               <template slot-scope="scope">
                 <el-input v-model="scope.row.remark" maxlength="200" placeholder="请输入"></el-input>
@@ -160,13 +160,13 @@
                              type="date"
                              format="yyyy-MM-dd"
                              :picker-options="pickerOptions2"
+                             :clearable="false"
             >
             </el-date-picker>
           </el-form-item>
           <el-form-item label="任务名称">
             <el-select class="w430"
                        filterable
-                       clearable
                        v-model="editWork.taskId"
                        placeholder="请选择">
               <el-option
@@ -183,7 +183,7 @@
           <el-form-item label="状态" class="hide">
             <el-input class="w430" v-model="editWork.auditStatus" placeholder="请输入" :disabled="false"></el-input>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="工作内容">
             <el-input class="w430" v-model="editWork.remark" type="textarea" :rows="3" placeholder="请输入"></el-input>
           </el-form-item>
         </el-form>
@@ -326,6 +326,13 @@
             }
             if(this.daySumWorkingHour>15){
               this.$message.warning('每天的报工时长不能超过15小时！')
+              this.dialogVisible = false
+              this.flag = false
+              return
+            }
+
+            if(item.remark === "") {
+              this.$message.warning('工作内容不能为空！')
               this.dialogVisible = false
               this.flag = false
               return

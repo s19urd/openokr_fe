@@ -4,12 +4,12 @@
       <el-row>
         <el-col :span="12" style="padding:0  20px 0 0">
           <el-table
-            header-row-class-name="gray"
-            :data="tableData"
-            :summary-method="getSummaries"
-            show-summary
-            style="width: 100%"
-          >
+              header-row-class-name="gray"
+              :data="tableData"
+              :summary-method="getSummaries"
+              show-summary
+              style="width: 100%"
+            >
             <el-table-column prop="orgName" label="部门" width="180"></el-table-column>
             <el-table-column prop="orgUserNum" label="人数"></el-table-column>
             <el-table-column prop="duration" label="工时"></el-table-column>
@@ -34,7 +34,6 @@
 <script>
 import Vue from "vue";
 import util from "@/libs/util.js";
-import { setTimeout } from 'timers';
 export default {
   name: "statisticByMember",
 
@@ -51,9 +50,17 @@ export default {
       totalDuration: 0
     };
   },
+  props: {
+    searchKeys: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
+  },
   computed: {
     tableData() {
-      if (this.pageData.length == 0) {
+      if (this.pageData.length === 0) {
         this.totalDuration = 0;
         return [];
       }
@@ -74,41 +81,44 @@ export default {
   methods: {
     //获取数据
     getData(vo) {
-      this.searchParam = Object.assign({}, vo)
+      this.searchParam =Object.assign({},  vo ? vo : this.searchKeys) 
       let promise = {};
+      let promiseArray = [],
+          promiseTable,
+          promiseLine
 
-      if (this.searchParam.searchType === "0") {
-        promise = this.$api.daily.weekly.getStatisticByOrg(this.searchParam);
-        promise.then(res => {
-          if (res.code === 0) {
-            this.pageData = res.data;
-            //渲染统计图表
-            setTimeout(() => {
-              this.drawPie();
-            }, 100);
-          }
-        });
-        return promise;
-      }
-      if (
-        this.searchParam.searchType === "1" ||
-        this.searchParam.searchType === "2"
-      ) {
-        promise = this.$api.daily.weekly.getStatisticChartByOrg(
+      promiseTable = this.$api.daily.weekly.getStatisticByOrg(this.searchParam);
+      promiseArray.push(promiseTable)
+      if ( this.searchParam.searchType === "1" || this.searchParam.searchType === "2") {
+        promiseLine = this.$api.daily.weekly.getStatisticChartByOrg(
           this.searchParam
         )
-        promise.then(res => {
+        promiseArray.push(promiseLine)
+      }
+      let promiseAll = Promise.all(promiseArray)
+      promiseAll.then((resultArray)=> {
+        let res = resultArray[0]
+        if (res.code === 0) {
+          this.pageData = res.data
+          //渲染统计图表
+          setTimeout(() => {
+            this.drawPie()
+          }, 100)
+        }
+        if (this.searchParam.searchType === "1" || this.searchParam.searchType === "2") {
+          res = resultArray[1]
           if (res.code === 0) {
-            this.chartData = res.data;
+            this.chartData = res.data
             //渲染统计图表
             setTimeout(() => {
-              this.drawLine();
-            }, 100);
+              this.drawLine()
+            }, 100)
           }
-        });
-        return promise;
-      }
+        }
+      })
+      return promiseAll
     },
+
     //渲染饼图
     drawPie() {
       if (!this.pieChart) {
@@ -125,16 +135,16 @@ export default {
         "#F56C6C",
         "#909399",
         "##FFEF40"
-      ];
+      ]
       //如果有数据
-      if (this.pageData.length > 0) {
-        data = this.pageData.map((item, index) => {
-          names.push(item.orgName);
-          return {
+      if (this.tableData.length > 0) {
+        data = this.tableData.map((item, index) => {
+          names.push({name: `${item.orgName}  |   ${item.duration}h      ${item.percentage}`, icon: 'circle'})
+          return { 
             value: item.duration,
-            name: item.orgName
-          };
-        });
+            name:   `${item.orgName}  |   ${item.duration}h      ${item.percentage}`
+          }
+        })
       } else {
         data = [
           {
@@ -143,15 +153,18 @@ export default {
           }
         ];
       }
+      let reportStartDateShow = this.searchParam.reportStartDateShow
       // 绘制图表
       this.pieChart.setOption({
         title: {
           text: "按照人员所属部门统计 " + this.searchParam.reportStartDateShow,
           textStyle: { fontWeight: 400, fontSize: "14px" }
         },
-        tooltip: {
+        tooltip: {  
           trigger: "item",
-          formatter: "{a} <br/>{b} : {c} ({d}%)"
+          formatter: function (params, ticket, callback) {
+           return `${reportStartDateShow}<br>${params.data.name}`
+          }
         },
         legend: {
           orient: "vertical",
@@ -186,6 +199,7 @@ export default {
       let data = []
       let _series = []
       let _xAxisData = []
+      let _xAxisName = ''
       let colors = [
         "#409EFF",
         "#67C23A",
@@ -198,14 +212,21 @@ export default {
       //如果有数据
       if (this.chartData) {
         let xaxisDataLen = this.chartData.xaxisData.length
-        for ( let i=1; i< xaxisDataLen; i++ ) {
-          if (this.searchParam.searchType === '1') {
+
+        if (this.searchParam.searchType === '1') {
+          for ( let i=1; i< xaxisDataLen; i++ ) {
             _xAxisData.push(`${this.searchParam.reportStartDateShow}第${i}周`)
           }
-          if (this.searchParam.searchType === '2') {
+          _xAxisName = '时间/周'
+        }
+
+        if (this.searchParam.searchType === '2') {
+          for ( let i=1; i< xaxisDataLen; i++ ) {
             _xAxisData.push(`${this.searchParam.reportStartDateShow}第${i}月`)
           }
+          _xAxisName = '时间/月'
         }
+
         this.chartData.lineSeriesData.map(item => {
           _series.push({
             name: item.name,
@@ -243,12 +264,12 @@ export default {
         },
         xAxis: {
           type: "category",
-          name: "时间",
+          name:  _xAxisName ,
           data: _xAxisData
         },
         yAxis: {
           type: "value",
-          name: "工时/h"
+          name: "工时/小时"
         },
         legend: {
           orient: "vertical",

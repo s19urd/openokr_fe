@@ -8,7 +8,7 @@
         </div>
         <div class="basicInfo" v-if="taskVO.taskStartTime && taskVO.taskEndTime">
           <el-tag>任务周期：{{ taskVO.taskStartTime }} ~ {{ taskVO.taskEndTime }}</el-tag>
-          <el-tag>jira编码:{{ taskVO.jiraLabel }}</el-tag>由
+          <el-tag>Jira编码:<a class="link" v-if="taskVO.jiraLabel" :href="taskVO.jiraLabel">{{ taskVO.jiraLabel }}</a></el-tag>由
           <span class="person">{{ taskVO.createUserName || '系统导入' }} </span><template v-if="taskVO.createUserName"> 创建</template>
         </div>
       </div>
@@ -159,11 +159,12 @@ export default {
       color: #4c84ff;
     }
 
-    .text {
-      margin-top: 20px;
+    .basicInfo {
+      margin-bottom: 20px;
 
-      .basicInfo {
-        margin-bottom: 20px;
+      .link {
+        text-decoration: underline !important;
+        margin-left: 4px;
       }
     }
   }

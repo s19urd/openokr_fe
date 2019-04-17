@@ -66,6 +66,9 @@ export default {
       condition.reportEndDayStr = condition.searchStartEndDate[1];
       delete condition.searchStartEndDate;
     }
+    if(condition.reportUserIdList!=='' && condition.reportUserIdList!==undefined ){
+      condition.reportUserIdList = [condition.reportUserIdList];
+    }
     return axios.post('/api/daily/getDailyPage.json', {
       ...condition,
       ...pageInfo

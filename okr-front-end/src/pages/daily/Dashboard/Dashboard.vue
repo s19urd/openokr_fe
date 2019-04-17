@@ -9,6 +9,19 @@
       </el-radio-group>
     </div>
     <div class="tab-wrap">
+      <div class="releatedTeam">
+        <span>关联团队：</span>
+        <el-select v-model="selectedTeamId">
+          <el-option
+            v-for="item in teamList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+      </div>
+    
       <el-radio-group v-model="searchType" size="small">
         <el-radio-button
           class="radio-sty2"
@@ -18,6 +31,7 @@
           {{item.name}}
         </el-radio-button>
       </el-radio-group>
+
       <span class="d2-ml-20">
          当前统计周期：
         <el-select v-model="reportStartDateStr" @change="changeStartDate">
@@ -32,7 +46,7 @@
     </div>
     <div class="tab-content-wrap" v-loading="tabLoading"  element-loading-text="加载中">
       <statistic-by-member ref="statisticByMember" v-show="pageType==='1'"></statistic-by-member>
-      <statistic-by-product ref="statisticByProduct" v-show="pageType==='2'"></statistic-by-product>
+      <statistic-by-product ref="statisticByProduct" v-show="pageType==='2'" :search-keys="searchKeys"></statistic-by-product>
     </div>
   </div>
 </template>
@@ -69,7 +83,9 @@
         reportStartDateShow:'',
         weekSearchType:'1',
         tabLoading:false,
-
+        searchKeys: {},
+        selectedTeamId: '',
+        teamList: [{ id: '4ef00cb7ad60418ba02a5ddc16abb74b', name: 'test team'}]
       };
     },
     computed:{
@@ -145,17 +161,17 @@
         }
 
         return _options;
-      },
-      teamId(){
-        this.$route.params.teamId
       }
     },
     watch:{
-      pageType(){
-
+      pageType (){
+        this.getData()
       },
       reportStartDateStr(){
-        this.getData();
+        this.getData()
+      },
+      selectedTeamId () {
+        this.getData()
       }
     },
     methods: {
@@ -176,8 +192,14 @@
         }
       },
       getSearchParam(){
+        this.searchKeys = {
+          teamId: this.selectedTeamId,
+          searchType: this.searchType,
+          reportStartDateStr: this.reportStartDateStr,
+          reportStartDateShow: this.reportStartDateShow
+        }
         return {
-          teamId:this.teamId||this.$route.params.teamId,
+          teamId: this.selectedTeamId,
           searchType:this.searchType,
           reportStartDateStr:this.reportStartDateStr,
           reportStartDateShow:this.reportStartDateShow
@@ -215,7 +237,11 @@
       },
     },
     mounted () {
-
+      this.$api.okr.task.queryTeamList().then(res => {
+        this.teamList = res.data
+        this.selectedTeamId = this.teamList && this.teamList.length && this.teamList[0].id
+        this.getData()
+      })
     }
   };
 </script>
@@ -229,6 +255,11 @@
   .tab-wrap{
     padding: 20px 0;
     font-size: 14px;
+
+    .el-radio-button__inner {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
   }
   .text-center{
     text-align: center;
@@ -259,6 +290,10 @@
   .echart-sty1{
     border: #ccc solid 1px;
     padding: 20px;
+    margin-right: 20px;
+  }
+  .releatedTeam {
+    display: inline-block;
     margin-right: 20px;
   }
 

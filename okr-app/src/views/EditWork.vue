@@ -121,7 +121,7 @@ export default {
     sumWorkingHour() {
       let sumTemp = 0
       this.totalProjectReport.forEach(item => {
-        sumTemp = sumTemp + Number(item.duration)
+        sumTemp = sumTemp + (item.duration ? Number(item.duration) : 0)
       })
       return sumTemp
     },
@@ -254,7 +254,7 @@ export default {
       pageSize: '',
     }
 
-    Vue.api.editWork.getTaskListByCondition(query).then(res => {
+    Vue.api.editWork.getTaskList(query).then(res => {
       let resPrject = res.data.data
       resPrject.forEach((item, index) => {
         this.projectList.push({ text: item.taskName, taskId: item.id })
@@ -305,15 +305,19 @@ padding: 15px;
   padding-bottom: 2.875rem;
 }
 
-.projectWorkingHour {
-  .van-cell__title {
-    flex-grow: .5;
-    text-align: left;
-  }
+.van-cell__title {
+  text-align: left;
 }
+
 .van-cell__value {
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.projectWorkingHour {
+  .van-cell__title {
+    flex-grow: .5;
+  }
 }
 
 .itemTitleWrap {
