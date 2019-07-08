@@ -242,13 +242,17 @@
         let nowTime = now.getTime()
         let nowDay = now.getDay()||7
         let oneDayTime = 24 * 60 * 60 * 1000
+        let oneMonTime = 2 * 30 * 24 * 60 * 60 * 1000
         //表格显示一周
         let startMondayTime = nowTime - (nowDay - 1) * oneDayTime//周一
         let endSundayTime = nowTime + (7 - nowDay) * oneDayTime//周日
         //新增时间下拉禁用
-        let addStartTime = nowTime  - (nowDay +7) * oneDayTime
+        //let addStartTime = nowTime  - (nowDay +7) * oneDayTime
+        let addStartTime = nowTime  - (nowDay) * oneMonTime//两个月
         //删除时间下拉禁用
         let editStartTime = nowTime  - (nowDay -0) * oneDayTime
+        console.log("startMondayTime："+Vue.filter('dateFormat')(addStartTime, 'yyyy-MM-dd'))
+        console.log("endSundayTime："+Vue.filter('dateFormat')(editStartTime, 'yyyy-MM-dd'))
         result.push(startMondayTime, endSundayTime,addStartTime,editStartTime)
         return result
       },
