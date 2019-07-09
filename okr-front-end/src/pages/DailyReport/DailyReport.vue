@@ -248,9 +248,9 @@
         //新增时间下拉禁用
         //let addStartTime = nowTime  - (nowDay +7) * oneDayTime
         let addStartTime= now.setMonth(now.getMonth()-2)
-        console.log("addStartTime："+Vue.filter('dateFormat')(addStartTime, 'yyyy-MM-dd'))
         //删除时间下拉禁用
         let editStartTime = nowTime  - (nowDay -0) * oneDayTime
+        console.log("addStartTime："+Vue.filter('dateFormat')(addStartTime, 'yyyy-MM-dd'))
         result.push(startMondayTime, endSundayTime,addStartTime,editStartTime)
         return result
       },
