@@ -14,16 +14,16 @@
         </div>
         <div class="fc-view-foot">
           <strong class="txt-all text-primary" @click="toggleContent">
-            <span>{{ showContent ? '查看具体目标': '收起'}}</span>
+            <span>{{ itemInfo.showContent ? '查看具体目标': '收起'}}</span>
             <img
-              :class="{active: showContent}"
+              :class="{active: itemInfo.showContent}"
               class="icon icon-arrow-more"
               src="@/assets/okr/arrow-more.svg"
               alt
             >
           </strong>
         </div>
-        <div class="fc-view-cb" v-if="showContent">
+        <div class="fc-view-cb" v-if="itemInfo.showContent">
           <p v-for="item in itemInfo.Objectives" :key="item.key">{{ item.content }}</p>
         </div>
       </div>
@@ -36,32 +36,39 @@ import Vue from "vue";
 Vue.prototype.$echarts = echarts;
 export default {
   name: "board-map-item",
-  
+
   data() {
     return {
-      itemInfo: {
-        layer: "公司",
-        name: "厦门商集目标",
-        progress: "68%",
-        Objectives: [
-          { key: "1", content: "加快产品反馈收集和迭代速度..." },
-          { key: "2", content: "销售线索增加100%..." },
-          { key: "3", content: "新客户签约成功率达到60%以上" }
-        ]
-      },
-      showContent: false,
-      pieChart: ""
+      // itemInfo: {
+      //   layer: "公司",
+      //   name: "厦门商集目标",
+      //   progress: "68%",
+      //   Objectives: [
+      //     { key: "1", content: "加快产品反馈收集和迭代速度..." },
+      //     { key: "2", content: "销售线索增加100%..." },
+      //     { key: "3", content: "新客户签约成功率达到60%以上" }
+      //   ],
+      //   showContent: false,
+      //   pieChart: ""
+      // }
     };
+  },
+
+  props: {
+      itemInfo: {
+        type: Object,
+        required: true
+      }
   },
 
   methods: {
     toggleContent() {
-      this.showContent = !this.showContent;
+      this.itemInfo.showContent = !this.itemInfo.showContent;
     },
     //渲染饼图
     drawPie() {
-      if (!this.pieChart) {
-        this.pieChart = this.$echarts.init(
+      if (!this.itemInfo.pieChart) {
+        this.itemInfo.pieChart = this.$echarts.init(
           document.getElementById("echart-pie-progress")
         );
       }
@@ -69,7 +76,7 @@ export default {
       let colors = ["#F57677", "#DEDEDE"];
 
       //绘制图表
-      this.pieChart.setOption({
+      this.itemInfo.pieChart.setOption({
         color: colors,
         tooltip: {
           trigger: "item",
@@ -83,10 +90,10 @@ export default {
             label: {
               normal: {
                 show: true,
-                 position: 'center',
+                position: "center",
                 formatter: "{d}%",
                 textStyle: {
-                  fontFamily: '微软雅黑',
+                  fontFamily: "微软雅黑",
                   fontWeight: "normal",
                   fontSize: 12,
                   color: "#212121"
