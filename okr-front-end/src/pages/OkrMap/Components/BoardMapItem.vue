@@ -1,7 +1,7 @@
 <template>
   <div class="maps-layered">
     <dd class="maps-fc-list active">
-      <i class="child-node-num">{{ itemInfo.Objectives.length || 0 }}</i>
+      <i class="child-node-num" v-if="!itemInfo.showContent">{{ itemInfo.objectives.length || 0 }}</i>
       <div class="fc-view">
         <div class="fc-view-con clearfix">
           <i class="fc-view-tip">{{ itemInfo.layer }}</i>
@@ -9,7 +9,7 @@
             <h4 class="title">
               <p>{{ itemInfo.name }}</p>
             </h4>
-            <div class="echart-pie" id="echart-pie-progress"></div>
+            <div class="echart-pie" :id="chartId"></div>
           </div>
         </div>
         <div class="fc-view-foot">
@@ -24,7 +24,7 @@
           </strong>
         </div>
         <div class="fc-view-cb" v-if="itemInfo.showContent">
-          <p v-for="item in itemInfo.Objectives" :key="item.key">{{ item.content }}</p>
+          <p v-for="item in itemInfo.objectives" :key="item.key">{{ item.content }}</p>
         </div>
       </div>
     </dd>
@@ -39,18 +39,7 @@ export default {
 
   data() {
     return {
-      // itemInfo: {
-      //   layer: "公司",
-      //   name: "厦门商集目标",
-      //   progress: "68%",
-      //   Objectives: [
-      //     { key: "1", content: "加快产品反馈收集和迭代速度..." },
-      //     { key: "2", content: "销售线索增加100%..." },
-      //     { key: "3", content: "新客户签约成功率达到60%以上" }
-      //   ],
-      //   showContent: false,
-      //   pieChart: ""
-      // }
+      chartId: Math.random()
     };
   },
 
@@ -69,7 +58,7 @@ export default {
     drawPie() {
       if (!this.itemInfo.pieChart) {
         this.itemInfo.pieChart = this.$echarts.init(
-          document.getElementById("echart-pie-progress")
+          document.getElementById(this.chartId)
         );
       }
 
@@ -115,6 +104,7 @@ export default {
   },
 
   mounted() {
+
     this.drawPie();
   }
 };
