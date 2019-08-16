@@ -41,7 +41,6 @@ const routerConfig = [{
         layout: Blank,
         component: BoardMap
     },
-
     {
         path: '/TeamOKR',
         name: 'TeamOKR',

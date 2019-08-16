@@ -1,33 +1,38 @@
 <template>
-  <div class="maps-layered">
-    <dd class="maps-fc-list active">
-      <i class="child-node-num" v-if="!itemInfo.showContent">{{ itemInfo.objectives.length || 0 }}</i>
-      <div class="fc-view">
-        <div class="fc-view-con clearfix">
-          <i class="fc-view-tip">{{ itemInfo.layer }}</i>
-          <div class="fc-view-text">
-            <h4 class="title">
-              <p>{{ itemInfo.name }}</p>
-            </h4>
-            <div class="echart-pie" :id="chartId"></div>
+  <div>
+    <div class="maps-layered">
+      <dd class="maps-fc-list active">
+        <i class="child-node-num" v-if="!itemInfo.showContent">{{ itemInfo.objectives.length || 0 }}</i>
+        <div class="fc-view">
+          <div class="fc-view-con clearfix">
+            <i class="fc-view-tip">{{ itemInfo.layer }}</i>
+            <div class="fc-view-text">
+              <h4 class="title">
+                <p>{{ itemInfo.name }}</p>
+              </h4>
+              <div class="echart-pie" :id="chartId"></div>
+            </div>
+          </div>
+          <div class="fc-view-foot">
+            <strong class="txt-all text-primary" @click="toggleContent">
+              <span>{{ itemInfo.showContent ? '查看具体目标': '收起'}}</span>
+              <img
+                :class="{active: itemInfo.showContent}"
+                class="icon icon-arrow-more"
+                src="@/assets/okr/arrow-more.svg"
+                alt
+              >
+            </strong>
+          </div>
+          <div class="fc-view-cb" v-if="itemInfo.showContent">
+            <p v-for="item in itemInfo.objectives" :key="item.key">{{ item.content }}</p>
           </div>
         </div>
-        <div class="fc-view-foot">
-          <strong class="txt-all text-primary" @click="toggleContent">
-            <span>{{ itemInfo.showContent ? '查看具体目标': '收起'}}</span>
-            <img
-              :class="{active: itemInfo.showContent}"
-              class="icon icon-arrow-more"
-              src="@/assets/okr/arrow-more.svg"
-              alt
-            >
-          </strong>
-        </div>
-        <div class="fc-view-cb" v-if="itemInfo.showContent">
-          <p v-for="item in itemInfo.objectives" :key="item.key">{{ item.content }}</p>
-        </div>
-      </div>
-    </dd>
+      </dd>
+    </div>
+    <ul v-if="hasChild" class="layers">
+      <board-map-item v-for="(item, index) in itemInfo.children" :key="index" :itemInfo="item"></board-map-item>
+    </ul>
   </div>
 </template>
 <script>
@@ -43,11 +48,17 @@ export default {
     };
   },
 
+  computed: {
+     hasChild() {
+       return this.itemInfo.children && this.itemInfo.children.length
+     }
+  },
+
   props: {
-      itemInfo: {
-        type: Object,
-        required: true
-      }
+    itemInfo: {
+      type: [Object, Array],
+      required: true
+    }
   },
 
   methods: {
@@ -104,13 +115,16 @@ export default {
   },
 
   mounted() {
-
     this.drawPie();
   }
 };
 </script>
 <style lang="scss">
+
 /*========= okr地图 ==========*/
+.layers {
+  display: flex;
+}
 .text-primary {
   color: #4c84ff !important;
 }
