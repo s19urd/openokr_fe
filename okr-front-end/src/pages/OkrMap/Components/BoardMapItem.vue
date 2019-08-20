@@ -31,7 +31,7 @@
       </dd>
     </div>
     <ul v-if="hasChild" class="layers">
-      <board-map-item v-for="(item, index) in itemInfo.children" :key="index" :itemInfo="item"></board-map-item>
+      <board-map-item v-for="(item, index) in itemInfo.children" :key="index" :itemInfo="item" class="item"></board-map-item>
     </ul>
   </div>
 </template>
@@ -124,6 +124,11 @@ export default {
 /*========= okr地图 ==========*/
 .layers {
   display: flex;
+  justify-content: center;
+   .item {
+    //  float: left;
+    
+   }
 }
 .text-primary {
   color: #4c84ff !important;

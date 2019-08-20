@@ -22,3 +22,11 @@ export default {
     }
 }
 </script>
+<style lang="scss">
+   .tree-map {
+       ul {
+           padding-left: 0;
+       }
+   }
+</style>
+
