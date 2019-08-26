@@ -8,7 +8,7 @@
             <i class="fc-view-tip">{{ itemInfo.layer }}</i>
             <div class="fc-view-text">
               <h4 class="title">
-                <p>{{ itemInfo.name }}</p>
+                <p>{{ itemInfo.label }}</p>
               </h4>
               <div class="echart-pie" :id="chartId"></div>
             </div>
@@ -31,7 +31,12 @@
       </dd>
     </div>
     <ul v-if="hasChild" class="layers">
-      <board-map-item v-for="(item, index) in itemInfo.children" :key="index" :itemInfo="item" class="item"></board-map-item>
+      <board-map-item
+        v-for="(item, index) in itemInfo.children"
+        :key="index"
+        :itemInfo="item"
+        class="item"
+      ></board-map-item>
     </ul>
   </div>
 </template>
@@ -49,9 +54,9 @@ export default {
   },
 
   computed: {
-     hasChild() {
-       return this.itemInfo.children && this.itemInfo.children.length
-     }
+    hasChild() {
+      return this.itemInfo.children && this.itemInfo.children.length;
+    }
   },
 
   props: {
@@ -120,15 +125,13 @@ export default {
 };
 </script>
 <style lang="scss">
-
 /*========= okr地图 ==========*/
 .layers {
-  display: flex;
-  justify-content: center;
-   .item {
-    //  float: left;
-    
-   }
+  display: table;
+  .item {
+    display: table-cell;
+    vertical-align: top;
+  }
 }
 .text-primary {
   color: #4c84ff !important;
@@ -148,5 +151,74 @@ export default {
   height: 60px;
   display: inline-block;
   margin-top: -10px;
+}
+
+/* 画线*/
+
+//去掉顶级父节点的线
+.tree-map>ul>div>.maps-layered {
+  &::after {
+    border: none;
+  }
+  &::before {
+    border: none;
+  }
+}
+
+.maps-layered {
+  position: relative;
+  padding-top: 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+    height: 20px;
+    border-right: 1px solid #ddd;
+    border-top: solid 1px #ddd;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 50%;
+    border-top: 1px solid #ddd;
+    top: 0;
+  }
+}
+
+.item:last-child {
+  >.maps-layered::after {
+    border-top: none;
+  }
+}
+.item:first-child {
+   >.maps-layered::before {
+    border-top: none;
+  }
+}
+
+.layers {
+  position: relative;
+
+  > .item::before,
+  > .item::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 30px;
+    // border-bottom: 1px solid #ddd;
+  }
+
+  > .item::after {
+    left: 50%;
+    border-left: 1px solid #ddd;
+  }
+
 }
 </style>

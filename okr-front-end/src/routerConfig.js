@@ -21,6 +21,8 @@ import TeamOKR from './pages/TeamOKR'
 //okr map
 import BoardMap from './pages/OkrMap/BoardMap'
 
+import Tree from './pages/Tree'
+
 
 // ice 会自动在这个变量下添加路由数据
 // 请不要修改名称
@@ -36,6 +38,11 @@ import BoardMap from './pages/OkrMap/BoardMap'
 // 如果不指定 meta.name 的话，name 字段会使用和上面路由 name 一样的取值逻辑
 // 下面两个页面就是对比 你可以分别观察两个页面上显示的路由数据差异
 const routerConfig = [{
+        path: '/Tree',
+        name: 'Tree',
+        layout: Blank,
+        component: Tree
+    }, {
         path: '/BoardMap',
         name: 'BoardMap',
         layout: Blank,

@@ -119,7 +119,6 @@
           <el-table-column
             prop="duration"
             label="耗费工时（h）"
-            width="150"
             width="100"
             align="center"
           >
