@@ -2,19 +2,27 @@
   <div>
     <div class="maps-layered">
       <dd class="maps-fc-list active">
-        <i class="child-node-num" v-if="!itemInfo.showContent">{{ itemInfo.objectives.length || 0 }}</i>
+        <i
+          class="child-node-num"
+          v-if="!itemInfo.showContent&&itemInfo.keys.length"
+        >{{ itemInfo.keys.length }}</i>
         <div class="fc-view">
           <div class="fc-view-con clearfix">
             <i class="fc-view-tip">{{ itemInfo.layer }}</i>
             <div class="fc-view-text">
               <h4 class="title">
-                <p>{{ itemInfo.label }}</p>
+                <p>{{ itemInfo.orgName }}</p>
               </h4>
-              <div class="echart-pie" :id="chartId"></div>
+              <div v-show="itemInfo.progress" class="echart-pie" :id="chartId"></div>
+              <i class="progress">{{itemInfo.progress}}</i>
             </div>
           </div>
+          <div class="fc-view-object" v-if="itemInfo.objective">
+            <i class="fc-view-tip">目标</i>
+            <div class="title">{{ itemInfo.objective }}</div>
+          </div>
           <div class="fc-view-foot">
-            <strong class="txt-all text-primary" @click="toggleContent">
+            <strong class="txt-all text-primary" @click="toggleContent" v-if="itemInfo.keys.length">
               <span>{{ itemInfo.showContent ? '查看具体目标': '收起'}}</span>
               <img
                 :class="{active: itemInfo.showContent}"
@@ -24,8 +32,8 @@
               >
             </strong>
           </div>
-          <div class="fc-view-cb" v-if="itemInfo.showContent">
-            <p v-for="item in itemInfo.objectives" :key="item.key">{{ item.content }}</p>
+          <div class="fc-view-cb" v-if="itemInfo.showContent&&itemInfo.keys.length">
+            <p v-for="item in itemInfo.keys" :key="item.key">{{ item.content }}</p>
           </div>
         </div>
       </dd>
@@ -79,13 +87,15 @@ export default {
       }
 
       let colors = ["#F57677", "#DEDEDE"];
+      let complete = parseInt(this.itemInfo.progress);
+      let inProgress = 100 - parseInt(this.itemInfo.progress);
 
       //绘制图表
       this.itemInfo.pieChart.setOption({
         color: colors,
         tooltip: {
           trigger: "item",
-          formatter: "{a} <br/>{b}: {c} ({d}%)"
+          formatter: "{b}: {c} ({d}%)"
         },
 
         series: [
@@ -94,9 +104,8 @@ export default {
             radius: ["50%", "70%"],
             label: {
               normal: {
-                show: true,
+                show: false,
                 position: "center",
-                formatter: "{d}%",
                 textStyle: {
                   fontFamily: "微软雅黑",
                   fontWeight: "normal",
@@ -105,16 +114,12 @@ export default {
                 }
               }
             },
-
-            data: [{ value: 32, name: "待完成" }, { value: 68, name: "已完成" }]
+            data: [
+              { value: inProgress, name: "待完成" },
+              { value: complete, name: "已完成" }
+            ]
           }
-        ],
-        avoidLabelOverlap: false,
-        labelLine: {
-          normal: {
-            show: false
-          }
-        }
+        ]
       });
     }
   },
@@ -146,6 +151,13 @@ export default {
   }
 }
 
+.progress {
+  position: absolute;
+  right: 22px;
+  top: 26px;
+  font-size: 12px;
+}
+
 .echart-pie {
   width: 60px;
   height: 60px;
@@ -153,15 +165,39 @@ export default {
   margin-top: -10px;
 }
 
+.fc-view-object {
+  display: table;
+  margin-bottom: 12px;
+  margin-top: -18px;
+  .fc-view-tip {
+    float: none;
+    display: table-cell;
+  }
+  .title {
+    display: table-cell;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 14px;
+  }
+}
+
 /* 画线*/
 
 //去掉顶级父节点的线
-.tree-map>ul>div>.maps-layered {
+.tree-map > ul > div > .maps-layered {
   &::after {
     border: none;
   }
   &::before {
     border: none;
+  }
+
+  .fc-view-text {
+    position: relative;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: 0;
   }
 }
 
@@ -191,12 +227,12 @@ export default {
 }
 
 .item:last-child {
-  >.maps-layered::after {
+  > .maps-layered::after {
     border-top: none;
   }
 }
 .item:first-child {
-   >.maps-layered::before {
+  > .maps-layered::before {
     border-top: none;
   }
 }
@@ -219,6 +255,5 @@ export default {
     left: 50%;
     border-left: 1px solid #ddd;
   }
-
 }
 </style>

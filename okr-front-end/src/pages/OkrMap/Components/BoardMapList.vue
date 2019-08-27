@@ -26,6 +26,7 @@ export default {
    .tree-map {
        ul {
            padding-left: 0;
+           width: 100%;
        }
    }
 </style>
