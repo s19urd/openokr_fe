@@ -14,7 +14,7 @@
                 <p>{{ itemInfo.orgName }}</p>
               </h4>
               <div v-show="itemInfo.progress" class="echart-pie" :id="chartId"></div>
-              <i class="progress">{{itemInfo.progress}}</i>
+              <i class="progress" v-if="itemInfo.progress">{{itemInfo.progress}}%</i>
             </div>
           </div>
           <div class="fc-view-object" v-if="itemInfo.objective">
@@ -32,9 +32,11 @@
               >
             </strong>
           </div>
-          <div class="fc-view-cb" v-if="itemInfo.showContent&&itemInfo.keys.length">
-            <p v-for="item in itemInfo.keys" :key="item.key">{{ item.content }}</p>
-          </div>
+          <transition  name="slide-fade">
+            <div class="fc-view-cb" v-if="itemInfo.showContent&&itemInfo.keys.length">
+              <p v-for="item in itemInfo.keys" :key="item.key">{{ item.content }}</p>
+            </div>
+          </transition>
         </div>
       </dd>
     </div>
@@ -153,9 +155,10 @@ export default {
 
 .progress {
   position: absolute;
-  right: 22px;
+  right: 26px;
   top: 26px;
   font-size: 12px;
+  width: 20px;
 }
 
 .echart-pie {
@@ -185,6 +188,10 @@ export default {
 
 //去掉顶级父节点的线
 .tree-map > ul > div > .maps-layered {
+  position: relative;
+  left: 50%;
+  transform: translateX(32%);
+
   &::after {
     border: none;
   }

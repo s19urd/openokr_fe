@@ -3,6 +3,7 @@ import Vue from 'vue'
 import ElementUI from 'element-ui'
 //import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/style/theme-element/style.scss'
+import '@/assets/style/animate/vue-transition.scss'
 import '@/assets/svg-icons'
 //org-tree
 import '@/assets/style/org-tree.scss';

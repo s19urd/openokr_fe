@@ -1,6 +1,11 @@
 <template>
-  <div class="tree" :style="{width: viewWidth + 'px'}">
-    <board-map-list :data="data"></board-map-list>
+  <div class="treeContainer">
+    <transition name="fade">
+      <div v-if="!loading" class="tree" :style="{width: viewWidth + 'px'}">
+        <board-map-list :data="data"></board-map-list>
+      </div>
+      <p v-if="loading" class="loading">正在加载中...</p>
+    </transition>
   </div>
 </template>
 <script>
@@ -182,7 +187,7 @@ var testData = [
               { key: "3", content: "新客户签约成功率达到60%以上" }
             ]
           },
-           {
+          {
             id: 12,
             layer: "公司",
             orgName: "厦门商集目标12",
@@ -194,7 +199,7 @@ var testData = [
               { key: "2", content: "销售线索增加100%..." },
               { key: "3", content: "新客户签约成功率达到60%以上" }
             ]
-          },
+          }
         ]
       },
       {
@@ -251,14 +256,15 @@ export default {
       data: testData,
       maxLayerItems: 0,
       flag: false,
-      viewWidth: 0
+      viewWidth: 0,
+      loading: true
     };
   },
 
   methods: {
     getMax() {
       function getJSONWidth(jsonObj) {
-        if (jsonObj === undefined) {
+        if (!jsonObj) {
           return 0;
         } else {
           var width = 0;
@@ -290,30 +296,21 @@ export default {
           : window.screen.width;
     },
 
-    calcPoints() {
-      let xscrollLeft = document.querySelector(".d2-theme-container-main-body").scrollLeft;
-      // let firstPoint = document.querySelector('.maps-fc-list.active').getBoundingClientRect().x
-      // let result = firstPoint + xscrollLeft + 200
-      // console.log(result)
-      let pointArr = [];
-
-      let allItems = document.querySelectorAll(".maps-fc-list.active");
-      console.log(allItems);
-      allItems.forEach((item, index) => {
-        pointArr.push({
-          index: index,
-          width: item.getBoundingClientRect().x + xscrollLeft + 200
-        });
+    getOkrMapData() {
+      let timeSessionId = "3";
+      this.$api.okr.map.getOkrMap(timeSessionId).then(res => {
+        if (res.success) {
+          this.data = res.data;
+          this.loading = false;
+          console.log(this.data);
+          this.calcViewWidth();
+        }
       });
-      console.log(pointArr);
     }
   },
 
   mounted() {
-    this.calcViewWidth();
-    setTimeout(() => {
-      this.calcPoints();
-    }, 0);
+    this.getOkrMapData();
   }
 };
 </script>
@@ -322,7 +319,14 @@ export default {
 .tree {
   overflow: auto;
   height: 100%;
-  // display: table-row-group;
+}
+.treeContainer {
+  .loading {
+    margin: 300px auto;
+    text-align: center;
+    font-size: 24px;
+  }
 }
 </style>
+
 
