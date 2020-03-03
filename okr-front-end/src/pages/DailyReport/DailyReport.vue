@@ -198,6 +198,7 @@
 <script>
   import Vue from 'vue'
   import listMixin from "@/mixins/list.mixin";
+  import trackEvent from '@/libs/ga'
   export default {
     inject:['reload'],
     name: 'DailyReport',
@@ -246,9 +247,11 @@
         let startMondayTime = nowTime - (nowDay - 1) * oneDayTime//周一
         let endSundayTime = nowTime + (7 - nowDay) * oneDayTime//周日
         //新增时间下拉禁用
-        let addStartTime = nowTime  - (nowDay +7) * oneDayTime
+        //let addStartTime = nowTime  - (nowDay +7) * oneDayTime
+        let addStartTime= now.setMonth(now.getMonth()-2)
         //删除时间下拉禁用
         let editStartTime = nowTime  - (nowDay -0) * oneDayTime
+        console.log("addStartTime："+Vue.filter('dateFormat')(addStartTime, 'yyyy-MM-dd'))
         result.push(startMondayTime, endSundayTime,addStartTime,editStartTime)
         return result
       },
@@ -306,7 +309,8 @@
       add () {
         let taskItem = Object.assign({}, this.initItemData)
         taskItem.index= this.tableData.length;
-        this.tableData.push(taskItem)
+        this.tableData.push(taskItem);
+        trackEvent('dailyReport', 'addWork', 'ADD')
       },
       //验证formData
       validate () {
@@ -426,6 +430,7 @@
         window.open(routeData.href, '_blank');
       },
       toMyTasks(){
+        _paq.push(['trackEvent', 'Menu', 'toMyRePort']);
         let routeData = this.$router.resolve({ path: '/CreateTask.vhtml' });
         window.open(routeData.href, '_blank');
       },
@@ -436,6 +441,7 @@
       },
       // 全部报工-团队成员
       openTeamDialog() {
+        _paq.push(['trackEvent', 'Menu', 'AllWorkReport']);
         this.$router.push({ name : 'AllReportMembers' })
         this.reload()
       },

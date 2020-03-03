@@ -1,17 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>okr-app</title>
-  </head>
-  <body>
+    <!-- Matomo -->
+    <script type="text/javascript">
+        var _paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+        _paq.push(["setCookieDomain", "*.test.okr.onlyou.com"]);
+        _paq.push(["setDomains", ["*.test.okr.onlyou.com"]]);
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u = "//172.16.11.175:10086/";
+            _paq.push(['setTrackerUrl', u + 'matomo.php']);
+            _paq.push(['setSiteId', '2']);
+            var d = document,
+                g = d.createElement('script'),
+                s = d.getElementsByTagName('script')[0];
+            g.type = 'text/javascript';
+            g.async = true;
+            g.defer = true;
+            g.src = u + 'matomo.js';
+            s.parentNode.insertBefore(g, s);
+        })();
+    </script>
     <noscript>
-      <strong>We're sorry but okr-app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
+    <p><img src="//172.16.11.175:10086/matomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p>
+  </noscript>
+    <!-- End Matomo Code -->
+</head>
+
+<body>
+    <noscript>
+    <strong>We're sorry but okr-app doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
+  </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-  </body>
+</body>
+
 </html>
